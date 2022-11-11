@@ -1,4 +1,10 @@
-#VRML_SIM R2022a utf8
+#VRML_SIM R2022b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/devices/hokuyo/protos/HokuyoUtm30lx.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/robots/nvidia/jetbot/protos/JetBotRaspberryPiCamera.proto"
+
 WorldInfo {
   coordinateSystem "NUE"
   contactProperties [
@@ -7,8 +13,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.9013051651492808 -0.006143412073050965 -0.4331411522394614 1.5669957544622584
-  position -3.2133330730450793 0.6932567455198573 -0.5200990530870436
+  orientation 0.9280142662464277 -0.09032594672221299 0.36142875507053984 4.708032810305919
+  position -4.868258899481296 2.1541621723579834 -1.0000633712427571
 }
 TexturedBackground {
   texture "stadium"
@@ -1147,7 +1153,7 @@ Solid {
   name "model_arena_demo_flat.obj"
   boundingObject Mesh {
     url [
-      "../../blender/model_arena_demo_flat.obj"
+      "model_arena_demo_flat.obj"
     ]
   }
 }
@@ -1156,22 +1162,41 @@ Robot {
   rotation 1 0 0 -1.5707953071795862
   children [
     Transform {
-      translation -0.33 -0.01 0
+      translation 0 0 0.09
       children [
         Shape {
           appearance PBRAppearance {
-            baseColor 0 0 0
+            baseColor 1 0.2 0.2
+            metalness 0
           }
           geometry Box {
-            size 0.1 0.1 0.05
+            size 0.6 0.4 0.05
           }
         }
       ]
     }
-    HokuyoUtm30lx {
-      translation -0.33 0.110001 0.08
+    JetBotRaspberryPiCamera {
+      translation -0.3 2.65359e-08 0.2
       rotation 0 0 1 3.14159
-      name "laser"
+      name "camera(3)"
+    }
+    JetBotRaspberryPiCamera {
+      translation 0.0200008 -0.19 0.21
+      rotation 0 0 1 -1.5707953071795862
+      name "camera(2)"
+    }
+    JetBotRaspberryPiCamera {
+      translation 0.02 0.21 0.21
+      rotation 0 0 1 1.5708
+      name "camera(1)"
+    }
+    JetBotRaspberryPiCamera {
+      translation 0.3 0 0.21
+    }
+    HokuyoUtm30lx {
+      translation 0.27 -2e-07 0.17
+      rotation 0 0 1 3.14159
+      name "laser(1)"
     }
     Track {
       translation 0 -0.23 0
@@ -1430,15 +1455,6 @@ Robot {
         }
       }
       geometriesCount 36
-    }
-    Shape {
-      appearance PBRAppearance {
-        baseColor 1 0.2 0.2
-        metalness 0
-      }
-      geometry Box {
-        size 0.6 0.4 0.05
-      }
     }
   ]
   name "david"

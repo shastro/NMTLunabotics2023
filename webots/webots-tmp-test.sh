@@ -10,6 +10,7 @@ sudo docker run \
      -e DISPLAY \
      -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
      -v /dev/dri:/dev/dri:rw \
-     -v $PWD/worlds:/webots \
+     -v $PWD/worlds:/webots_worlds \
      cyberbotics/webots \
-     webots
+     webots \
+     /webots_worlds/lunabotics_TEST_FLAT.wbt
