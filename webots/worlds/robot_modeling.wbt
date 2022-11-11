@@ -1,0 +1,540 @@
+#VRML_SIM R2022a utf8
+WorldInfo {
+  contactProperties [
+    ContactProperties {
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.0015830955143624928 -0.033907903357728184 0.9994237078929412 1.6954903962803063
+  position -1.5579617027605837 -0.9793521478857217 0.10672171121787409
+}
+Solid {
+  children [
+    Shape {
+      appearance PBRAppearance {
+      }
+      geometry DEF BOX Box {
+        size 6.9 2.5 0.05
+      }
+    }
+  ]
+  boundingObject USE BOX
+}
+Robot {
+  translation -1.83 0.15 0.15
+  rotation 1 0 0 1.01503e-06
+  children [
+    HokuyoUtm30lx {
+      translation 0 0 0.07
+      rotation 0 0 1 3.14159
+    }
+    Track {
+      translation 0 -0.23 0
+      children [
+        TrackWheel {
+          position -0.28 -0.01
+          radius 0.035
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.035
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position -0.23 0.07
+          radius 0.035
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.035
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position 0.27 -0.04
+          radius 0.025
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position 0.08 -0.1
+          radius 0.025
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position 0 -0.1
+          radius 0.025
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position -0.08 -0.1
+          radius 0.025
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position -0.16 -0.1
+          radius 0.025
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            }
+          ]
+        }
+      ]
+      name "left_track"
+      boundingObject Group {
+        children [
+          Transform {
+            translation -0.23 -7.13734e-08 0.07
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.035
+              }
+            ]
+          }
+          Transform {
+            translation -0.28 1.01961e-08 -0.01
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.035
+              }
+            ]
+          }
+          Transform {
+            translation -0.06 0 0
+            rotation 1 0 0 -1.5707953071795862
+          }
+          Transform {
+            translation -0.16 1.01962e-07 -0.1
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            ]
+          }
+          Transform {
+            translation -0.12 7.13734e-08 -0.075
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.05
+              }
+            ]
+          }
+          Transform {
+            translation -0.02 7.13734e-08 -0.075
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.05
+              }
+            ]
+          }
+          Transform {
+            translation 0.05 7.13734e-08 -0.075
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.05
+              }
+            ]
+          }
+          Transform {
+            translation 0.08 1.22354e-07 -0.1
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            ]
+          }
+          Transform {
+            translation 0.27 4.07848e-08 -0.04
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            ]
+          }
+          Transform {
+            translation 0.180402 0 -0.068
+            rotation 0 1 0 -0.3
+            children [
+              Box {
+                size 0.2 0.05 0.05
+              }
+            ]
+          }
+          Transform {
+            translation -0.228044 0 -0.0566729
+            rotation 0 1 0 0.58
+            children [
+              Box {
+                size 0.16 0.05 0.05
+              }
+            ]
+          }
+        ]
+      }
+      physics Physics {
+      }
+      device [
+        LinearMotor {
+          name "left_motor"
+        }
+      ]
+      animatedGeometry Shape {
+        appearance PBRAppearance {
+          metalness 0
+        }
+        geometry Cylinder {
+          height 0.07
+          radius 0.004
+        }
+      }
+      geometriesCount 93
+    }
+    Track {
+      translation 0 0.23 0
+      children [
+        TrackWheel {
+          position -0.28 -0.01
+          radius 0.035
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.035
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position 0.27 0.05
+          radius 0.025
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position 0.27 -0.04
+          radius 0.035
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.035
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position 0.08 -0.1
+          radius 0.025
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position 0 -0.1
+          radius 0.025
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position -0.08 -0.1
+          radius 0.025
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position -0.16 -0.1
+          radius 0.025
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 1 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            }
+          ]
+        }
+      ]
+      name "right_track"
+      boundingObject Group {
+        children [
+          Transform {
+            translation 0.27 4.07847e-08 -0.04
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.035
+              }
+            ]
+          }
+          Transform {
+            translation -0.28 1.01961e-08 -0.01
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.035
+              }
+            ]
+          }
+          Transform {
+            translation -0.06 0 0
+            rotation 1 0 0 -1.5707953071795862
+          }
+          Transform {
+            translation -0.16 1.01962e-07 -0.1
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            ]
+          }
+          Transform {
+            translation -0.12 7.13734e-08 -0.075
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.05
+              }
+            ]
+          }
+          Transform {
+            translation -0.02 7.13734e-08 -0.075
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.05
+              }
+            ]
+          }
+          Transform {
+            translation 0.05 7.13734e-08 -0.075
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.05
+              }
+            ]
+          }
+          Transform {
+            translation 0.08 1.22354e-07 -0.1
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            ]
+          }
+          Transform {
+            translation 0.27 -5.09808e-08 0.05
+            rotation 1 0 0 -1.5707953071795862
+            children [
+              Cylinder {
+                height 0.05
+                radius 0.025
+              }
+            ]
+          }
+          Transform {
+            translation 0.180402 0 -0.068
+            rotation 0 1 0 -0.3
+            children [
+              Box {
+                size 0.2 0.05 0.05
+              }
+            ]
+          }
+          Transform {
+            translation -0.228044 0 -0.0566729
+            rotation 0 1 0 0.58
+            children [
+              Box {
+                size 0.16 0.05 0.05
+              }
+            ]
+          }
+        ]
+      }
+      physics Physics {
+      }
+      device [
+        LinearMotor {
+          name "right_motor"
+        }
+      ]
+      animatedGeometry Shape {
+        appearance PBRAppearance {
+          metalness 0
+        }
+        geometry Cylinder {
+          height 0.07
+          radius 0.004
+        }
+      }
+      geometriesCount 93
+    }
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.2 0.2
+        metalness 0
+      }
+      geometry Box {
+        size 0.6 0.4 0.05
+      }
+    }
+  ]
+  name "david"
+  boundingObject Box {
+    size 0.6 0.4 0.05
+  }
+  physics Physics {
+  }
+  controller "ros"
+  controllerArgs [
+    "--clock"
+    "--auto-publish"
+    "--use-sim-time"
+    "--name=david_sim"
+  ]
+}
+TexturedBackground {
+  texture "dusk"
+}

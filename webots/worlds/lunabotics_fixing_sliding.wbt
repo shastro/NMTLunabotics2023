@@ -1,0 +1,228 @@
+#VRML_SIM R2022a utf8
+WorldInfo {
+  coordinateSystem "NUE"
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        100
+      ]
+      rollingFriction 100 100 100
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.1296798606263152 -0.7293144364429981 -0.671776440896651 2.3523961765101444
+  position -0.03190863933980295 1.285840304003397 -1.379384639957569
+  follow "david"
+  followType "None"
+}
+TexturedBackground {
+  texture "stadium"
+}
+TexturedBackgroundLight {
+}
+Robot {
+  translation -2.35 0.22 0.0800001
+  rotation 0 -1 0 -1.5707953071795862
+  children [
+    Track {
+      translation 0.29 0 0
+      rotation 0 0 1 1.5707963268
+      children [
+        Group {
+          children [
+            Shape {
+              appearance Appearance {
+                material Material {
+                  diffuseColor 1 0.3 0
+                }
+              }
+              geometry Box {
+                size 0.1 0.08 0.9
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position 0 -0.45
+          children [
+            Shape {
+              appearance PBRAppearance {
+              }
+              geometry Box {
+                size 0.08 0.1 0.1
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position 0 0.45
+          children [
+            Shape {
+              appearance PBRAppearance {
+              }
+              geometry Box {
+                size 0.08 0.1 0.1
+              }
+            }
+          ]
+        }
+      ]
+      name "left_track"
+      boundingObject Group {
+        children [
+          Transform {
+            translation 2.24549e-12 0 -0.45
+            rotation 1 0 0 1.5707963268
+            children [
+              Cylinder {
+                height 0.08
+                radius 0.05
+              }
+            ]
+          }
+          Transform {
+            translation 2.24549e-12 0 0.45
+            rotation 1 0 0 1.5707963268
+            children [
+              Cylinder {
+                height 0.08
+                radius 0.05
+              }
+            ]
+          }
+          Box {
+            size 0.1 0.08 0.9
+          }
+        ]
+      }
+      physics Physics {
+      }
+      device [
+        LinearMotor {
+          name "left_motor"
+        }
+      ]
+    }
+    Track {
+      translation -0.29 0 0
+      rotation 0 0 1 1.5707963268
+      children [
+        Group {
+          children [
+            Shape {
+              appearance Appearance {
+                material Material {
+                  diffuseColor 1 0.3 0
+                }
+              }
+              geometry Box {
+                size 0.1 0.08 0.9
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position 0 0.45
+          children [
+            Shape {
+              appearance PBRAppearance {
+              }
+              geometry Box {
+                size 0.08 0.1 0.1
+              }
+            }
+          ]
+        }
+        TrackWheel {
+          position 0 -0.45
+          children [
+            Shape {
+              appearance PBRAppearance {
+              }
+              geometry Box {
+                size 0.08 0.1 0.1
+              }
+            }
+          ]
+        }
+      ]
+      name "right_track"
+      boundingObject Group {
+        children [
+          Transform {
+            translation 2.24549e-12 0 -0.45
+            rotation 1 0 0 1.5707963268
+            children [
+              Cylinder {
+                height 0.08
+                radius 0.05
+              }
+            ]
+          }
+          Transform {
+            translation 2.24549e-12 0 0.45
+            rotation 1 0 0 1.5707963268
+            children [
+              Cylinder {
+                height 0.08
+                radius 0.05
+              }
+            ]
+          }
+          Box {
+            size 0.1 0.08 0.9
+          }
+        ]
+      }
+      physics Physics {
+      }
+      device [
+        LinearMotor {
+          name "right_motor"
+        }
+      ]
+    }
+    HokuyoUrg04lx {
+      translation 0 0.13 -2.03924e-08
+      rotation -0.577349935856137 0.577349935856137 0.5773509358560258 2.09439
+    }
+    DEF BODY Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 0
+        roughness 0.2
+        metalness 0
+      }
+      geometry Box {
+        size 0.5 0.06 1
+      }
+    }
+  ]
+  name "david"
+  boundingObject USE BODY
+  physics Physics {
+  }
+  controller "ros"
+  controllerArgs [
+    "--name=david_sim"
+    "--use-sim-time"
+    "--auto-publish"
+    "--clock"
+  ]
+}
+Solid {
+  children [
+    Shape {
+      geometry Box {
+        size 10 0.1 10
+      }
+    }
+  ]
+  boundingObject Shape {
+    appearance Appearance {
+    }
+    geometry Box {
+      size 10 0.1 10
+    }
+  }
+}
