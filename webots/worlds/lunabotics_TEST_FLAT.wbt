@@ -13,8 +13,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.9280142662464277 -0.09032594672221299 0.36142875507053984 4.708032810305919
-  position -4.868258899481296 2.1541621723579834 -1.0000633712427571
+  orientation -0.0911696482584555 -0.5679623664383703 -0.8179895143253096 2.0606830432928955
+  position -1.281760691220604 0.8992090419075435 -1.1502830788510494
 }
 TexturedBackground {
   texture "stadium"
@@ -1161,6 +1161,36 @@ Robot {
   translation -1.77 0.15 -0.11
   rotation 1 0 0 -1.5707953071795862
   children [
+    Transform {
+      translation 0 -0.1 0.11
+      rotation 1 0 0 1.5708
+      scale 4.5 4.5 0.5
+      children [
+        Shape {
+          appearance PBRAppearance {
+          }
+          geometry Cylinder {
+            height 0.1
+            radius 0.05
+          }
+        }
+      ]
+    }
+    Transform {
+      translation 0 0.1 0.11
+      rotation 1 0 0 1.5708
+      scale 4.5 4.5 0.5
+      children [
+        Shape {
+          appearance PBRAppearance {
+          }
+          geometry Cylinder {
+            height 0.1
+            radius 0.05
+          }
+        }
+      ]
+    }
     Transform {
       translation 0 0 0.09
       children [
