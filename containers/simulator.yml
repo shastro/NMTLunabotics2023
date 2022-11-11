@@ -1,1 +1,17 @@
 # Docker compose file for running the simulator on a dev machine.
+
+services:
+  webots:
+    image: cyberbotics/webots
+    environment:
+      DISPLAY: ":0"
+    command: webots /webots_worlds/lunabotics_TEST_FLAT.wbt
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev/dri:/dev/dri:rw
+      - ../webots/worlds:/webots_worlds
+    networks:
+      - rosnet
+
+networks:
+  rosnet: {}
