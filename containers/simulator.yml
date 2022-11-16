@@ -1,17 +1,19 @@
 # Docker compose file for running the simulator on a dev machine.
 
 services:
+  ros:
+    build: ../ros
+    command: roscore
+    volumes:
+      - ../ros:/lunabotics/ros
   webots:
-    image: cyberbotics/webots
+    build: ../webots/docker
     environment:
       DISPLAY: ":0"
+      ROS_MASTER_URI: "http://ros:11311"
+    # command:  /bin/sh -c "echo fuck"
     command: webots /webots_worlds/lunabotics_TEST_FLAT.wbt
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /dev/dri:/dev/dri:rw
       - ../webots/worlds:/webots_worlds
-    networks:
-      - rosnet
-
-networks:
-  rosnet: {}
