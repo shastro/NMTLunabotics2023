@@ -11,9 +11,15 @@ services:
     environment:
       DISPLAY: ":0"
       ROS_MASTER_URI: "http://ros:11311"
-    # command:  /bin/sh -c "echo fuck"
-    command: webots /webots_worlds/lunabotics_TEST_FLAT.wbt
+    command: webots /webots_worlds/gridmap_testbed.wbt
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /dev/dri:/dev/dri:rw
       - ../webots/worlds:/webots_worlds
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
