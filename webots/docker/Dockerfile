@@ -32,6 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /lunabotics/ros/catkin_ws
+RUN mkdir /lunabotics/ros/catkin_ws/src
 
 COPY webots_entrypoint /webots_entrypoint
 ENTRYPOINT ["/webots_entrypoint"]
