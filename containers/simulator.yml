@@ -4,6 +4,9 @@ services:
   ros:
     build: ../ros
     command: roscore
+    environment:
+      ROS_IP: "172.23.0.2"
+      ROS_MASTER_URI: "http://172.23.0.2:11311"
     volumes:
       - ../ros:/lunabotics/ros
   webots:
@@ -23,3 +26,6 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+networks:
+  default:
+    name: "ros_docker_net"
