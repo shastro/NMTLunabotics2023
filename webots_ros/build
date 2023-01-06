@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-IFS=$'\n\t'
-
-cd $(dirname "$0")
-docker build . -t webots_ros
-yes | docker image prune || true

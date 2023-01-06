@@ -29,6 +29,7 @@ ENV ROS_DISTRO noetic
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-noetic-ros-core=1.5.0-1* \
     ros-noetic-controller-manager \
+    ros-noetic-webots-ros \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /lunabotics/ros/catkin_ws
