@@ -1,1 +1,15 @@
 # Docker compose file for running the actual robot.
+
+services:
+  ros:
+    hostname: ros
+    build: ../ros
+    command: roscore
+    environment:
+      ROS_MASTER_URI: "http://david:11311"
+    volumes:
+      - ../ros:/lunabotics/ros
+
+networks:
+  ros-docker-net:
+    name: "ros_docker_net"
