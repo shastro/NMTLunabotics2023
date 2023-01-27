@@ -8,10 +8,8 @@ IP=172.23.0.4
 
 docker run \
        --volume $PWD/../ros:/lunabotics/ros \
-       --net=containers_default \
-       --env="ROS_MASTER_URI=http://172.23.0.2:11311" \
-       --env="ROS_IP=$IP" \
-       --ip="$IP" \
+       --net=ros_docker_net \
+       --env="ROS_MASTER_URI=http://ros:11311" \
        -it \
        webots_ros \
        /bin/bash
