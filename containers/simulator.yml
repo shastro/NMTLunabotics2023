@@ -13,8 +13,8 @@ services:
     hostname: webots
     build: ../webots/docker
     environment:
-      DISPLAY: ":0"
-      ROS_MASTER_URI: "http://ros:11311"
+      - DISPLAY
+      - ROS_MASTER_URI="http://ros:11311"
     command: webots /webots_worlds/gridmap_testbed.wbt
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
