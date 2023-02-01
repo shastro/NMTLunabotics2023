@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>motor_bridge</name>
+  <version>0.1.0</version>
+  <description>
+    Interface from ROS to physical motors. Operates via a CAN bus when
+    compiling for hardware, and is a thin wrapper around Webots motors
+    when compiling for the simulator.
+  </description>
+
+  <maintainer email="alexander.bethel@student.nmt.edu">Alex Bethel</maintainer>
+
+  <license>GPLv3</license>
+
+  <depend>roscpp</depend>
+  <buildtool_depend>catkin</buildtool_depend>
+</package>
