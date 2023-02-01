@@ -17,6 +17,7 @@ sudo docker run \
          cd $PWD
          export HOME="$HOME"
          export PS1='\u@\h:\w\$ '
+         . $DIR/catkin_ws/devel/setup.sh
          bash
      "
 
