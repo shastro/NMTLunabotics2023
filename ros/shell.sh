@@ -4,7 +4,7 @@ IFS=$'\n\t'
 
 # Generates a shell inside the ROS container.
 
-DIR="$(dirname "$0")"
+DIR="$(realpath "$(dirname "$0")")"
 
 sudo docker build "$DIR" -t lunabotics-2023-ros
 sudo docker run \
@@ -15,5 +15,11 @@ sudo docker run \
      lunabotics-2023-ros \
      sh -c "
          cd $PWD
+         export HOME="$HOME"
+         export PS1='\u@\h:\w\$ '
          bash
      "
+
+# ROS might create files owned by root here; it'll cause all kinds of
+# problems with git.
+sudo chown -R "$(id -u):$(id -g)" "$DIR"
