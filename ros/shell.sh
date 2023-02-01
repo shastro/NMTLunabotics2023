@@ -4,9 +4,16 @@ IFS=$'\n\t'
 
 # Generates a shell inside the ROS container.
 
-sudo docker build . -t lunabotics-2023-ros
+DIR="$(dirname "$0")"
+
+sudo docker build "$DIR" -t lunabotics-2023-ros
 sudo docker run \
      --rm \
      -it \
-     -v $PWD/catkin_ws:/catkin_ws \
-     lunabotics-2023-ros
+     -v $DIR/catkin_ws:$DIR/catkin_ws \
+     -h "$(hostname)-ROS" \
+     lunabotics-2023-ros \
+     sh -c "
+         cd $PWD
+         bash
+     "
