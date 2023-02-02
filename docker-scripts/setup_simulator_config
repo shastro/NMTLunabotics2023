@@ -10,4 +10,7 @@ docker run \
        --env="ROS_MASTER_URI=http://ros:11311" \
        -it \
        webots_ros \
-       /bin/bash
+       sh -c "
+              rosservice call /david_sim/Velodyne_Puck/enable 32
+              rosservice call /david_sim/Velodyne_Puck/enable_point_cloud true
+             "
