@@ -13,6 +13,13 @@ refactor our use of Docker to be more consistent and simpler.
   | docker-scripts/start\under{}sim              | Y           | Y            | Starts simulator      | Y                |
   |---------------------------------------+-------------+--------------+-----------------------+------------------|
 
+  Scripts vary widely in terms of how they are implemented. In
+  particular, the Docker scripts that don't use Compose each use long
+  manual invocations, each of which as slight variations in its use.
+
+  Some scripts can be run independently, whereas other scripts require
+  that certain other scripts are currently running.
+
 * Dockerfiles
 
   |--------------------------+---------------------+---------------------------------------------------+-------------------------|
@@ -21,6 +28,9 @@ refactor our use of Docker to be more consistent and simpler.
   | ros/Dockerfile           | lunabotics-2023-ros | ROS, ROS nodes, ROS tools, dev tools              | simulator.yml, rviz.yml |
   | webots/docker/Dockerfile | webots\under{}ros          | Webots, ROS, Webots-ROS, ROS nodes, Webots config | simulator.yml           |
   |--------------------------+---------------------+---------------------------------------------------+-------------------------|
+
+  These dockerfiles contain a bit of repetition. Note that the Webots
+  dockerfile installs ROS on top of the docker.io Webots image.
 
 * Compose files
 
@@ -33,3 +43,16 @@ refactor our use of Docker to be more consistent and simpler.
   | simulator.yml | Running simulator setup    | ROS, Webots |
   | telem.yml     | Running telemetry computer | -           |
   |---------------+----------------------------+-------------|
+
+  I like us having different compose files for different roles of
+  computers. Don't like the fact that some compose files depend on
+  others: rviz.yml depends on simulator.yml or potentially one of the
+  other ones running.
+
+  rviz.yml could possibly be almost completely auto-generated. The
+  only distinctive features of rviz.yml are:
+  * Requires the built `ros` image.
+  * Calls the program `rviz`.
+  * Connects to `ros-docker-net`.
+  And other than that, it's used as a program that's invoked once
+  rather than as a daemon that runs in the background.
