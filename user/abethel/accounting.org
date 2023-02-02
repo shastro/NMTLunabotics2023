@@ -56,3 +56,12 @@ refactor our use of Docker to be more consistent and simpler.
   * Connects to `ros-docker-net`.
   And other than that, it's used as a program that's invoked once
   rather than as a daemon that runs in the background.
+
+  Some computers need slightly different setups to get Docker working:
+  specifically my computer and some Ubuntu computers I've used aren't
+  compatible with the `services.<name>.deploy` option, because their
+  GPUs don't work well with Docker. We should have a capability for
+  machine-specific configuration that can declare whether to include
+  this string in every file. Also, my machine doesn't have xhost
+  installed; could just install xhost via Nix, or could have another
+  config option for it.
