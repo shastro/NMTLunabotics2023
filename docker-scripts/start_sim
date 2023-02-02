@@ -5,8 +5,4 @@ IFS=$'\n\t'
 xhost +local:root
 
 cd "$(dirname "$0")/../containers"
-if which docker-compose 2>/dev/null; then
-    sudo docker-compose -f simulator.yml up
-else
-    sudo docker compose -f simulator.yml up
-fi
+sudo docker compose -f simulator.yml up
