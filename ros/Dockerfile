@@ -10,4 +10,6 @@ RUN apt-get install -y \
     ros-noetic-move-base \
     ros-noetic-rviz \
     ros-noetic-rosmon \
-    ros-noetic-tf2-tools
+    ros-noetic-tf2-tools \
+    ros-noetic-robot-state-publisher \
+    ros-noetic-joint-state-publisher
