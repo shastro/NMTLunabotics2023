@@ -5,7 +5,7 @@ services:
     build: ../ros
     environment:
       - DISPLAY
-      - ROS_MASTER_URI="http://ros:11311"
+      - ROS_MASTER_URI=http://ros:11311
     command: rviz
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
