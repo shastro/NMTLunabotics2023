@@ -32,8 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-noetic-webots-ros \
     ros-noetic-tf2-tools \
     ros-noetic-robot-state-publisher \
-    ros-noetic-joint-state-publisher \
-    && rm -rf /var/lib/apt/lists/*
+    ros-noetic-joint-state-publisher
 
 WORKDIR /lunabotics/ros/catkin_ws
 RUN mkdir /lunabotics/ros/catkin_ws/src
