@@ -26,9 +26,7 @@ services:
       resources:
         reservations:
           devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+            - capabilities: [gpu]
 networks:
   ros-docker-net:
     name: "ros_docker_net"
