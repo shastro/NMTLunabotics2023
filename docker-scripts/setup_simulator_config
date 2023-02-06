@@ -13,4 +13,5 @@ docker run \
        sh -c "
               rosservice call /david_sim/Velodyne_Puck/enable 32
               rosservice call /david_sim/Velodyne_Puck/enable_point_cloud true
+              rosrun tf2_ros static_transform_publisher 0 0 0 0 0 0 /map /david_sim/Velodyne_Puck
              "
