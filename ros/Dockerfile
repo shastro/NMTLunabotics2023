@@ -13,3 +13,6 @@ RUN apt-get install -y \
     ros-noetic-tf2-tools \
     ros-noetic-robot-state-publisher \
     ros-noetic-joint-state-publisher
+
+
+# TODO: Add building catkin workspace to build step

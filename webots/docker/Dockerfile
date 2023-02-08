@@ -39,4 +39,5 @@ RUN mkdir /lunabotics/ros/catkin_ws/src
 
 COPY webots_entrypoint /webots_entrypoint
 COPY webots.conf /root/.config/Cyberbotics/Webots-R2022b.conf
+COPY test.urdf /lunabotics/test.urdf
 ENTRYPOINT ["/webots_entrypoint"]
