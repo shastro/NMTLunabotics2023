@@ -33,3 +33,6 @@
 # Backup files
 *~
 renders
+
+# Ros stuff
+ros/catkin_ws/devel/*
