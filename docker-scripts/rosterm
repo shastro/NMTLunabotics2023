@@ -4,7 +4,7 @@ IFS=$'\n\t'
 
 cd $(dirname "$0")
 
-docker run \
+sudo docker run \
        --volume $PWD/../ros:/lunabotics/ros \
        --net=ros_docker_net \
        --env="ROS_MASTER_URI=http://ros:11311" \
