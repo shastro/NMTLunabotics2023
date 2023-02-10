@@ -33,4 +33,5 @@
 # Backup files
 *~
 renders
-ros/devel/*
+ros/catkin_ws/devel/*
+ros/catkin_ws/build/*
