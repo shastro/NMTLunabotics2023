@@ -1,2 +1,2 @@
-#!/usr/bin/env zsh
-sed -e 's/zsh/bash/'
+#!/usr/bin/env bash
+sed 's/bash/bash/'

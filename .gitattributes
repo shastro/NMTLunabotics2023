@@ -1,0 +1,3 @@
+docker-scripts/* filter=munge-project-identifier
+scripts/* filter=munge-project-identifier
+ros/*.sh filter=munge-project-identifier
