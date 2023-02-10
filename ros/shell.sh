@@ -11,6 +11,9 @@ sudo docker run \
      --rm \
      -it \
      -v $DIR/catkin_ws:$DIR/catkin_ws \
+     -e DISPLAY \
+     -v /tmp/.X11-unix:/tmp/.X11-unix \
+     -v /dev/dri:/dev/dri \
      -h "$(hostname)-ROS" \
      lunabotics-2023-ros \
      sh -c "
