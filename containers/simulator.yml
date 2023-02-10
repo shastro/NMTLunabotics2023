@@ -22,11 +22,11 @@ services:
       - ../webots/worlds:/webots_worlds
     networks:
       - ros-docker-net
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: [gpu]
   rviz:
     hostname: rviz
     build: ../ros
@@ -39,13 +39,13 @@ services:
       - /dev/dri:/dev/dri:rw
     networks:
       - ros-docker-net
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
 networks:
   ros-docker-net:
     name: "ros_docker_net"
