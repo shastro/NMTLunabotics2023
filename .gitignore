@@ -33,3 +33,4 @@
 # Backup files
 *~
 renders
+ros/devel/*
