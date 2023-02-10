@@ -22,11 +22,11 @@ services:
       - ../webots/worlds:/webots_worlds
     networks:
       - ros-docker-net
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: [gpu]
 networks:
   ros-docker-net:
     name: "ros_docker_net"
