@@ -2,17 +2,20 @@
 
 #include <SPI.h>
 #include "mcp_can.h"
+#include <Servo.h>
 
 const int SPI_CS_PIN = 17;              // CANBed V1
 
 MCP_CAN CAN(SPI_CS_PIN);                // Set CS pin
 
+Servo my_servo;
 
-const int LED_PIN = 6;
+const int SERVO_PIN = 6;
 
 void setup()
 {
     Serial.begin(115200);
+    while(!Serial);
     while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
     {
         Serial.println("CAN BUS FAIL!");
@@ -20,7 +23,7 @@ void setup()
     }
     Serial.println("CAN BUS OK!");
 
-    pinMode(LED_PIN, OUTPUT);
+    my_servo.attach(SERVO_PIN, 900, 2100);
 }
 
 unsigned char len = 0;
@@ -47,10 +50,9 @@ void loop()
                 Serial.print("\t");
             }
             Serial.println();
-            Serial.println(buf[0]);
+            my_servo.write(buf[0]);
         }
     }
-    analogWrite(LED_PIN, buf[0]);
 }
 
 /*********************************************************************************************************

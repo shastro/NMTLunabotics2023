@@ -13,6 +13,7 @@ MCP_CAN CAN(SPI_CS_PIN);                // Set CS pin
 void setup()
 {
     Serial.begin(115200);
+    while(!Serial);
     while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
     {
         Serial.println("CAN BUS FAIL!");
@@ -28,8 +29,9 @@ void loop()
     // send data:  id = 0x00, standard frame, data len = 8, stmp: data buf
 
     int id = 0x10;
-    
-    unsigned char sval = char(255*(0.5*(sin(t)+1)));
+
+    // Storing the servo angle in the first byte
+    unsigned char sval = char(180*(0.5*(sin(t)+1)));
     stmp[0] = sval;
 
     Serial.print("Sending data on ");
@@ -44,7 +46,7 @@ void loop()
 
     CAN.sendMsgBuf(id, 0, 8, stmp);
     delay(5);                       // send data per 100ms
-    t += 0.005;
+    t += 0.0025;
 }
 
 // END FILE
