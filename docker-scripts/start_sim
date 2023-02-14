@@ -5,4 +5,4 @@ IFS=$'\n\t'
 xhost +local:root
 
 cd "$(dirname "$0")/../containers"
-sudo docker compose -f simulator.yml up
+sudo docker compose -f simulator.yml up --build
