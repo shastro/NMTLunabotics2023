@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+# Avoid a race condition when starting the Realsense node.
+
+sleep 1
+while true; do
+    roslaunch realsense2_camera rs_camera.launch
+done

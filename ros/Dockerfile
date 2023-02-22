@@ -12,7 +12,9 @@ RUN apt-get install -y \
     ros-noetic-rosmon \
     ros-noetic-tf2-tools \
     ros-noetic-robot-state-publisher \
-    ros-noetic-joint-state-publisher
+    ros-noetic-joint-state-publisher \
+    ros-noetic-realsense2-camera
 
+COPY scripts /scripts
 
 # TODO: Add building catkin workspace to build step
