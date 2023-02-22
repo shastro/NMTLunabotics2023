@@ -2,6 +2,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# Generates a shell inside the Webots container.
+
 cd $(dirname "$0")
 
 sudo docker build ../webots/docker -t webots_ros

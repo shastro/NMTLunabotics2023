@@ -4,13 +4,13 @@ IFS=$'\n\t'
 
 # Generates a shell inside the ROS container.
 
-DIR="$(realpath "$(dirname "$0")")"
+DIR="$(realpath "$(dirname "$0")")"/..
 
-sudo docker build "$DIR" -t lunabotics-2023-ros
+sudo docker build "$DIR/ros" -t lunabotics-2023-ros
 sudo docker run \
      --rm \
      -it \
-     -v $DIR/catkin_ws:$DIR/catkin_ws \
+     -v $DIR:$DIR \
      -e DISPLAY \
      -v /tmp/.X11-unix:/tmp/.X11-unix \
      -v /dev/dri:/dev/dri \
