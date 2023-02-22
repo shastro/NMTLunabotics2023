@@ -1,0 +1,19 @@
+#!/usr/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+# Generates a shell inside the Webots container.
+
+cd $(dirname "$0")
+
+sudo docker build ../webots/docker -t webots_ros
+sudo docker run \
+     --volume $PWD/../ros:/lunabotics/ros \
+     --net=ros_docker_net \
+     --env="ROS_MASTER_URI=http://ros:11311" \
+     -e DISPLAY \
+     -v /tmp/.X11-unix:/tmp/.X11-unix \
+     -v /dev/dri:/dev/dri \
+     -it \
+     webots_ros \
+     /bin/bash
