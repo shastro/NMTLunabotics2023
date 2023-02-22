@@ -13,7 +13,9 @@ RUN apt-get install -y \
     ros-noetic-tf2-tools \
     ros-noetic-robot-state-publisher \
     ros-noetic-joint-state-publisher \
-    ros-noetic-realsense2-camera
+    ros-noetic-realsense2-camera \
+    ros-noetic-ompl \
+    ros-noetic-grid-map-core
 
 COPY scripts /scripts
 
