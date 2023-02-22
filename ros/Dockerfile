@@ -22,4 +22,5 @@ RUN apt-get install -y \
 
 COPY scripts /scripts
 
+WORKDIR ../ros/catkin_ws/
 # TODO: Add building catkin workspace to build step

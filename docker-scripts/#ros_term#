@@ -22,7 +22,6 @@ sudo docker run \
          export PS1='\u@\h:\w\$ '
          [ -e $DIR/catkin_ws/devel/setup.sh ] && . $DIR/catkin_ws/devel/setup.sh
          bash
-         cd ../ros/catkin_ws/
      "
 
 # ROS might create files owned by root here; it'll cause all kinds of
