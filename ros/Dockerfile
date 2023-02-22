@@ -15,7 +15,10 @@ RUN apt-get install -y \
     ros-noetic-joint-state-publisher \
     ros-noetic-realsense2-camera \
     ros-noetic-ompl \
-    ros-noetic-grid-map-core
+    ros-noetic-grid-map-core \
+    ros-noetic-grid-map-ros \
+    ros-noetic-eigen-conversions \
+    ros-noetic-gazebo-ros
 
 COPY scripts /scripts
 
