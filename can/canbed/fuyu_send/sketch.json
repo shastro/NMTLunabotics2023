@@ -2,6 +2,6 @@
   "cpu": {
     "fqbn": "arduino:avr:leonardo",
     "name": "Longan Labs CANBed",
-    "port": "serial:///dev/ttyACM0"
+    "port": "serial:///dev/ttyACM1"
   }
 }
