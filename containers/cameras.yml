@@ -30,7 +30,7 @@ services:
       - ROS_MASTER_URI=http://ros:11311
     command: rviz
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /tmp:/tmp:rw
       - /dev/dri:/dev/dri:rw
     networks:
       - ros-docker-net
