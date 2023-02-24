@@ -11,6 +11,7 @@ services:
       - ros-docker-net
     ports:
       - "11311:11311"
+    restart: always
 
   cameras:
     hostname: cameras
@@ -25,6 +26,7 @@ services:
     device_cgroup_rules:
       - c 81:* rmw
       - c 189:* rmw
+    restart: always
 
 networks:
   ros-docker-net:
