@@ -1,5 +1,6 @@
 # Docker compose file for operating cameras.
-
+# If container fails with qt error try the following command
+# xhost +local:root
 services:
   ros:
     hostname: ros
