@@ -5,10 +5,26 @@ services:
     hostname: ros
     build: ../ros
     command: roscore
-    environment:
-      ROS_MASTER_URI: "http://david:11311"
     volumes:
       - ../ros:/lunabotics/ros
+    networks:
+      - ros-docker-net
+    ports:
+      - "11311:11311"
+
+  cameras:
+    hostname: cameras
+    build: ../ros
+    environment:
+      - ROS_MASTER_URI=http://ros:11311
+    command: /scripts/unfuck_realsense
+    volumes:
+      - /dev:/dev:rw
+    networks:
+      - ros-docker-net
+    device_cgroup_rules:
+      - c 81:* rmw
+      - c 189:* rmw
 
 networks:
   ros-docker-net:
