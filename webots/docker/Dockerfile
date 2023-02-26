@@ -32,10 +32,35 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-noetic-webots-ros \
     ros-noetic-tf2-tools \
     ros-noetic-robot-state-publisher \
-    ros-noetic-joint-state-publisher
+    ros-noetic-joint-state-publisher \
+    ros-noetic-grid-map \
+    ros-noetic-eigen-conversions 
+
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    libeigen3-dev \
+    python3-catkin-tools \
+    qt5-default \
+    libflann-dev \
+    python3-pcl \
+    pcl-tools \
+    ros-noetic-pcl-ros \
+    ros-noetic-tf-conversions
+
 
 WORKDIR /lunabotics/ros/catkin_ws
 RUN mkdir /lunabotics/ros/catkin_ws/src
+
+# Cloning packages
+WORKDIR /lunabotics/ros/catkin_ws/src
+RUN git clone https://github.com/ANYbotics/kindr.git
+RUN git clone https://github.com/ANYbotics/kindr_ros.git
+RUN git clone https://github.com/ANYbotics/message_logger.git
+RUN git clone https://github.com/ANYbotics/elevation_mapping.git
+WORKDIR /lunabotics/ros/catkin_ws
+RUN . /opt/ros/noetic/setup.sh && catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+RUN . /opt/ros/noetic/setup.sh && catkin build
 
 COPY webots_entrypoint /webots_entrypoint
 COPY webots.conf /root/.config/Cyberbotics/Webots-R2022b.conf
