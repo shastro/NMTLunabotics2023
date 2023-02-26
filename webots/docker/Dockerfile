@@ -49,6 +49,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-noetic-tf-conversions \
     ros-noetic-ompl
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-noetic-gazebo-ros \
+    ros-noetic-turtlebot3*
 
 WORKDIR /lunabotics/ros/catkin_ws
 RUN mkdir /lunabotics/ros/catkin_ws/src
