@@ -37,7 +37,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-noetic-webots-ros \
     ros-noetic-tf2-tools \
     ros-noetic-robot-state-publisher \
-    ros-noetic-joint-state-publisher
+    ros-noetic-joint-state-publisher \
+    ros-noetic-grid-map \
+    ros-noetic-eigen-conversions 
+
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    libeigen3-dev \
+    python3-catkin-tools \
+    qt5-default \
+    libflann-dev \
+    python3-pcl \
+    pcl-tools \
+    ros-noetic-pcl-ros \
+    ros-noetic-tf-conversions \
+    ros-noetic-ompl
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-noetic-gazebo-ros \
+    ros-noetic-turtlebot3*
 
 WORKDIR /lunabotics/ros/catkin_ws
 RUN mkdir /lunabotics/ros/catkin_ws/src

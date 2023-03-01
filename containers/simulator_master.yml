@@ -1,0 +1,14 @@
+# Docker compose file for running the simulator on a dev machine.
+
+services:
+  ros:
+    hostname: ros
+    build: ../ros
+    command: roscore
+    volumes:
+      - ../ros:/lunabotics/ros
+    networks:
+      - ros-docker-net
+networks:
+  ros-docker-net:
+    name: "ros_docker_net"

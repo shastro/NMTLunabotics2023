@@ -18,7 +18,8 @@ RUN apt-get install -y \
     ros-noetic-grid-map-core \
     ros-noetic-grid-map-ros \
     ros-noetic-eigen-conversions \
-    ros-noetic-gazebo-ros
+    ros-noetic-gazebo-ros 
+    
 
 COPY scripts /scripts
 

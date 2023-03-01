@@ -6,5 +6,5 @@ IFS=$'\n\t'
 
 sleep 1
 while true; do
-    roslaunch realsense2_camera rs_camera.launch
+    roslaunch realsense2_camera rs_camera.launch || true
 done
