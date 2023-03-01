@@ -1,0 +1,15 @@
+[submodule "elevation_mapping"]
+	path = ros/catkin_ws/src/elevation_mapping
+	url = https://github.com/ANYbotics/elevation_mapping.git
+[submodule "kindr"]
+	path = ros/catkin_ws/src/kindr
+	url = https://github.com/ANYbotics/kindr.git
+[submodule "kindr_ros"]
+	path = ros/catkin_ws/src/kindr_ros
+	url = https://github.com/ANYbotics/kindr_ros.git
+[submodule "message_logger"]
+	path = ros/catkin_ws/src/message_logger
+	url = https://github.com/ANYbotics/message_logger.git
+[submodule "point_cloud_io"]
+	path = ros/catkin_ws/src/point_cloud_io
+	url = https://github.com/ANYbotics/point_cloud_io.git
