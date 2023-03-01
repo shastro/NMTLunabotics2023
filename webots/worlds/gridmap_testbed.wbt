@@ -1161,9 +1161,13 @@ Robot {
   translation -1.73477 0.15 -0.120332
   rotation -0.9999999999999999 0 0 1.5707953071795862
   children [
+    Compass {
+    }
     DistanceSensor {
       translation 0.33 0 0.09
       numberOfRays 43
+    }
+    GPS {
     }
     VelodynePuck {
       translation 0.26 0 0.21
@@ -1496,9 +1500,11 @@ Robot {
   }
   controller "ros"
   controllerArgs [
+    "--robot-description"
     "--clock"
     "--auto-publish"
     "--use-sim-time"
     "--name=david_sim"
   ]
+  supervisor TRUE
 }
