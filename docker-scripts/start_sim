@@ -4,5 +4,8 @@ IFS=$'\n\t'
 
 xhost +local:root
 
+# Make sure there are GL drivers
+sudo apt-get install mesa-common-dev
+
 cd "$(dirname "$0")/../containers"
 sudo docker compose -f simulator.yml up --build

@@ -48,4 +48,4 @@ services:
     #           capabilities: [gpu]
 networks:
   ros-docker-net:
-    name: "ros_docker_net"
+    name: "ros-docker-net"
