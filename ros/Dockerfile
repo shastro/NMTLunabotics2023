@@ -24,4 +24,10 @@ RUN apt-get install -y \
 COPY scripts /scripts
 COPY catkin_ws /catkin_ws
 
-RUN cd /catkin_ws && rm -rf /catkin_ws/build /catkin_ws/devel && /ros_entrypoint.sh catkin_make
+RUN cd /catkin_ws && \
+    rm -rf /catkin_ws/build /catkin_ws/devel && \
+    /ros_entrypoint.sh catkin_make
+
+# Add /catkin_ws to the ROS environment.
+COPY ros_entrypoint.sh /ros_entrypoint.sh
+
