@@ -24,8 +24,9 @@ target_link_libraries(motor_bridge ${catkin_LIBRARIES})
 add_message_files(
   DIRECTORY msg
   FILES
+  Pitch.msg
 )
-# generate_messages(DEPENDENCIES std_msgs)
+generate_messages(DEPENDENCIES std_msgs)
 
 add_dependencies(motor_bridge ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
