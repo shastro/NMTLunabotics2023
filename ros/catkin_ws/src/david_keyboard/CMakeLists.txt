@@ -8,9 +8,12 @@ project(david_keyboard)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  geometry_msgs
-  motor_bridge
   roscpp
+  geometry_msgs
+  rosconsole
+  roslib
+  rostime
+  motor_bridge
   std_msgs
 )
 
@@ -105,7 +108,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES david_keyboard
-   CATKIN_DEPENDS geometry_msgs motor_bridge roscpp std_msgs
+   CATKIN_DEPENDS roscpp geometry_msgs motor_bridge std_msgs
 #  DEPENDS system_lib
 )
 
@@ -143,12 +146,12 @@ add_executable(david_keyboard src/keyboard.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(david_keyboard ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#add_dependencies(david_keyboard ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(david_keyboard
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
