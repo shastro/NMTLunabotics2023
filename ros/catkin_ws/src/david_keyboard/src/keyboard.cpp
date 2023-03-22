@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
                 I'm not cleaning any input" << std::endl;
   ros::NodeHandle nh;
   ros::Publisher pub =
-      nh.advertise<std_msgs::String>("/pitch_control", 1000);
+      nh.advertise<std_msgs::String>("pitch_control", 1000);
   
   ros::Rate rate(10);
   motor_bridge::Pitch p;
