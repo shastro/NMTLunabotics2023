@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     std::cin >> l;
     l = l < 0 ? 0 : l;
     l = l > 9 ? 9 : l;
-    l = (l / 9) * max;
+    l =  (l * max) / 9;
     p.length = l;
     pub.publish(p);
   }
