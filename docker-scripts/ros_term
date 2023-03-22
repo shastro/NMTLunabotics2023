@@ -10,7 +10,6 @@ sudo docker build "$DIR/ros" -t lunabotics-2023-ros
 sudo docker run \
      --rm \
      -it \
-     --gpus=all \
      -v $DIR:$DIR \
      -e DISPLAY \
      -v /tmp/.X11-unix:/tmp/.X11-unix \

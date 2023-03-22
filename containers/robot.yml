@@ -12,6 +12,7 @@ services:
     ports:
       - "11311:11311"
     restart: always
+    enable-cuda: false
 
   cameras:
     hostname: cameras
@@ -27,7 +28,8 @@ services:
       - c 81:* rmw
       - c 189:* rmw
     restart: always
-
+    enable-cuda: false
+    
 networks:
   ros-docker-net:
     name: "ros_docker_net"
