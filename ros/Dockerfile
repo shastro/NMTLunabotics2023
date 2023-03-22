@@ -3,7 +3,7 @@ FROM ros:noetic-ros-core
 RUN apt-get update -y
 
 # Standard tools
-RUN apt-get install -y clang make gcc g++ inetutils-ping net-tools git
+RUN apt-get install -y clang make gcc g++ inetutils-ping net-tools git tmux
 
 # 2. Install ROS packages from apt.
 RUN apt-get install -y \
