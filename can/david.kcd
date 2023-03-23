@@ -1,0 +1,55 @@
+<!-- -*- xml -*- -->
+<NetworkDefinition
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://kayak.2codeornot2code.org/1.0"
+    xsi:noNamespaceSchemaLocation="Definition.xsd">
+  <Document name="DAVIID" version="2.0" author="NMT Lunabotics"
+            date="2023-03-22">
+    The NMT Lunabotics robot of 2022-'23.
+  </Document>
+
+  <Node id="0" name="Jetson"/>
+  <Node id="1" name="Locomotion Left"/>
+  <Node id="2" name="Locomotion Right"/>
+  <Node id="3" name="Pitch Controller"/>
+
+  <Bus name="Main">
+    <Message id="0x000" name="EStop">
+      <Producer>
+        <NodeRef id="0"/>
+      </Producer>
+    </Message>
+
+    <Message id="0x100" name="PitchCtrlLeft">
+      <Producer>
+        <NodeRef id="0"/>
+      </Producer>
+      <Signal name="Count" offset="0" length="48"/>
+      <Signal name="Tolerance" offset="48" length="16"/>
+    </Message>
+
+    <Message id="0x101" name="PitchTelemLeft">
+      <Producer>
+        <NodeRef id="3"/>
+      </Producer>
+      <Signal name="Count" offset="0" length="48"/>
+      <Signal name="Done" offset="48"/>
+    </Message>
+
+    <Message id="0x102" name="PitchCtrlRight">
+      <Producer>
+        <NodeRef id="0"/>
+      </Producer>
+      <Signal name="Count" offset="0" length="48"/>
+      <Signal name="Tolerance" offset="48" length="16"/>
+    </Message>
+
+    <Message id="0x103" name="PitchTelemLeft">
+      <Producer>
+        <NodeRef id="3"/>
+      </Producer>
+      <Signal name="Count" offset="0" length="48"/>
+      <Signal name="Done" offset="48"/>
+    </Message>
+  </Bus>
+</NetworkDefinition>
