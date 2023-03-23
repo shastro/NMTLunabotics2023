@@ -5,7 +5,7 @@
 
 const int SPI_CS_PIN = 17;              // CANBed V1
 
-MCP_CAN CAN(SPI_CS_PIN);                                    // Set CS pin
+MCP_CAN CAN(SPI_CS_PIN);                // Set CS pin
 
 // Define pins
 #define P1_L  4
@@ -25,10 +25,10 @@ MCP_CAN CAN(SPI_CS_PIN);                                    // Set CS pin
 #define PITCH_TELEM_RIGHT  0x103
 
 // Left State
-uint64_t left_true_count;
+volatile uint64_t left_true_count;
 
 // Right state
-uint64_t right_true_count;
+volatile uint64_t right_true_count;
 
 
 enum DIR {
@@ -62,6 +62,7 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(HALL_L), left_hall_handler, RISING);
   attachInterrupt(digitalPinToInterrupt(HALL_R), right_hall_handler, RISING);
 
+
   Serial.begin(115200);
   // while(!Serial);
   while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
@@ -70,7 +71,11 @@ void setup()
       delay(100);
     }
   Serial.println("CAN BUS OK!");
+
+  
+  home();
 }
+
 
 void home(){
   // Left State
@@ -117,10 +122,6 @@ void home(){
 void loop()
 {
 
-  if (!has_homed) {
-    home();
-    has_homed = true;
-  }
   
   unsigned char len = 0;
   unsigned char buf[8];
@@ -134,7 +135,10 @@ void loop()
 
     // IF ESTOP freeze forever
     if (canId == ESTOP) {
-      while(true){}
+      while(true){
+        Serial.println("HALTED");
+        delay(100);
+      }
     }
 
     if (canId == PITCH_CTRL_LEFT) {
@@ -161,10 +165,6 @@ void loop()
     }
     Serial.println();
 
-    // Send back the data, mirrored and flipped.
-    for (int i = 0; i < len; i++)
-      buf[i] = ~buf[i];
-    CAN.sendMsgBuf(0x00, 0, 8, buf);
   } // finish CAN message
 
   // Now set the controls
@@ -254,13 +254,13 @@ enum DIR get_direction(uint64_t true_count, uint64_t target_count, uint64_t tole
 }
 
 void left_hall_handler(){
-  if (left_true_count == 0) {
-    // Should never happen ideally
-    // just going to clamp at zero
-    return;
-  }
   switch (left_dir) {
     case RETRACT: 
+      if (left_true_count == 0) {
+        // Should never happen ideally
+        // just going to clamp at zero
+        return;
+      }
       left_true_count -= 1;
       break;
     case EXTEND: 
@@ -272,11 +272,11 @@ void left_hall_handler(){
   }
 }
 void right_hall_handler(){
-  if (right_true_count == 0) {
-    return;
-  }
   switch (right_dir) {
     case RETRACT: 
+      if (right_true_count == 0) {
+        return;
+      }
       right_true_count -= 1;
       break;
     case EXTEND: 
