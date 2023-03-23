@@ -9,7 +9,6 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "david_keyboard");
 
     std::cout << "david keyboard initialized" << std::endl;
-    std::cout << "Please don't type anything other than 0-9, I'm not cleaning any input" << std::endl;
     ros::NodeHandle nh;
     ros::Publisher pub =
         nh.advertise<motor_bridge::Pitch>("pitch_control", 1000);
