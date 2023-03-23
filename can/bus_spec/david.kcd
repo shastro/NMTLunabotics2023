@@ -9,9 +9,10 @@
   </Document>
 
   <Node id="0" name="Jetson"/>
-  <Node id="1" name="Locomotion Left"/>
-  <Node id="2" name="Locomotion Right"/>
-  <Node id="3" name="Pitch Controller"/>
+  <Node id="1" name="Locomotion Excavation"/>
+  <Node id="2" name="Pitch Controller"/>
+  <Node id="3" name="Depth Controller"/>
+  <Node id="4" name="Excavation Controller"/>
 
   <Bus name="Main">
     <Message id="0x000" name="EStop">
@@ -30,7 +31,7 @@
 
     <Message id="0x101" name="PitchTelemLeft">
       <Producer>
-        <NodeRef id="3"/>
+        <NodeRef id="2"/>
       </Producer>
       <Signal name="Count" offset="0" length="48"/>
       <Signal name="Done" offset="48"/>
@@ -46,7 +47,7 @@
 
     <Message id="0x103" name="PitchTelemRight">
       <Producer>
-        <NodeRef id="3"/>
+        <NodeRef id="2"/>
       </Producer>
       <Signal name="Count" offset="0" length="48"/>
       <Signal name="Done" offset="48"/>
