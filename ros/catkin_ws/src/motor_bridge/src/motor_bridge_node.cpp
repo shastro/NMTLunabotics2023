@@ -7,6 +7,8 @@
 
 #include <motor_bridge/Pitch.h>
 
+#include "can/david.h"
+
 static struct {
     const int HOME_LENGTH = 0;
     const int MAX_LENGTH = 1024;
