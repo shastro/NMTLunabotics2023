@@ -44,7 +44,7 @@
       <Signal name="Tolerance" offset="48" length="16"/>
     </Message>
 
-    <Message id="0x103" name="PitchTelemLeft">
+    <Message id="0x103" name="PitchTelemRight">
       <Producer>
         <NodeRef id="3"/>
       </Producer>
