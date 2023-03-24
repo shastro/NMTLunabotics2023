@@ -6,17 +6,6 @@
 // Import can message constants
 #include "../../bus_spec/david.h"
 
-enum CAN_MESSAGES {
-    ESTOP = 0x0,
-    ESTART = 0x1, // start again if shutdown
-    PITCH_CTRL_HOME = 0x010,
-    PITCH_CTRL_LEFT = 0x101,
-    PITCH_CTRL_RIGHT = 0x110,
-    PITCH_CTRL_BOTH  = (PITCH_CTRL_LEFT | PITCH_CTRL_RIGHT),
-    PITCH_TELEM_LEFT = 0x200,
-    PITCH_TELEM_RIGHT = 0x201,
-};
-
 enum MOTOR {
   MOTOR_LEFT = 0,
   MOTOR_RIGHT = 1,
@@ -113,13 +102,13 @@ void loop()
     CAN.readMsgBuf(&len, buf);
     uint32_t canId = CAN.getCanId();
 
-    if (canId == ESTART) {
+    if (canId == DAVID_E_START_FRAME_ID) {
         stopped = false;
         goto end_message;
     }
     
     // IF ESTOP stop other behaviors
-    if (canId == ESTOP) {
+    if (canId == DAVID_E_STOP_FRAME_ID) {
         stopped = true;
         goto end_message;
     }
@@ -144,7 +133,7 @@ void loop()
 
     // enter homing
     if (!stopped && !homing) {    
-        if (canId == PITCH_CTRL_HOME) {
+        if (canId == DAVID_PITCH_CTRL_HOME_FRAME_ID) {
             homing = true;
             left_true_count = right_true_count = 100000000;
             prev_left_count = prev_right_count = left_true_count+1;
@@ -157,12 +146,12 @@ void loop()
     // standard loop
     if (!stopped && !homing) {    
         // If PITCH_CTRL_BOTH both if statements will fire.
-        if (canId & PITCH_CTRL_LEFT > 0) {
+        if (canId & DAVID_PITCH_CTRL_LEFT_FRAME_ID > 0) {
             uint64_t target_count = extract_count(buf);
             uint64_t tolerance = extract_tolerance(buf);
             left_dir = get_direction(left_true_count, target_count, tolerance);
         }
-        if (canId & PITCH_CTRL_RIGHT > 0) {
+        if (canId & DAVID_PITCH_CTRL_RIGHT_FRAME_ID > 0) {
             uint64_t target_count = extract_count(buf);
             uint64_t tolerance = extract_tolerance(buf);
             right_dir = get_direction(right_true_count, target_count, tolerance);
@@ -198,8 +187,8 @@ void loop()
   } // finish CAN message
   
   // Send telemetry
-  send_telemetry(PITCH_TELEM_LEFT, left_true_count, left_done);
-  send_telemetry(PITCH_TELEM_RIGHT, right_true_count, right_done);
+  send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, left_true_count, left_done);
+  send_telemetry(DAVID_PITCH_TELEM_RIGHT_FRAME_ID, right_true_count, right_done);
 }
 
 void send_telemetry(uint32_t canId, uint64_t true_count, bool done){
