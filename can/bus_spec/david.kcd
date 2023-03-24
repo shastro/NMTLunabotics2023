@@ -21,7 +21,19 @@
       </Producer>
     </Message>
 
-    <Message id="0x100" name="PitchCtrlLeft">
+    <Message id="0x001" name="EStart">
+      <Producer>
+        <NodeRef id="0"/>
+      </Producer>
+    </Message>
+    
+    <Message id="0x010" name="PitchCtrlHome">
+      <Producer>
+        <NodeRef id="0"/>
+      </Producer>
+    </Message>
+    
+    <Message id="0x101" name="PitchCtrlLeft">
       <Producer>
         <NodeRef id="0"/>
       </Producer>
@@ -29,7 +41,23 @@
       <Signal name="Tolerance" offset="48" length="16"/>
     </Message>
 
-    <Message id="0x101" name="PitchTelemLeft">
+    <Message id="0x110" name="PitchCtrlRight">
+      <Producer>
+        <NodeRef id="0"/>
+      </Producer>
+      <Signal name="Count" offset="0" length="48"/>
+      <Signal name="Tolerance" offset="48" length="16"/>
+    </Message>
+
+    <Message id="0x111" name="PitchCtrlBoth">
+      <Producer>
+        <NodeRef id="0"/>
+      </Producer>
+      <Signal name="Count" offset="0" length="48"/>
+      <Signal name="Tolerance" offset="48" length="16"/>
+    </Message>
+
+    <Message id="0x200" name="PitchTelemLeft">
       <Producer>
         <NodeRef id="2"/>
       </Producer>
@@ -37,15 +65,7 @@
       <Signal name="Done" offset="48"/>
     </Message>
 
-    <Message id="0x102" name="PitchCtrlRight">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-      <Signal name="Count" offset="0" length="48"/>
-      <Signal name="Tolerance" offset="48" length="16"/>
-    </Message>
-
-    <Message id="0x103" name="PitchTelemRight">
+    <Message id="0x201" name="PitchTelemRight">
       <Producer>
         <NodeRef id="2"/>
       </Producer>
