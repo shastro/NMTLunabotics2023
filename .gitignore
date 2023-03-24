@@ -32,6 +32,7 @@
 
 # Backup files
 *~
+*.swp
 renders
 ros/catkin_ws/devel/*
 ros/catkin_ws/build/*

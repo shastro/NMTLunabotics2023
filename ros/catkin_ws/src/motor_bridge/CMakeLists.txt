@@ -27,15 +27,16 @@ generate_messages(DEPENDENCIES std_msgs)
 catkin_package(CATKIN_DEPENDS std_msgs std_srvs message_runtime)
 
 include_directories(include ${catkin_INCLUDE_DIRS} ../../../../teknic/inc/inc-pub)
-add_executable(motor_bridge
-  src/motor_bridge_node.cpp
+
+# pitch_ctrl node
+add_executable(pitch_ctrl
+  src/pitch_ctrl_node.cpp
   src/can/david.c
 )
-target_link_libraries(motor_bridge ${catkin_LIBRARIES})
-
-add_dependencies(motor_bridge ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(pitch_ctrl ${catkin_LIBRARIES})
+add_dependencies(pitch_ctrl ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 link_directories(${catkin_LIBRARY_DIRS})
 
-install(TARGETS motor_bridge
+install(TARGETS pitch_ctrl
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
