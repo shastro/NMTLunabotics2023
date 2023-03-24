@@ -5,6 +5,12 @@
 #include <unistd.h>
 #include <motor_bridge/Pitch.h>
 
+enum motor {
+    BOTH = 0,
+    LEFT = 1,
+    RIGHT = 2
+};
+
 int main(int argc, char **argv) {
     ros::init(argc, argv, "david_keyboard");
 
@@ -20,6 +26,7 @@ int main(int argc, char **argv) {
     int min = 0;
     char key;
     int l = 0;
+    motor m = BOTH;
 
     while (ros::ok()) {
         key = std::cin.get();
@@ -44,12 +51,22 @@ int main(int argc, char **argv) {
                 l = 1024;
                 std::cout << ">>: " << l << std::endl;
                 break;
+            case 'b':
+                m = BOTH;
+                break;
+            case 'l':
+                m = LEFT;
+                break;
+            case 'r':
+                m = RIGHT;
+                break;
             default:
-                std::cout << "Invalid key pressed. Please press [ or ]." << std::endl;
+                std::cout << "Invalid key pressed" << std::endl;
                 break;
         }
 
         p.length = l;
+        p.motor = m;
         pub.publish(p);
     }
 }
