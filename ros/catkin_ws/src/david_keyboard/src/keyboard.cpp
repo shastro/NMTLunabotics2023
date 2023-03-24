@@ -22,18 +22,31 @@ int main(int argc, char **argv) {
     int l = 0;
 
     while (ros::ok()) {
-        key = getchar();
+        key = std::cin.get();
+        std::cin.ignore(100, '\n');
 
-        if (key == '[') {
-            l -= 64;
-            l = (l < min) ? min : l;
-            std::cout << "<<: " << l << std::endl;
-        } else if (key == ']') {
-            l += 64;
-            l = (l > max) ? max : l;
-            std::cout << ">>: " << l << std::endl;
-        } else {
-            std::cout << "Invalid key pressed. Please press [ or ]." << std::endl;
+        switch (key) {
+            case '[':
+                l -= 64;
+                l = (l < min) ? min : l;
+                std::cout << "<<: " << l << std::endl;
+                break;
+            case ']':
+                l += 64;
+                l = (l > max) ? max : l;
+                std::cout << ">>: " << l << std::endl;
+                break;
+            case '{':
+                l = 0;
+                std::cout << "<<: " << l << std::endl;
+                break;
+            case '}':
+                l = 1024;
+                std::cout << ">>: " << l << std::endl;
+                break;
+            default:
+                std::cout << "Invalid key pressed. Please press [ or ]." << std::endl;
+                break;
         }
 
         p.length = l;
