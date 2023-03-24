@@ -8,23 +8,15 @@
 #include <motor_bridge/Pitch.h>
 
 #include "can/david.h"
+#include "can_interface.hpp"
+
+#define CAN_BUS "can0"
 
 enum motor {
     BOTH = 0,
     LEFT = 1,
     RIGHT = 2
 };
-
-static struct {
-    const int HOME_LENGTH = 0;
-    const int MAX_LENGTH = 1024;
-    int target_length; // set by callback.
-    int actual_length; // actual length as estimated by telemetry.
-    const int FORWARD = 0;
-    const int BACKWARD = 1;
-    int motor_direction;
-    int motor_on;
-} PitchMotorState;
 
 void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
     int length = msg->length;
@@ -33,6 +25,7 @@ void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
         << length << " motor: " << m << std::endl;
 
     uint8_t message[8];
+    SocketCan can(CAN_BUS);
 
     if (m = LEFT) {
         david_pitch_ctrl_left_t left = {
@@ -54,7 +47,7 @@ void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
         david_pitch_ctrl_both_pack(message, &both, sizeof(message));
     }
 
-    //TODO: send message
+    can.transmit(message);
 }
 
 int main(int argc, char **argv) {
