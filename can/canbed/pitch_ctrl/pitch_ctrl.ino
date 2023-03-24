@@ -106,10 +106,8 @@ void loop()
 {
   unsigned char len = 0;
   unsigned char buf[8];
-  bool left_done = true;
-  bool right_done = true;
   
-  // check if data coming
+  // Check for new messages
   if(CAN_MSGAVAIL == CAN.checkReceive()) {
     // read data
     CAN.readMsgBuf(&len, buf);
@@ -126,7 +124,7 @@ void loop()
         goto end_message;
     }
 
-    // enter homing
+    // Enter homing state
     if (!stopped && !homing) {    
         if (canId == DAVID_PITCH_CTRL_HOME_FRAME_ID) {
             homing = true;
@@ -138,7 +136,7 @@ void loop()
         }
     }
     
-    // set lengths
+    // Set lengths
     if (!stopped && !homing) {    
         // If PITCH_CTRL_BOTH both if statements will fire.
         if (canId & DAVID_PITCH_CTRL_LEFT_FRAME_ID > 0) {
@@ -166,7 +164,7 @@ void loop()
 
   } // finish CAN message
 
-  // do homing
+  // Do homing
   if (!stopped && homing) {
       Serial.println(count_stationary_timer);
       if ((left_true_count == left_prev_count)
@@ -187,18 +185,21 @@ void loop()
       }
   }
 
-  // standard movement towards target counts
+  bool left_done = false;
+  bool right_done = false;
+  
+  // Standard movement towards target counts
   if (!stopped && !homing) {
       left_dir = get_direction(left_true_count, left_target_count, left_tolerance);
       right_dir = get_direction(right_true_count, right_target_count, right_tolerance);
       // Set controls
-      if (!(left_dir == STOP)){
-          left_done = false;
+      if (left_dir == STOP) {
+          left_done = true;
       }
       set_control(MOTOR_LEFT,left_dir);
 
-      if (!(right_dir == STOP)){
-          right_done = false;
+      if (right_dir == STOP) {
+          right_done = true;
       }
       set_control(MOTOR_RIGHT,right_dir);
   }
