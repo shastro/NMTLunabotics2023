@@ -33,10 +33,16 @@ enum DIR {
   STOP,
 };
 
+#define P1_L 4
+#define P2_L 5
+#define P1_R 6
+#define P2_R 12
+#define HALL_L 0
+#define HALL_R 3
 
 static const int PIN_TABLE[2][3] = {
-    { 0, 4, 5  },
-    { 1, 6, 12 },
+    { HALL_L, P1_L, P2_L  },
+    { HALL_R, P1_R, P2_R },
 };
 
 MCP_CAN CAN(SPI_CS_PIN); // Set CS pin
@@ -72,7 +78,7 @@ void set_control(enum MOTOR motor, enum DIR dir) {
         analogWrite(PIN_TABLE[motor][P2], V0);
         break;
     case STOP:
-        analogWrite(PIN_TABLE[motor][P1], V2_5);
+        analogWrite(PIN_TABLE[motor][P1], V0);
         analogWrite(PIN_TABLE[motor][P2], V2_5);
         break;
     }
@@ -128,8 +134,10 @@ void loop()
     if (!stopped && !homing) {    
         if (canId == DAVID_PITCH_CTRL_HOME_FRAME_ID) {
             homing = true;
-            left_true_count = right_true_count = 100000000;
-            left_prev_count = right_prev_count = left_true_count+1;
+            left_target_count = 0;
+            right_target_count = 0;
+            left_prev_count = left_true_count+1;
+            right_prev_count = right_true_count+1;
             set_control(MOTOR_LEFT, RETRACT);
             set_control(MOTOR_RIGHT, RETRACT);
             goto end_message;
@@ -177,7 +185,7 @@ void loop()
       left_prev_count = left_true_count;
       right_prev_count = right_true_count;
 
-      if (count_stationary_timer > 100) {
+      if (count_stationary_timer > 10000) {
           homing = false;
           left_true_count = right_true_count = 0;
           set_control(MOTOR_LEFT, STOP);
@@ -230,7 +238,7 @@ void send_telemetry(uint32_t canId, uint64_t true_count, bool done){
 enum DIR get_direction(uint64_t true_count, uint64_t target_count, uint64_t tolerance) {
   enum DIR retdir;
   if (abs(true_count - target_count) > tolerance) {
-    if (true_count > target_count) {
+    if (true_count < target_count) {
       retdir = RETRACT;  
     } else {
       retdir = EXTEND;  
@@ -244,7 +252,7 @@ enum DIR get_direction(uint64_t true_count, uint64_t target_count, uint64_t tole
 
 void left_hall_handler(){
   switch (left_dir) {
-    case RETRACT: 
+    case EXTEND: 
       if (left_true_count == 0) {
         // Should never happen ideally
         // just going to clamp at zero
@@ -252,7 +260,7 @@ void left_hall_handler(){
       }
       left_true_count -= 1;
       break;
-    case EXTEND: 
+    case RETRACT: 
       left_true_count += 1;
       break;
     case STOP: 
@@ -262,13 +270,13 @@ void left_hall_handler(){
 }
 void right_hall_handler(){
   switch (right_dir) {
-    case RETRACT: 
+    case EXTEND: 
       if (right_true_count == 0) {
         return;
       }
       right_true_count -= 1;
       break;
-    case EXTEND: 
+    case RETRACT: 
       right_true_count += 1;
       break;
     case STOP: 
