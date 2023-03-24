@@ -4,7 +4,7 @@
 #include "mcp_can.h"
 
 // Import can message constants
-#include "../../bus_spec/david.h"
+#include "david.h"
 
 enum MOTOR {
   MOTOR_LEFT = 0,
@@ -25,7 +25,7 @@ enum VOLTZ {
     V0 = 0,
     V2_5 = 128,
     V5 = 255
-}
+};
 
 enum DIR {
   EXTEND,
@@ -33,7 +33,8 @@ enum DIR {
   STOP,
 };
 
-static const int PIN_TABLE[][] = {
+
+static const int PIN_TABLE[2][3] = {
     { 0, 4, 5  },
     { 1, 6, 12 },
 };
@@ -59,16 +60,16 @@ bool homing = true;
 void set_control(enum MOTOR motor, enum DIR dir) {
     switch (dir) {
     case EXTEND:
-        analogWrite(PINS[motor][P1], V5);
-        analogWrite(PINS[motor][P2], V5);
+        analogWrite(PIN_TABLE[motor][P1], V5);
+        analogWrite(PIN_TABLE[motor][P2], V5);
         break;
     case RETRACT:
-        analogWrite(PINS[motor][P1], V0);
-        analogWrite(PINS[motor][P2], V0);
+        analogWrite(PIN_TABLE[motor][P1], V0);
+        analogWrite(PIN_TABLE[motor][P2], V0);
         break;
     case STOP:
-        digitalWrite(PINS[motor][P1], V2_5);
-        digitalWrite(PINS[motor][P2], V2_5);
+        analogWrite(PIN_TABLE[motor][P1], V2_5);
+        analogWrite(PIN_TABLE[motor][P2], V2_5);
         break;
     }
 }
@@ -76,16 +77,16 @@ void set_control(enum MOTOR motor, enum DIR dir) {
 void setup()
 {
   // PinModes
-  pinMode(PINS[MOTOR_LEFT][HALL], INPUT_PULLUP);
-  pinMode(PINS[MOTOR_LEFT][P1], OUTPUT);
-  pinMode(PINS[MOTOR_LEFT][P2], OUTPUT);
-  pinMode(PINS[MOTOR_RIGHT][HALL], INPUT_PULLUP);
-  pinMode(PINS[MOTOR_RIGHT][P1], OUTPUT);
-  pinMode(PINS[MOTOR_RIGHT][P2], OUTPUT);
+  pinMode(PIN_TABLE[MOTOR_LEFT][HALL], INPUT_PULLUP);
+  pinMode(PIN_TABLE[MOTOR_LEFT][P1], OUTPUT);
+  pinMode(PIN_TABLE[MOTOR_LEFT][P2], OUTPUT);
+  pinMode(PIN_TABLE[MOTOR_RIGHT][HALL], INPUT_PULLUP);
+  pinMode(PIN_TABLE[MOTOR_RIGHT][P1], OUTPUT);
+  pinMode(PIN_TABLE[MOTOR_RIGHT][P2], OUTPUT);
 
   // Interrupts
-  attachInterrupt(digitalPinToInterrupt(PINS[MOTOR_LEFT][HALL]), left_hall_handler, RISING);
-  attachInterrupt(digitalPinToInterrupt(PINS[MOTOR_RIGHT][HALL]), right_hall_handler, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_LEFT][HALL]), left_hall_handler, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_RIGHT][HALL]), right_hall_handler, RISING);
 
   Serial.begin(115200);
   while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
@@ -96,7 +97,7 @@ void setup()
   Serial.println("CAN BUS OK!");
   
 }
-s
+
 void loop()
 {
   unsigned char len = 0;
@@ -106,20 +107,23 @@ void loop()
 
   // do homing
   if (!stopped && homing) {
+      Serial.println(count_stationary_timer);
       if ((left_true_count == prev_left_count)
           && (right_true_count == prev_right_count)) {
-          stationary_time++;
+          count_stationary_timer++;
       } else {
-          stationary_time = 0;
+          count_stationary_timer = 0;
       }
 
-      if (stationary_time > 100) {
+      prev_left_count = left_true_count;
+      prev_right_count = right_true_count;
+
+      if (count_stationary_timer > 100) {
           homing = false;
           left_true_count = right_true_count = 0;
           set_control(MOTOR_LEFT, STOP);
           set_control(MOTOR_RIGHT, STOP);
       }
-      goto end_message;
   }
   
   // check if data coming
