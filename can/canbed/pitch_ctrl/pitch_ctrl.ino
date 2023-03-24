@@ -3,7 +3,7 @@
 #include <SPI.h>
 #include "mcp_can.h"
 
-// Import can message constants
+// Import CAN message constants
 #include "david.h"
 
 enum MOTOR {
