@@ -3,6 +3,9 @@
 #include <SPI.h>
 #include "mcp_can.h"
 
+// Import can message constants
+#include "../../bus_spec/david.h"
+
 enum CAN_MESSAGES {
     ESTOP = 0x0,
     ESTART = 0x1, // start again if shutdown
