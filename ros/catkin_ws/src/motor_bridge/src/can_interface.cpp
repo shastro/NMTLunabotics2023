@@ -58,5 +58,5 @@ SocketCAN::SocketCAN(const string &interface) {
 }
 
 void SocketCAN::transmit(const can_frame &cf) {
-    // todo
+    write(*sock, &cf, sizeof(can_frame));
 }
