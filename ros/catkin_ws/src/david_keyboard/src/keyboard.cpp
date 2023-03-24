@@ -24,9 +24,19 @@ int main(int argc, char **argv) {
 
     int max = 1024;
     int min = 0;
+    int step = 64;
     char key;
     int l = 0;
     motor m = BOTH;
+
+    std::cout << "Current control scheme:" << std::endl
+        << "[ - decrease pitch length by " << step << std::endl
+        << "] - increase pitch length by " << step << std::endl
+        << "{ - set pitch length to 0" << std::endl
+        << "} - set pitch length to 1024" << std::endl
+        << "b - use both pitch motors" << std::endl
+        << "l - use left pitch motor" << std::endl
+        << "r - use right pitch motor" << std::endl;
 
     while (ros::ok()) {
         key = std::cin.get();

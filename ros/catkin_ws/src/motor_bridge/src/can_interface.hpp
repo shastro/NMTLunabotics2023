@@ -28,8 +28,8 @@ class SocketCAN {
   public:
     SocketCAN(const std::string &interface);
 
-    void transmit(const can_frame &cf);
-    void transmit(const uint8_t data[8]);
+    void transmit(const struct can_frame &cf);
+    void transmit(uint8_t data[8], int can_id);
 };
 
 #endif /* CAN_INTERFACE_H */

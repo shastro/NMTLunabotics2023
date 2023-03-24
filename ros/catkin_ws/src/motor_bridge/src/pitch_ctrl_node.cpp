@@ -20,34 +20,38 @@ enum motor {
 
 void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
     int length = msg->length;
-    motor m = msg->motor;
+    motor m = (motor) msg->motor;
     std::cout << "Pitch Message Received. length: "
         << length << " motor: " << m << std::endl;
 
     uint8_t message[8];
-    SocketCan can(CAN_BUS);
+    SocketCAN can(CAN_BUS);
+    int can_id;
 
     if (m = LEFT) {
         david_pitch_ctrl_left_t left = {
             .count = (uint64_t)length,
             .tolerance = 100,
-        }
+        };
         david_pitch_ctrl_left_pack(message, &left, sizeof(message));
+        can_id = DAVID_PITCH_CTRL_LEFT_FRAME_ID;
     } else if (m = RIGHT) {
         david_pitch_ctrl_right_t right = {
             .count = (uint64_t)length,
             .tolerance = 100,
-        }
+        };
         david_pitch_ctrl_right_pack(message, &right, sizeof(message));
+        can_id = DAVID_PITCH_CTRL_RIGHT_FRAME_ID;
     } else {
         david_pitch_ctrl_both_t both = {
             .count = (uint64_t)length,
             .tolerance = 100,
-        }
+        };
         david_pitch_ctrl_both_pack(message, &both, sizeof(message));
+        can_id = DAVID_PITCH_CTRL_BOTH_FRAME_ID;
     }
 
-    can.transmit(message);
+    can.transmit(message, can_id);
 }
 
 int main(int argc, char **argv) {

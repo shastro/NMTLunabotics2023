@@ -44,7 +44,6 @@ SocketCAN::SocketCAN(const string &interface) {
     strncpy(req.ifr_ifrn.ifrn_name, interface.data(),
             sizeof(req.ifr_ifrn.ifrn_name));
     if (ioctl(*sock, SIOCGIFINDEX, &req) == -1)
-        // TODO: leaks a socket
         throw string("Unable to select CAN interface");
 
     // Bind the socket to the network interface.
@@ -57,6 +56,14 @@ SocketCAN::SocketCAN(const string &interface) {
     cout << "Successfully bound socket to interface." << endl;
 }
 
-void SocketCAN::transmit(const can_frame &cf) {
-    write(*sock, &cf, sizeof(can_frame));
+void SocketCAN::transmit(const struct can_frame &cf) {
+    write(*sock, &cf, sizeof(cf));
+}
+
+void SocketCAN::transmit(uint8_t data[8], int can_id) {
+    struct can_frame frame;
+    frame.can_id = can_id;
+    frame.can_dlc = sizeof(data);
+    memcpy(frame.data, data, sizeof(data));
+    this->transmit(frame);
 }

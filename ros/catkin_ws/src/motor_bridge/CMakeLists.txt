@@ -32,7 +32,9 @@ include_directories(include ${catkin_INCLUDE_DIRS} ../../../../teknic/inc/inc-pu
 add_executable(pitch_ctrl
   src/pitch_ctrl_node.cpp
   src/can/david.c
+  src/can_interface.cpp
 )
+
 target_link_libraries(pitch_ctrl ${catkin_LIBRARIES})
 add_dependencies(pitch_ctrl ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
