@@ -12,30 +12,26 @@
 
 #define CAN_BUS "can0"
 
-enum motor {
-    BOTH = 0,
-    LEFT = 1,
-    RIGHT = 2
-};
+enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
 
 void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
     int length = msg->length;
-    motor m = (motor) msg->motor;
-    std::cout << "Pitch Message Received. length: "
-        << length << " motor: " << m << std::endl;
+    motor m = (motor)msg->motor;
+    std::cout << "Pitch Message Received. length: " << length << " motor: " << m
+              << std::endl;
 
     uint8_t message[8];
     SocketCAN can(CAN_BUS);
     int can_id;
 
-    if (m = LEFT) {
+    if (m == LEFT) {
         david_pitch_ctrl_left_t left = {
             .count = (uint64_t)length,
             .tolerance = 100,
         };
         david_pitch_ctrl_left_pack(message, &left, sizeof(message));
         can_id = DAVID_PITCH_CTRL_LEFT_FRAME_ID;
-    } else if (m = RIGHT) {
+    } else if (m == RIGHT) {
         david_pitch_ctrl_right_t right = {
             .count = (uint64_t)length,
             .tolerance = 100,

@@ -57,7 +57,8 @@ SocketCAN::SocketCAN(const string &interface) {
 }
 
 void SocketCAN::transmit(const struct can_frame &cf) {
-    write(*sock, &cf, sizeof(cf));
+    if (write(*sock, &cf, sizeof(cf)) != sizeof(cf))
+        throw string("Error transmitting CAN frame");
 }
 
 void SocketCAN::transmit(uint8_t data[8], int can_id) {
