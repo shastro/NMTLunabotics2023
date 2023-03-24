@@ -21,6 +21,12 @@ enum PINS {
     SPI_CS_PIN = 17
 };
 
+enum VOLTZ {
+    V0 = 0,
+    V2_5 = 128,
+    V5 = 255
+}
+
 enum DIR {
   EXTEND,
   RETRACT,
@@ -53,16 +59,16 @@ bool homing = true;
 void set_control(enum MOTOR motor, enum DIR dir) {
     switch (dir) {
     case EXTEND:
-        digitalWrite(PINS[motor][P1], HIGH);
-        digitalWrite(PINS[motor][P2], HIGH);
+        analogWrite(PINS[motor][P1], V5);
+        analogWrite(PINS[motor][P2], V5);
         break;
     case RETRACT:
-        digitalWrite(PINS[motor][P1], LOW);
-        digitalWrite(PINS[motor][P2], HIGH);
+        analogWrite(PINS[motor][P1], V0);
+        analogWrite(PINS[motor][P2], V0);
         break;
     case STOP:
-        digitalWrite(PINS[motor][P1], LOW);
-        digitalWrite(PINS[motor][P2], LOW);
+        digitalWrite(PINS[motor][P1], V2_5);
+        digitalWrite(PINS[motor][P2], V2_5);
         break;
     }
 }
@@ -90,11 +96,14 @@ void setup()
   Serial.println("CAN BUS OK!");
   
 }
-
+s
 void loop()
 {
   unsigned char len = 0;
   unsigned char buf[8];
+  bool left_done = true;
+  bool right_done = true;
+
 
   // check if data coming
   if(CAN_MSGAVAIL == CAN.checkReceive()) {
@@ -158,13 +167,11 @@ void loop()
         }
 
         // Set controls
-        bool left_done = true;
         if (!(left_dir == STOP)){
             left_done = false;
         }
         set_control(MOTOR_LEFT,left_dir);
 
-        bool right_done = true;
         if (!(right_dir == STOP)){
             right_done = false;
         }
