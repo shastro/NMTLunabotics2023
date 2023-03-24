@@ -104,7 +104,24 @@ void loop()
   bool left_done = true;
   bool right_done = true;
 
+  // do homing
+  if (!stopped && homing) {
+      if ((left_true_count == prev_left_count)
+          && (right_true_count == prev_right_count)) {
+          stationary_time++;
+      } else {
+          stationary_time = 0;
+      }
 
+      if (stationary_time > 100) {
+          homing = false;
+          left_true_count = right_true_count = 0;
+          set_control(MOTOR_LEFT, STOP);
+          set_control(MOTOR_RIGHT, STOP);
+      }
+      goto end_message;
+  }
+  
   // check if data coming
   if(CAN_MSGAVAIL == CAN.checkReceive()) {
     // read data
@@ -119,24 +136,6 @@ void loop()
     // IF ESTOP stop other behaviors
     if (canId == DAVID_E_STOP_FRAME_ID) {
         stopped = true;
-        goto end_message;
-    }
-
-    // do homing
-    if (!stopped && homing) {
-        if ((left_true_count == prev_left_count)
-            && (right_true_count == prev_right_count)) {
-            stationary_time++;
-        } else {
-            stationary_time = 0;
-        }
-
-        if (stationary_time > 100) {
-            homing = false;
-            left_true_count = right_true_count = 0;
-            set_control(MOTOR_LEFT, STOP);
-            set_control(MOTOR_RIGHT, STOP);
-        }
         goto end_message;
     }
 
