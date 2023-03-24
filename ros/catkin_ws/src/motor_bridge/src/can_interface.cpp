@@ -63,7 +63,7 @@ void SocketCAN::transmit(const struct can_frame &cf) {
 void SocketCAN::transmit(uint8_t data[8], int can_id) {
     struct can_frame frame;
     frame.can_id = can_id;
-    frame.can_dlc = sizeof(data);
-    memcpy(frame.data, data, sizeof(data));
-    this->transmit(frame);
+    frame.can_dlc = 8 * sizeof(data[0]);
+    memcpy(frame.data, data, frame.can_dlc);
+    transmit(frame);
 }
