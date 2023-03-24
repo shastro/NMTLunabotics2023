@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 echo "commit message: "
 read message
