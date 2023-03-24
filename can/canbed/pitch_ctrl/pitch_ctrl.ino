@@ -42,12 +42,16 @@ static const int PIN_TABLE[2][3] = {
 MCP_CAN CAN(SPI_CS_PIN); // Set CS pin
 
 // Left State
-volatile uint64_t left_true_count;
-uint64_t prev_left_count;
+static volatile uint64_t left_true_count;
+static uint64_t left_prev_count;
+static uint64_t left_target_count;
+static uint64_t left_tolerance;
 
 // Right state
-volatile uint64_t right_true_count;
-uint64_t prev_right_count;
+static volatile uint64_t right_true_count;
+static uint64_t right_prev_count;
+static uint64_t right_target_count;
+static uint64_t right_tolerance;
 
 static int count_stationary_timer;
 
@@ -104,27 +108,6 @@ void loop()
   unsigned char buf[8];
   bool left_done = true;
   bool right_done = true;
-
-  // do homing
-  if (!stopped && homing) {
-      Serial.println(count_stationary_timer);
-      if ((left_true_count == prev_left_count)
-          && (right_true_count == prev_right_count)) {
-          count_stationary_timer++;
-      } else {
-          count_stationary_timer = 0;
-      }
-
-      prev_left_count = left_true_count;
-      prev_right_count = right_true_count;
-
-      if (count_stationary_timer > 100) {
-          homing = false;
-          left_true_count = right_true_count = 0;
-          set_control(MOTOR_LEFT, STOP);
-          set_control(MOTOR_RIGHT, STOP);
-      }
-  }
   
   // check if data coming
   if(CAN_MSGAVAIL == CAN.checkReceive()) {
@@ -148,41 +131,28 @@ void loop()
         if (canId == DAVID_PITCH_CTRL_HOME_FRAME_ID) {
             homing = true;
             left_true_count = right_true_count = 100000000;
-            prev_left_count = prev_right_count = left_true_count+1;
+            left_prev_count = right_prev_count = left_true_count+1;
             set_control(MOTOR_LEFT, RETRACT);
             set_control(MOTOR_RIGHT, RETRACT);
             goto end_message;
         }
     }
     
-    // standard loop
+    // set lengths
     if (!stopped && !homing) {    
         // If PITCH_CTRL_BOTH both if statements will fire.
         if (canId & DAVID_PITCH_CTRL_LEFT_FRAME_ID > 0) {
-            uint64_t target_count = extract_count(buf);
-            uint64_t tolerance = extract_tolerance(buf);
-            left_dir = get_direction(left_true_count, target_count, tolerance);
+            left_target_count = extract_count(buf);
+            left_tolerance = extract_tolerance(buf);
         }
         if (canId & DAVID_PITCH_CTRL_RIGHT_FRAME_ID > 0) {
-            uint64_t target_count = extract_count(buf);
-            uint64_t tolerance = extract_tolerance(buf);
-            right_dir = get_direction(right_true_count, target_count, tolerance);
+            right_target_count = extract_count(buf);
+            right_tolerance = extract_tolerance(buf);
         }
-
-        // Set controls
-        if (!(left_dir == STOP)){
-            left_done = false;
-        }
-        set_control(MOTOR_LEFT,left_dir);
-
-        if (!(right_dir == STOP)){
-            right_done = false;
-        }
-        set_control(MOTOR_RIGHT,right_dir);
     }
 
     end_message: 
-    // Printing
+    // Print CAN message
     Serial.println("-----------------------------");
     Serial.print("Get data from ID: ");
     Serial.println(canId, HEX);
@@ -195,6 +165,43 @@ void loop()
     Serial.println();
 
   } // finish CAN message
+
+  // do homing
+  if (!stopped && homing) {
+      Serial.println(count_stationary_timer);
+      if ((left_true_count == left_prev_count)
+          && (right_true_count == right_prev_count)) {
+          count_stationary_timer++;
+      } else {
+          count_stationary_timer = 0;
+      }
+
+      left_prev_count = left_true_count;
+      right_prev_count = right_true_count;
+
+      if (count_stationary_timer > 100) {
+          homing = false;
+          left_true_count = right_true_count = 0;
+          set_control(MOTOR_LEFT, STOP);
+          set_control(MOTOR_RIGHT, STOP);
+      }
+  }
+
+  // standard movement towards target counts
+  if (!stopped && !homing) {
+      left_dir = get_direction(left_true_count, left_target_count, left_tolerance);
+      right_dir = get_direction(right_true_count, right_target_count, right_tolerance);
+      // Set controls
+      if (!(left_dir == STOP)){
+          left_done = false;
+      }
+      set_control(MOTOR_LEFT,left_dir);
+
+      if (!(right_dir == STOP)){
+          right_done = false;
+      }
+      set_control(MOTOR_RIGHT,right_dir);
+  }
   
   // Send telemetry
   send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, left_true_count, left_done);
