@@ -21,13 +21,13 @@
       </Producer>
     </Message>
 
-    <Message id="0x000" name="EStart">
+    <Message id="0x001" name="EStart">
       <Producer>
         <NodeRef id="0"/>
       </Producer>
     </Message>
     
-    <Message id="0x101" name="PitchCtrlHome">
+    <Message id="0x010" name="PitchCtrlHome">
       <Producer>
         <NodeRef id="0"/>
       </Producer>
