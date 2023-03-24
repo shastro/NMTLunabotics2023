@@ -23,7 +23,7 @@ enum PINS {
 
 enum VOLTZ {
     V0 = 0,
-    V2_5 = 128,
+    V2_5 = 127,
     V5 = 255
 };
 
@@ -40,6 +40,12 @@ enum DIR {
 #define HALL_L 0
 #define HALL_R 3
 
+
+// 30 is a fudge factor for how close we can 
+// get to the end
+static const float mm_per_count = 0.17896;
+static const int64_t MAX_COUNT = (int64_t)((152./mm_per_count) - 30);
+
 static const int PIN_TABLE[2][3] = {
     { HALL_L, P1_L, P2_L  },
     { HALL_R, P1_R, P2_R },
@@ -48,29 +54,29 @@ static const int PIN_TABLE[2][3] = {
 MCP_CAN CAN(SPI_CS_PIN); // Set CS pin
 
 // Left State
-static volatile uint64_t left_true_count;
-static uint64_t left_prev_count;
-static uint64_t left_target_count;
-static uint64_t left_tolerance;
+static volatile int64_t left_true_count;
+static int64_t left_prev_count;
+static int64_t left_target_count;
+static int64_t left_tolerance;
 
 // Right state
-static volatile uint64_t right_true_count;
-static uint64_t right_prev_count;
-static uint64_t right_target_count;
-static uint64_t right_tolerance;
+static volatile int64_t right_true_count;
+static int64_t right_prev_count;
+static int64_t right_target_count;
+static int64_t right_tolerance;
 
 static int count_stationary_timer;
 
 enum DIR left_dir;
 enum DIR right_dir;
 
-bool stopped = false;
+bool estopped = false;
 bool homing = true;
 
 void set_control(enum MOTOR motor, enum DIR dir) {
     switch (dir) {
     case EXTEND:
-        analogWrite(PIN_TABLE[motor][P1], V5);
+        analogWrite(PIN_TABLE[motor][P1], V0);
         analogWrite(PIN_TABLE[motor][P2], V5);
         break;
     case RETRACT:
@@ -101,17 +107,17 @@ void setup()
   Serial.begin(115200);
   while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
     {
-      Serial.println("CAN BUS FAIL!");
+      // Serial.println("CAN BUS FAIL!");
       delay(100);
     }
-  Serial.println("CAN BUS OK!");
+  // Serial.println("CAN BUS OK!");
   
 }
 
 void loop()
 {
   unsigned char len = 0;
-  unsigned char buf[8];
+  unsigned char buf[8] = {0};
   
   // Check for new messages
   if(CAN_MSGAVAIL == CAN.checkReceive()) {
@@ -120,61 +126,76 @@ void loop()
     uint32_t canId = CAN.getCanId();
 
     if (canId == DAVID_E_START_FRAME_ID) {
-        stopped = false;
+        estopped = false;
         goto end_message;
     }
     
     // IF ESTOP stop other behaviors
     if (canId == DAVID_E_STOP_FRAME_ID) {
-        stopped = true;
+        estopped = true;
         goto end_message;
     }
 
     // Enter homing state
-    if (!stopped && !homing) {    
+    if (!estopped && !homing) {    
         if (canId == DAVID_PITCH_CTRL_HOME_FRAME_ID) {
             homing = true;
             left_target_count = 0;
             right_target_count = 0;
             left_prev_count = left_true_count+1;
             right_prev_count = right_true_count+1;
-            set_control(MOTOR_LEFT, RETRACT);
-            set_control(MOTOR_RIGHT, RETRACT);
+
             goto end_message;
         }
     }
     
     // Set lengths
-    if (!stopped && !homing) {    
+    if (!estopped && !homing) {    
         // If PITCH_CTRL_BOTH both if statements will fire.
-        if (canId & DAVID_PITCH_CTRL_LEFT_FRAME_ID > 0) {
+        if (canId == DAVID_PITCH_CTRL_BOTH_FRAME_ID) {
             left_target_count = extract_count(buf);
+            right_target_count = left_target_count;
+            left_tolerance = extract_tolerance(buf);
+            right_tolerance = left_tolerance;
+            Serial.println("SET BOTH");
+        }
+        if (canId == DAVID_PITCH_CTRL_LEFT_FRAME_ID) {
+            left_target_count = extract_count(buf);
+            Serial.println("SET LEFT");
             left_tolerance = extract_tolerance(buf);
         }
-        if (canId & DAVID_PITCH_CTRL_RIGHT_FRAME_ID > 0) {
+        if (canId == DAVID_PITCH_CTRL_RIGHT_FRAME_ID) {
             right_target_count = extract_count(buf);
+            Serial.print("SET RIGHT: ");
+            Serial.println((int)right_target_count);
             right_tolerance = extract_tolerance(buf);
         }
+        if (left_target_count > MAX_COUNT) {
+          left_target_count = MAX_COUNT;
+        }
+        if (right_target_count > MAX_COUNT) {
+          right_target_count = MAX_COUNT;
+        }
     }
-
     end_message: 
     // Print CAN message
     Serial.println("-----------------------------");
-    Serial.print("Get data from ID: ");
-    Serial.println(canId, HEX);
+    // Serial.print("Get data from ID: ");
+    // Serial.println(canId, HEX);
 
-    // print the data
-    for(int i = 0; i<len; i++) {
-      Serial.print(buf[i], HEX);
-      Serial.print("\t");
-    }
-    Serial.println();
+    // // print the data
+    // for(int i = 0; i<len; i++) {
+    //   Serial.print(buf[i], HEX);
+    //   Serial.print("\t");
+    // }
+    // Serial.println();
 
   } // finish CAN message
 
   // Do homing
-  if (!stopped && homing) {
-      Serial.println(count_stationary_timer);
+  if (!estopped && homing) {
+      left_dir = RETRACT;
+      right_dir = RETRACT;
       if ((left_true_count == left_prev_count)
           && (right_true_count == right_prev_count)) {
           count_stationary_timer++;
@@ -187,37 +208,46 @@ void loop()
 
       if (count_stationary_timer > 10000) {
           homing = false;
-          left_true_count = right_true_count = 0;
-          set_control(MOTOR_LEFT, STOP);
-          set_control(MOTOR_RIGHT, STOP);
+          left_true_count = 0; 
+          right_true_count = 0;
+          left_target_count = 0;
+          right_target_count = 0;
       }
+ } else {
+    
+    // left_dir = EXTEND;
+    // right_dir = EXTEND;
   }
+    
 
   bool left_done = false;
   bool right_done = false;
   
   // Standard movement towards target counts
-  if (!stopped && !homing) {
+  if (!estopped && !homing) {
       left_dir = get_direction(left_true_count, left_target_count, left_tolerance);
       right_dir = get_direction(right_true_count, right_target_count, right_tolerance);
       // Set controls
+
       if (left_dir == STOP) {
           left_done = true;
       }
-      set_control(MOTOR_LEFT,left_dir);
-
       if (right_dir == STOP) {
           right_done = true;
       }
-      set_control(MOTOR_RIGHT,right_dir);
   }
   
+  set_control(MOTOR_LEFT, left_dir);
+  set_control(MOTOR_RIGHT, right_dir);
+
+  Serial.println((int)MAX_COUNT);
   // Send telemetry
-  send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, left_true_count, left_done);
+  send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, right_target_count, left_done);
   send_telemetry(DAVID_PITCH_TELEM_RIGHT_FRAME_ID, right_true_count, right_done);
+
 }
 
-void send_telemetry(uint32_t canId, uint64_t true_count, bool done){
+void send_telemetry(uint32_t canId, int64_t true_count, bool done){
   unsigned char buf[8] = {0};
   buf[0] = true_count >> 8*0;
   buf[1] = true_count >> 8*1;
@@ -235,10 +265,10 @@ void send_telemetry(uint32_t canId, uint64_t true_count, bool done){
   CAN.sendMsgBuf(canId, 0, 8, buf);
 }
 
-enum DIR get_direction(uint64_t true_count, uint64_t target_count, uint64_t tolerance) {
+enum DIR get_direction(int64_t true_count, int64_t target_count, int64_t tolerance) {
   enum DIR retdir;
-  if (abs(true_count - target_count) > tolerance) {
-    if (true_count < target_count) {
+  if (abs((int64_t)true_count - (int64_t)target_count) > 1000) {
+    if (true_count > target_count) {
       retdir = RETRACT;  
     } else {
       retdir = EXTEND;  
@@ -249,18 +279,30 @@ enum DIR get_direction(uint64_t true_count, uint64_t target_count, uint64_t tole
 
   return retdir;
 }
+// enum DIR get_direction(int64_t true_count, int64_t target_count, int64_t tolerance) {
+//   enum DIR retdir = STOP;
+
+//   if (true_count + tolerance > target_count) {
+//       retdir = RETRACT;
+//   }
+//   if (true_count - tolerance < target_count) {
+//       retdir = EXTEND;
+//   }
+  
+//   return retdir;
+// }
 
 void left_hall_handler(){
   switch (left_dir) {
-    case EXTEND: 
-      if (left_true_count == 0) {
-        // Should never happen ideally
-        // just going to clamp at zero
-        return;
-      }
+    case RETRACT: 
+      // if (left_true_count == 0) {
+      //   // Should never happen ideally
+      //   // just going to clamp at zero
+      //   return;
+      // }
       left_true_count -= 1;
       break;
-    case RETRACT: 
+    case EXTEND: 
       left_true_count += 1;
       break;
     case STOP: 
@@ -270,13 +312,13 @@ void left_hall_handler(){
 }
 void right_hall_handler(){
   switch (right_dir) {
-    case EXTEND: 
-      if (right_true_count == 0) {
-        return;
-      }
+    case RETRACT: 
+      // if (right_true_count == 0) {
+      //   return;
+      // }
       right_true_count -= 1;
       break;
-    case RETRACT: 
+    case EXTEND: 
       right_true_count += 1;
       break;
     case STOP: 
@@ -284,18 +326,22 @@ void right_hall_handler(){
   }
 }
 
-uint64_t extract_count(char buf[]) {
-  uint64_t count = 0;
+int64_t extract_count(char buf[]) {
+  int64_t count = 0;
+  int64_t temp = 0;
   for (int i=0; i<6; i++) {
-    count += buf[i] << 8*i;
+    temp = (int64_t)buf[i];
+    count += temp << (8*i);
   }
   return count;
 }
 
-uint64_t extract_tolerance(char buf[]) {
-  uint64_t tolerance = 0;
+int64_t extract_tolerance(char buf[]) {
+  int64_t tolerance = 0;
+  int64_t temp = 0;
   for (int i=6; i<8; i++) {
-    tolerance += buf[i] << 8*i;
+    temp = (int64_t)buf[i];
+    tolerance += temp << (8*i);
   }
   return tolerance;
 }
