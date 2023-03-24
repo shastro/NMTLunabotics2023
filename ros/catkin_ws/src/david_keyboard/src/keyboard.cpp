@@ -12,21 +12,31 @@ int main(int argc, char **argv) {
     ros::NodeHandle nh;
     ros::Publisher pub =
         nh.advertise<motor_bridge::Pitch>("pitch_control", 1000);
-  
+
     ros::Rate rate(10);
     motor_bridge::Pitch p;
 
     int max = 1024;
+    int min = 0;
+    char key;
+    int l = 0;
+
     while (ros::ok()) {
-        int input;
-        std::cout << "Enter a digit between 0 and 9: ";
-        while (!(std::cin >> input) || input < 0 || input > 9 || std::cin.peek() != '\n') {
-            std::cout << "Invalid input. Please enter a digit between 0 and 9: ";
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        key = getchar();
+
+        if (key == '[') {
+            l -= 64;
+            l = (l < min) ? min : l;
+            std::cout << "<<: " << l << std::endl;
+        } else if (key == ']') {
+            l += 64;
+            l = (l > max) ? max : l;
+            std::cout << ">>: " << l << std::endl;
+        } else {
+            std::cout << "Invalid key pressed. Please press [ or ]." << std::endl;
         }
-        input =  (input * max) / 9;
-        p.length = input;
+
+        p.length = l;
         pub.publish(p);
     }
 }

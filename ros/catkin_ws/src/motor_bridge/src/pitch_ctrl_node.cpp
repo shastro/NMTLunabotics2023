@@ -43,7 +43,7 @@ void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
 }
 
 int main(int argc, char **argv) {
-  ros::init(argc, argv, "motor_bridge");
+  ros::init(argc, argv, "pitch_ctrl_node");
   ros::NodeHandle nh;
   ros::Subscriber sub = nh.subscribe("pitch_control", 1024, pitchCallback);
 
