@@ -3,33 +3,31 @@
 #include <SPI.h>
 #include "mcp_can.h"
 
-const int SPI_CS_PIN = 17;              // CANBed V1
+enum CAN_MESSAGES {
+    ESTOP = 0x0,
+    ESTART = 0x1, // start again if shutdown
+    PITCH_CTRL_HOME = 0x010,
+    PITCH_CTRL_LEFT = 0x101,
+    PITCH_CTRL_RIGHT = 0x110,
+    PITCH_CTRL_BOTH  = (PITCH_CTRL_LEFT | PITCH_CTRL_RIGHT),
+    PITCH_TELEM_LEFT = 0x200,
+    PITCH_TELEM_RIGHT = 0x201,
+};
 
-MCP_CAN CAN(SPI_CS_PIN);                // Set CS pin
+enum MOTOR {
+  MOTOR_LEFT = 0,
+  MOTOR_RIGHT = 1,
+};
 
 // Define pins
-#define P1_L  4
-#define P2_L  5
-#define P1_R  6
-#define P2_R  12
-#define HALL_L  0
-#define HALL_R  1
-
 // P1 is direction
 // P2 is power
-
-#define ESTOP  0x0
-#define PITCH_CTRL_LEFT  0x100
-#define PITCH_TELEM_LEFT  0x101
-#define PITCH_CTRL_RIGHT  0x102
-#define PITCH_TELEM_RIGHT  0x103
-
-// Left State
-volatile uint64_t left_true_count;
-
-// Right state
-volatile uint64_t right_true_count;
-
+enum PINS {
+    HALL = 0, // See below tables for right/left motors
+    P1 = 1,
+    P2 = 2,
+    SPI_CS_PIN = 17
+};
 
 enum DIR {
   EXTEND,
@@ -37,92 +35,72 @@ enum DIR {
   STOP,
 };
 
-enum MOTOR {
-  MOTOR_LEFT,
-  MOTOR_RIGHT,
+static const int PIN_TABLE[][] = {
+    { 0, 4, 5  },
+    { 1, 6, 12 },
 };
+
+MCP_CAN CAN(SPI_CS_PIN); // Set CS pin
+
+// Left State
+volatile uint64_t left_true_count;
+uint64_t prev_left_count;
+
+// Right state
+volatile uint64_t right_true_count;
+uint64_t prev_right_count;
+
+static int count_stationary_timer;
 
 enum DIR left_dir;
 enum DIR right_dir;
 
-bool has_homed = false;
+bool stopped = false;
+bool homing = true;
+
+void set_control(enum MOTOR motor, enum DIR dir) {
+    switch (dir) {
+    case EXTEND:
+        digitalWrite(PINS[motor][P1], HIGH);
+        digitalWrite(PINS[motor][P2], HIGH);
+        break;
+    case RETRACT:
+        digitalWrite(PINS[motor][P1], LOW);
+        digitalWrite(PINS[motor][P2], HIGH);
+        break;
+    case STOP:
+        digitalWrite(PINS[motor][P1], LOW);
+        digitalWrite(PINS[motor][P2], LOW);
+        break;
+    }
+}
 
 void setup()
 {
   // PinModes
-  pinMode(P1_L, OUTPUT);
-  pinMode(P2_L, OUTPUT);
-  pinMode(P1_R, OUTPUT);
-  pinMode(P2_R, OUTPUT);
-  pinMode(HALL_L, INPUT_PULLUP);
-  pinMode(HALL_R, INPUT_PULLUP);
+  pinMode(PINS[MOTOR_LEFT][HALL], INPUT_PULLUP);
+  pinMode(PINS[MOTOR_LEFT][P1], OUTPUT);
+  pinMode(PINS[MOTOR_LEFT][P2], OUTPUT);
+  pinMode(PINS[MOTOR_RIGHT][HALL], INPUT_PULLUP);
+  pinMode(PINS[MOTOR_RIGHT][P1], OUTPUT);
+  pinMode(PINS[MOTOR_RIGHT][P2], OUTPUT);
 
   // Interrupts
-
-  attachInterrupt(digitalPinToInterrupt(HALL_L), left_hall_handler, RISING);
-  attachInterrupt(digitalPinToInterrupt(HALL_R), right_hall_handler, RISING);
-
+  attachInterrupt(digitalPinToInterrupt(PINS[MOTOR_LEFT][HALL]), left_hall_handler, RISING);
+  attachInterrupt(digitalPinToInterrupt(PINS[MOTOR_RIGHT][HALL]), right_hall_handler, RISING);
 
   Serial.begin(115200);
-  // while(!Serial);
   while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
     {
       Serial.println("CAN BUS FAIL!");
       delay(100);
     }
   Serial.println("CAN BUS OK!");
-
   
-  home();
-}
-
-
-void home(){
-  // Left State
-  left_true_count = 100000000;
-  // Right state
-  right_true_count = 100000000;
-  // Set to retract
-  set_control(MOTOR_LEFT,RETRACT);
-  set_control(MOTOR_RIGHT,RETRACT);
-  // Homing loop
-  uint64_t p_left_count = left_true_count + 1;
-  uint64_t p_right_count = right_true_count + 1;
-
-  // Done homing
-  bool done = false;
-  while (!done) {
-    delay(100);
-    p_left_count = left_true_count;
-    p_right_count = right_true_count;
-    // During the delay we expect constantly changing pulses due to the interrupt
-    // Once a motor is set it will keep retracting
-    // So we just delay and expect interrupts to keep coming updating the value
-    // of right_true_count until it does not match p_right_count
-    delay(100);
-
-    // Have stayed in the same position for 100 ms
-    if (p_left_count == left_true_count) {
-     if (p_right_count == right_true_count) {
-        done = true;
-      } 
-    }
-  }
-
-  // Set true_count to zero
-  left_true_count = 0;
-  right_true_count = 0;
-
-  // Set to STOP after home
-  set_control(MOTOR_LEFT,STOP);
-  set_control(MOTOR_RIGHT,STOP);
-    
 }
 
 void loop()
 {
-
-  
   unsigned char len = 0;
   unsigned char buf[8];
 
@@ -130,29 +108,78 @@ void loop()
   if(CAN_MSGAVAIL == CAN.checkReceive()) {
     // read data
     CAN.readMsgBuf(&len, buf);
-
     uint32_t canId = CAN.getCanId();
 
-    // IF ESTOP freeze forever
+    if (canId == ESTART) {
+        stopped = false;
+        goto end_message;
+    }
+    
+    // IF ESTOP stop other behaviors
     if (canId == ESTOP) {
-      while(true){
-        Serial.println("HALTED");
-        delay(100);
-      }
+        stopped = true;
+        goto end_message;
     }
 
-    if (canId == PITCH_CTRL_LEFT) {
-      uint64_t target_count = extract_count(buf);
-      uint64_t tolerance = extract_tolerance(buf);
-      left_dir = get_direction(left_true_count, target_count, tolerance);
+    // do homing
+    if (!stopped && homing) {
+        if ((left_true_count == prev_left_count)
+            && (right_true_count == prev_right_count)) {
+            stationary_time++;
+        } else {
+            stationary_time = 0;
+        }
+
+        if (stationary_time > 100) {
+            homing = false;
+            left_true_count = right_true_count = 0;
+            set_control(MOTOR_LEFT, STOP);
+            set_control(MOTOR_RIGHT, STOP);
+        }
+        goto end_message;
     }
 
-    if (canId == PITCH_CTRL_RIGHT) {
-      uint64_t target_count = extract_count(buf);
-      uint64_t tolerance = extract_tolerance(buf);
-      right_dir = get_direction(right_true_count, target_count, tolerance);
+    // enter homing
+    if (!stopped && !homing) {    
+        if (canId == PITCH_CTRL_HOME) {
+            homing = true;
+            left_true_count = right_true_count = 100000000;
+            prev_left_count = prev_right_count = left_true_count+1;
+            set_control(MOTOR_LEFT, RETRACT);
+            set_control(MOTOR_RIGHT, RETRACT);
+            goto end_message;
+        }
+    }
+    
+    // standard loop
+    if (!stopped && !homing) {    
+        // If PITCH_CTRL_BOTH both if statements will fire.
+        if (canId & PITCH_CTRL_LEFT > 0) {
+            uint64_t target_count = extract_count(buf);
+            uint64_t tolerance = extract_tolerance(buf);
+            left_dir = get_direction(left_true_count, target_count, tolerance);
+        }
+        if (canId & PITCH_CTRL_RIGHT > 0) {
+            uint64_t target_count = extract_count(buf);
+            uint64_t tolerance = extract_tolerance(buf);
+            right_dir = get_direction(right_true_count, target_count, tolerance);
+        }
+
+        // Set controls
+        bool left_done = true;
+        if (!(left_dir == STOP)){
+            left_done = false;
+        }
+        set_control(MOTOR_LEFT,left_dir);
+
+        bool right_done = true;
+        if (!(right_dir == STOP)){
+            right_done = false;
+        }
+        set_control(MOTOR_RIGHT,right_dir);
     }
 
+    end_message: 
     // Printing
     Serial.println("-----------------------------");
     Serial.print("Get data from ID: ");
@@ -166,28 +193,13 @@ void loop()
     Serial.println();
 
   } // finish CAN message
-
-  // Now set the controls
-
-  bool left_done = true;
-  if (!(left_dir == STOP)){
-    left_done = false;
-  }
-  set_control(MOTOR_LEFT,left_dir);
-
-  bool right_done = true;
-  if (!(right_dir == STOP)){
-    right_done = false;
-  }
-  set_control(MOTOR_RIGHT,right_dir);
-
+  
   // Send telemetry
   send_telemetry(PITCH_TELEM_LEFT, left_true_count, left_done);
   send_telemetry(PITCH_TELEM_RIGHT, right_true_count, right_done);
 }
 
 void send_telemetry(uint32_t canId, uint64_t true_count, bool done){
-
   unsigned char buf[8] = {0};
   buf[0] = true_count >> 8*0;
   buf[1] = true_count >> 8*1;
@@ -204,39 +216,6 @@ void send_telemetry(uint32_t canId, uint64_t true_count, bool done){
 
   CAN.sendMsgBuf(canId, 0, 8, buf);
 }
-
-void set_control(enum MOTOR motor, enum DIR dir) {
-    switch (dir) {
-        case EXTEND:
-            if (motor == MOTOR_LEFT) {
-              digitalWrite(P1_L, HIGH);
-              digitalWrite(P2_L, HIGH);
-            } else {
-              digitalWrite(P1_R, HIGH);
-              digitalWrite(P2_R, HIGH);
-            }
-            break;
-        case RETRACT:
-            if (motor == MOTOR_LEFT) {
-              digitalWrite(P1_L, LOW);
-              digitalWrite(P2_L, HIGH);
-            } else {
-              digitalWrite(P1_R, LOW);
-              digitalWrite(P2_R, HIGH);
-            }
-            break;
-        case STOP:
-            if (motor == MOTOR_LEFT) {
-              digitalWrite(P1_L, LOW);
-              digitalWrite(P2_L, LOW);
-            } else {
-              digitalWrite(P1_R, LOW);
-              digitalWrite(P2_R, LOW);
-            }
-            break;
-    }
-}
-
 
 enum DIR get_direction(uint64_t true_count, uint64_t target_count, uint64_t tolerance) {
   enum DIR retdir;
