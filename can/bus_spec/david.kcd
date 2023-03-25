@@ -86,7 +86,7 @@
         <NodeRef id="0"/>
       </Producer>
       <Signal name="Velocity" offset="0" length="32"
-              slope="0.001" intercept="-100"/>
+              slope="0.001" type="signed"/>
     </Message>
 
     <Message id="0x301" name="LocoCtrlRight">
@@ -94,7 +94,7 @@
         <NodeRef id="0"/>
       </Producer>
       <Signal name="Velocity" offset="0" length="32"
-              slope="0.001" intercept="-100"/>
+              slope="0.001" type="signed" />
     </Message>
   </Bus>
 </NetworkDefinition>
