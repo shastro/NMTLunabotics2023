@@ -39,7 +39,7 @@ enum DIR {
 #define P1_R 6
 #define P2_R 12
 #define HALL_L 0
-#define HALL_R 3
+#define HALL_R 1
 
 static const int64_t DEFAULT_TRIG_DELAY = 10000; // Microsecond delay
 static const int64_t DEFAULT_MAX_COUNT = 875-20;
@@ -86,7 +86,7 @@ void set_control(enum MOTOR motor, enum DIR dir) {
     if (last_dirs[motor] != dir) {
         const static int MOTOR_ADDRESS[] = {0xB0, 0xB2};
         Wire.beginTransmission(MOTOR_ADDRESS[motor]);
-
+        
 #define CMDBYTE             0x00                    // Command byte 
 #define SPEEDBYTE           0x02                    // Byte to write to speed register
         Wire.write(SPEEDBYTE);                    
