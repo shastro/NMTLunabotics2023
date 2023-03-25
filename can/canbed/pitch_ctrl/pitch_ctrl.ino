@@ -43,7 +43,7 @@ enum DIR {
 static const int64_t DEFAULT_TRIG_DELAY = 10000; // Microsecond delay
 static const int64_t DEFAULT_MAX_COUNT = 875-10;
 static const int64_t DEFAULT_HOMING_DELAY = 10000;
-static const int64_t DEFAULT_TOLERANCE = 1000;
+static const int64_t DEFAULT_TOLERANCE = 10;
 // static const float mm_per_count = 0.17896; 
 // static const int64_t MAX_COUNT = (int64_t)((152./mm_per_count) - 30);
 
@@ -174,11 +174,11 @@ void loop()
             right_target_count = extract_value(buf, 0, 6);
             right_tolerance = extract_value(buf, 6, 2);
         }
-        if (left_target_count > MAX_COUNT) {
-          left_target_count = MAX_COUNT;
+        if (left_target_count > max_count) {
+          left_target_count = max_count;
         }
-        if (right_target_count > MAX_COUNT) {
-          right_target_count = MAX_COUNT;
+        if (right_target_count > max_count) {
+          right_target_count = max_count;
         }
     }
 
@@ -192,17 +192,17 @@ void loop()
   if (!estopped && homing) {
       left_dir = RETRACT;
       right_dir = RETRACT;
+      
       if ((left_true_count == left_prev_count)
           && (right_true_count == right_prev_count)) {
           count_stationary_timer++;
       } else {
           count_stationary_timer = 0;
       }
-
       left_prev_count = left_true_count;
       right_prev_count = right_true_count;
 
-      if (count_stationary_timer > 10000) {
+      if (count_stationary_timer > homing_delay) {
           homing = false;
           left_true_count = 0; 
           right_true_count = 0;
@@ -211,29 +211,18 @@ void loop()
       }
  }
   
-  bool left_done = false;
-  bool right_done = false;
-  
   // Standard movement towards target counts
   if (!estopped && !homing) {
       left_dir = get_direction(left_true_count, left_target_count, left_tolerance);
       right_dir = get_direction(right_true_count, right_target_count, right_tolerance);
-      // Set controls
-
-      if (left_dir == STOP) {
-          left_done = true;
-      }
-      if (right_dir == STOP) {
-          right_done = true;
-      }
   }
   
   set_control(MOTOR_LEFT, left_dir);
   set_control(MOTOR_RIGHT, right_dir);
 
   // Send telemetry
-  send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, left_true_count, left_done);
-  send_telemetry(DAVID_PITCH_TELEM_RIGHT_FRAME_ID, right_true_count, right_done);
+  send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, left_true_count, left_dir == STOP);
+  send_telemetry(DAVID_PITCH_TELEM_RIGHT_FRAME_ID, right_true_count, right_dir == STOP);
 
 }
 
@@ -257,7 +246,7 @@ void send_telemetry(uint32_t canId, int64_t true_count, bool done){
 
 enum DIR get_direction(int64_t true_count, int64_t target_count, int64_t tolerance) {
   enum DIR retdir = STOP;
-  if (abs((int64_t)true_count - (int64_t)target_count) > tolerance) {
+  if (abs((int64_t)true_count - (int64_t)target_count) > DEFAULT_TOLERANCE) {
     if (true_count > target_count) {
       retdir = RETRACT;  
     } else {
