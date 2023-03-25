@@ -1,4 +1,5 @@
-// receive a frame from can bus
+// pitch controllers
+// extends and retracts to lengths given by CAN messages with high accuracy.
 
 #include <SPI.h>
 #include <Wire.h>
@@ -127,11 +128,11 @@ void setup()
 
 void loop()
 {
-    unsigned char len = 0;
-    unsigned char buf[8] = {0};
-  
     // Check for new messages
     if(CAN_MSGAVAIL == CAN.checkReceive()) {
+        unsigned char len = 0;
+        unsigned char buf[8] = {0};
+
         // read data
         CAN.readMsgBuf(&len, buf);
         uint32_t canId = CAN.getCanId();
