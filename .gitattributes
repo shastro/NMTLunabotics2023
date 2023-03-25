@@ -1,3 +1,11 @@
 docker-scripts/* filter=munge-project-identifier
 scripts/* filter=munge-project-identifier
 ros/*.sh filter=munge-project-identifier
+
+* text=auto
+
+*.c text
+*.cpp text
+*.h text
+*.hpp text
+*.ino text
