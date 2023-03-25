@@ -41,9 +41,9 @@ enum DIR {
 #define HALL_R 3
 
 static const int64_t DEFAULT_TRIG_DELAY = 10000; // Microsecond delay
-static const int64_t DEFAULT_MAX_COUNT = 875-10;
-static const int64_t DEFAULT_HOMING_DELAY = 10000;
-static const int64_t DEFAULT_TOLERANCE = 10;
+static const int64_t DEFAULT_MAX_COUNT = 875-20;
+static const int64_t DEFAULT_HOMING_DELAY = 300;
+static const int64_t DEFAULT_TOLERANCE = 1000;
 // static const float mm_per_count = 0.17896; 
 // static const int64_t MAX_COUNT = (int64_t)((152./mm_per_count) - 30);
 
@@ -99,6 +99,7 @@ void set_control(enum MOTOR motor, enum DIR dir) {
 
 void setup()
 {
+
   // PinModes
   pinMode(PIN_TABLE[MOTOR_LEFT][HALL], INPUT_PULLUP);
   pinMode(PIN_TABLE[MOTOR_LEFT][P1], OUTPUT);
@@ -173,6 +174,10 @@ void loop()
         if (canId == DAVID_PITCH_CTRL_RIGHT_FRAME_ID) {
             right_target_count = extract_value(buf, 0, 6);
             right_tolerance = extract_value(buf, 6, 2);
+			Serial.print("Target count: ");
+			Serial.println((int)right_target_count);
+			Serial.print("Tolerance: ");
+			Serial.println((int)right_tolerance);
         }
         if (left_target_count > max_count) {
           left_target_count = max_count;
@@ -212,6 +217,7 @@ void loop()
  }
   
   // Standard movement towards target counts
+
   if (!estopped && !homing) {
       left_dir = get_direction(left_true_count, left_target_count, left_tolerance);
       right_dir = get_direction(right_true_count, right_target_count, right_tolerance);
@@ -219,9 +225,15 @@ void loop()
   
   set_control(MOTOR_LEFT, left_dir);
   set_control(MOTOR_RIGHT, right_dir);
+  // set_control(MOTOR_LEFT, EXTEND);
+  // set_control(MOTOR_RIGHT, EXTEND);
 
+  // Serial.print("Right dir");
+  // Serial.println(right_dir); 
+  Serial.print("Right count:");
+  Serial.println((long) right_true_count);
   // Send telemetry
-  send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, left_true_count, left_dir == STOP);
+  send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, right_target_count, left_dir == STOP);
   send_telemetry(DAVID_PITCH_TELEM_RIGHT_FRAME_ID, right_true_count, right_dir == STOP);
 
 }
@@ -245,8 +257,11 @@ void send_telemetry(uint32_t canId, int64_t true_count, bool done){
 }
 
 enum DIR get_direction(int64_t true_count, int64_t target_count, int64_t tolerance) {
-  enum DIR retdir = STOP;
-  if (abs((int64_t)true_count - (int64_t)target_count) > DEFAULT_TOLERANCE) {
+  enum DIR retdir = STOP; // Should be stop
+  // Serial.println(abs((int)true_count - (int)target_count));
+  // Serial.print("target_count: ");
+  // Serial.println((int)target_count);
+  if (abs(true_count - target_count) >= 10) {
     if (true_count > target_count) {
       retdir = RETRACT;  
     } else {
