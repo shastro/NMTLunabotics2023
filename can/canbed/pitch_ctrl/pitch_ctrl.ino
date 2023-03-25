@@ -40,17 +40,12 @@ enum DIR {
 #define HALL_L 0
 #define HALL_R 3
 
-
-// 30 is a fudge factor for how close we can 
-// get to the end
-static const float mm_per_count = 0.17896;
+static const int64_t DEFAULT_TRIG_DELAY = 10000; // Microsecond delay
+static const int64_t DEFAULT_MAX_COUNT = 875-10;
+static const int64_t DEFAULT_HOMING_DELAY = 10000;
+static const int64_t DEFAULT_TOLERANCE = 1000;
+// static const float mm_per_count = 0.17896; 
 // static const int64_t MAX_COUNT = (int64_t)((152./mm_per_count) - 30);
-static const int64_t MAX_COUNT = 875-10;
-
-static const int64_t default_trig_delay = 10000; // Microsecond delay
-static int64_t trig_delay = default_trig_delay;
-static int64_t left_last_trigger = 0;
-static int64_t right_last_trigger = 0;
 
 static const int PIN_TABLE[2][3] = {
     { HALL_L, P1_L, P2_L  },
@@ -60,21 +55,27 @@ static const int PIN_TABLE[2][3] = {
 MCP_CAN CAN(SPI_CS_PIN); // Set CS pin
 
 // Left State
-static volatile int64_t left_true_count;
-static int64_t left_prev_count;
-static int64_t left_target_count;
-static int64_t left_tolerance;
+static volatile int64_t left_true_count = 0;
+static int64_t left_prev_count = 0;
+static int64_t left_target_count = 0;
+static int64_t left_tolerance = DEFAULT_TOLERANCE;
+static int64_t left_last_trigger = 0;
 
 // Right state
-static volatile int64_t right_true_count;
-static int64_t right_prev_count;
-static int64_t right_target_count;
-static int64_t right_tolerance;
+static volatile int64_t right_true_count = 0;
+static int64_t right_prev_count = 0;
+static int64_t right_target_count = 0;
+static int64_t right_tolerance = DEFAULT_TOLERANCE;
+static int64_t right_last_trigger = 0;
 
-static int count_stationary_timer;
+static int64_t max_count = DEFAULT_MAX_COUNT;
+static int64_t trig_delay = DEFAULT_TRIG_DELAY;
+static int64_t homing_delay = DEFAULT_HOMING_DELAY;
 
-enum DIR left_dir;
-enum DIR right_dir;
+static int count_stationary_timer = 0;
+
+enum DIR left_dir = STOP;
+enum DIR right_dir = STOP;
 
 bool estopped = false;
 bool homing = true;
@@ -113,10 +114,10 @@ void setup()
   Serial.begin(115200);
   while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
     {
-      // Serial.println("CAN BUS FAIL!");
+      Serial.println("CAN BUS FAIL!");
       delay(100);
     }
-  // Serial.println("CAN BUS OK!");
+  Serial.println("CAN BUS OK!");
   
 }
 
@@ -141,7 +142,8 @@ void loop()
     }
 
     if (canId == DAVID_SET_TRIG_DELAY_FRAME_ID) {
-        trig_delay = extract_count(buf);
+        trig_delay = extract_value(buf, 0, 6);
+        max_count = extract_value(buf, 6, 2);
     }
 
     // Enter homing state
@@ -159,22 +161,18 @@ void loop()
     if (!estopped && !homing) {    
         // If PITCH_CTRL_BOTH both if statements will fire.
         if (canId == DAVID_PITCH_CTRL_BOTH_FRAME_ID) {
-            left_target_count = extract_count(buf);
+            left_target_count = extract_value(buf, 0, 6);
             right_target_count = left_target_count;
-            left_tolerance = extract_tolerance(buf);
+            left_tolerance = extract_value(buf, 6, 2);
             right_tolerance = left_tolerance;
-            Serial.println("SET BOTH");
         }
         if (canId == DAVID_PITCH_CTRL_LEFT_FRAME_ID) {
-            left_target_count = extract_count(buf);
-            Serial.println("SET LEFT");
-            left_tolerance = extract_tolerance(buf);
+            left_target_count = extract_value(buf, 0, 6);
+            left_tolerance = extract_value(buf, 6, 2);
         }
         if (canId == DAVID_PITCH_CTRL_RIGHT_FRAME_ID) {
-            right_target_count = extract_count(buf);
-            Serial.print("SET RIGHT: ");
-            Serial.println((int)right_target_count);
-            right_tolerance = extract_tolerance(buf);
+            right_target_count = extract_value(buf, 0, 6);
+            right_tolerance = extract_value(buf, 6, 2);
         }
         if (left_target_count > MAX_COUNT) {
           left_target_count = MAX_COUNT;
@@ -186,15 +184,7 @@ void loop()
 
     // Print CAN message
     Serial.println("-----------------------------");
-    // Serial.print("Get data from ID: ");
-    // Serial.println(canId, HEX);
-
-    // // print the data
-    // for(int i = 0; i<len; i++) {
-    //   Serial.print(buf[i], HEX);
-    //   Serial.print("\t");
-    // }
-    // Serial.println();
+    Serial.println(canId, HEX);
 
   } // finish CAN message
 
@@ -219,13 +209,8 @@ void loop()
           left_target_count = 0;
           right_target_count = 0;
       }
- } else {
-    
-    // left_dir = EXTEND;
-    // right_dir = EXTEND;
-  }
-    
-
+ }
+  
   bool left_done = false;
   bool right_done = false;
   
@@ -243,13 +228,10 @@ void loop()
       }
   }
   
-  right_dir = EXTEND;
-  left_dir = EXTEND;
-  // set_control(MOTOR_LEFT, left_dir);
-  // set_control(MOTOR_RIGHT, right_dir);
+  set_control(MOTOR_LEFT, left_dir);
+  set_control(MOTOR_RIGHT, right_dir);
 
-  // Serial.println((int)MAX_COUNT);
-  // Send telemetry0.17896
+  // Send telemetry
   send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, left_true_count, left_done);
   send_telemetry(DAVID_PITCH_TELEM_RIGHT_FRAME_ID, right_true_count, right_done);
 
@@ -274,17 +256,15 @@ void send_telemetry(uint32_t canId, int64_t true_count, bool done){
 }
 
 enum DIR get_direction(int64_t true_count, int64_t target_count, int64_t tolerance) {
-  enum DIR retdir;
-  if (abs((int64_t)true_count - (int64_t)target_count) > 1000) {
+  enum DIR retdir = STOP;
+  if (abs((int64_t)true_count - (int64_t)target_count) > tolerance) {
     if (true_count > target_count) {
       retdir = RETRACT;  
     } else {
       retdir = EXTEND;  
     }
-  } else {
-    retdir = STOP;
   }
-
+  
   return retdir;
 }
 
@@ -293,18 +273,12 @@ void left_hall_handler(){
 	  left_last_trigger = micros();
 	  switch (left_dir) {
 	    case RETRACT: 
-	      // if (left_true_count == 0) {
-	      //   // Should never happen ideally
-	      //   // just going to clamp at zero
-	      //   return;
-	      // }
 	      left_true_count -= 1;
 	      break;
 	    case EXTEND: 
 	      left_true_count += 1;
 	      break;
 	    case STOP: 
-	      // Should never happen
 	      break;
 	  }
   } 
@@ -315,9 +289,6 @@ void right_hall_handler(){
 	  right_last_trigger = micros();
 	  switch (right_dir) {
 	    case RETRACT: 
-	      // if (right_true_count == 0) {
-	      //   return;
-	      // }
 	      right_true_count -= 1;
 	      break;
 	    case EXTEND: 
@@ -327,28 +298,14 @@ void right_hall_handler(){
 	      break;
 	  }
   }
-
 }
 
-int64_t extract_count(char buf[]) {
+int64_t extract_value(char buf[], int first_byte, int bytes) {
   int64_t count = 0;
   int64_t temp = 0;
-  for (int i=0; i<6; i++) {
+  for (int i = first_byte; i< first_byte+bytes; i++) {
     temp = (int64_t)buf[i];
     count += temp << (8*i);
   }
-  return count;
+  return count;  
 }
-
-int64_t extract_tolerance(char buf[]) {
-  int64_t tolerance = 0;
-  int64_t temp = 0;
-  for (int i=6; i<8; i++) {
-    temp = (int64_t)buf[i];
-    tolerance += temp << (8*i);
-  }
-  return tolerance;
-}
-/*********************************************************************************************************
-  END FILE
-*********************************************************************************************************/

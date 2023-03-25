@@ -38,6 +38,7 @@
         <NodeRef id="0"/>
       </Producer>
       <Signal name="Microseconds" offset="0" length="48"/>
+      <Signal name="MaxCount" offset="48" length="16" />
     </Message>
     
     <Message id="0x101" name="PitchCtrlLeft">
