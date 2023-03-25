@@ -85,6 +85,7 @@ mkShell {
       '')
 
     (import ./cantools { inherit pkgs; })
+    (import ./arduino-nix { inherit pkgs; })
     # (import ./libcan { inherit pkgs; })
   ];
 }
