@@ -32,6 +32,13 @@
         <NodeRef id="0"/>
       </Producer>
     </Message>
+
+    <Message id="0x020" name="SetTrigDelay">
+      <Producer>
+        <NodeRef id="0"/>
+      </Producer>
+      <Signal name="Microseconds" offset="0" length="48"/>
+    </Message>
     
     <Message id="0x101" name="PitchCtrlLeft">
       <Producer>

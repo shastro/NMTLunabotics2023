@@ -47,7 +47,8 @@ static const float mm_per_count = 0.17896;
 // static const int64_t MAX_COUNT = (int64_t)((152./mm_per_count) - 30);
 static const int64_t MAX_COUNT = 875-10;
 
-static const int64_t trig_delay = 10000; // Microsecond delay
+static const int64_t default_trig_delay = 10000; // Microsecond delay
+static int64_t trig_delay = default_trig_delay;
 static int64_t left_last_trigger = 0;
 static int64_t right_last_trigger = 0;
 
@@ -132,13 +133,15 @@ void loop()
 
     if (canId == DAVID_E_START_FRAME_ID) {
         estopped = false;
-        goto end_message;
     }
     
     // IF ESTOP stop other behaviors
     if (canId == DAVID_E_STOP_FRAME_ID) {
         estopped = true;
-        goto end_message;
+    }
+
+    if (canId == DAVID_SET_TRIG_DELAY_FRAME_ID) {
+        trig_delay = extract_count(buf);
     }
 
     // Enter homing state
@@ -149,8 +152,6 @@ void loop()
             right_target_count = 0;
             left_prev_count = left_true_count+1;
             right_prev_count = right_true_count+1;
-
-            goto end_message;
         }
     }
     
@@ -182,7 +183,7 @@ void loop()
           right_target_count = MAX_COUNT;
         }
     }
-    end_message: 
+
     // Print CAN message
     Serial.println("-----------------------------");
     // Serial.print("Get data from ID: ");
