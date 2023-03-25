@@ -1,6 +1,7 @@
 // receive a frame from can bus
 
 #include <SPI.h>
+#include <Wire.h>
 #include "mcp_can.h"
 
 // Import CAN message constants
@@ -28,9 +29,9 @@ enum VOLTZ {
 };
 
 enum DIR {
-  EXTEND,
-  RETRACT,
-  STOP,
+  EXTEND = 1,
+  RETRACT = 2,
+  STOP = 0,
 };
 
 #define P1_L 4
@@ -76,30 +77,32 @@ static int count_stationary_timer = 0;
 
 enum DIR left_dir = STOP;
 enum DIR right_dir = STOP;
+enum DIR last_dirs[] = {4, 4};
 
 bool estopped = false;
 bool homing = true;
 
 void set_control(enum MOTOR motor, enum DIR dir) {
-    switch (dir) {
-    case EXTEND:
-        digitalWrite(PIN_TABLE[motor][P1], HIGH);
-        digitalWrite(PIN_TABLE[motor][P2], HIGH);
-        break;
-    case RETRACT:
-        digitalWrite(PIN_TABLE[motor][P1], LOW);
-        digitalWrite(PIN_TABLE[motor][P2], HIGH);
-        break;
-    case STOP:
-        digitalWrite(PIN_TABLE[motor][P1], LOW);
-        digitalWrite(PIN_TABLE[motor][P2], LOW);
-        break;
+    if (last_dirs[motor] != dir) {
+        const static int MOTOR_ADDRESS[] = {0xB0, 0xB2};
+        Wire.beginTransmission(MOTOR_ADDRESS[motor]);
+
+#define CMDBYTE             0x00                    // Command byte 
+#define SPEEDBYTE           0x02                    // Byte to write to speed register
+        Wire.write(SPEEDBYTE);                    
+        Wire.write(255);
+        Wire.write(CMDBYTE);
+        Wire.write(dir);
+    
+        Wire.endTransmission();
     }
+    last_dirs[motor] = dir;
 }
 
 void setup()
 {
-
+    Wire.begin();
+    
   // PinModes
   pinMode(PIN_TABLE[MOTOR_LEFT][HALL], INPUT_PULLUP);
   pinMode(PIN_TABLE[MOTOR_LEFT][P1], OUTPUT);
