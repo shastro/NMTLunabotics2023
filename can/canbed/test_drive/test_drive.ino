@@ -1,36 +1,43 @@
 // receive a frame from can bus
 
-#include <SPI.h>
 #include <Wire.h>
-#include "mcp_can.h"
+// #include "mcp_can.h"
 
 // Import CAN message constants
-#include "david.h"
-#define ADDRESS             0xB0                    // Address of MD03
+// #include "david.h"
+#define ADDRESS             0x58                    // Address of MD03
 #define SOFTREG             0x07                    // Byte to read software
 #define CMDBYTE             0x00                    // Command byte
 #define SPEEDBYTE           0x02                    // Byte to write to speed register
 #define TEMPREG             0x04                    // Byte to read temperature
 #define CURRENTREG          0x05                    // Byte to read motor current
+#define STATUSREG           0x01
 
 
 void setup()
 {
+    // while(Serial.available() == 0);
+    // Serial.read();
+    // Serial.println("fuck");
+
     Wire.begin();
     delay(100);
-    
-    // PinModes
-    /* pinMode(P1_L, OUTPUT); */
-    /* pinMode(P2_L, OUTPUT); */
-    /* pinMode(P1_R, OUTPUT); */
-    /* pinMode(P1_R, OUTPUT); */
+
+    Serial.print("Wire:");
+    Serial.begin(19200);                              // Start Serial connection
+    delay(100);    
+
 }
 
 void loop()
 {
-    sendData(SPEEDBYTE, 0xff);             // Sets speed to i
-    sendData(CMDBYTE, 0);          // Sets motor to direct, a value of 1 runs the motor forward and 2 runs backward
+    // Serial.println("Bruh");
+    sendData(0x3, 0x3);
+    sendData(SPEEDBYTE, 255);             // Sets speed to i
+    sendData(CMDBYTE, 1);          // Sets motor to direct, a value of 1 runs the motor forward and 2 runs backward
+    // showData();
     delay(100);  
+    // Serial.println("Bruh2");
     
 }
 
@@ -50,5 +57,26 @@ void sendData(byte reg, byte val){      // Function for sending data to MD03
   Wire.beginTransmission(ADDRESS);      // Send data to MD03
     Wire.write(reg);                    // Command like Direction, Speed
     Wire.write(val);                    // Value for the command
-  Wire.endTransmission();
+  int error = Wire.endTransmission();
+    Serial.println(error);
+}
+
+void showData() {
+   
+    byte status= getData(STATUSREG); // Get current value (186 = 20 Amp) to Serial
+    delay(10);
+    // Serial.print(" - Status: ");       
+    // Serial.print(status);              
+    
+    byte current = getData(CURRENTREG); // Get current value (186 = 20 Amp) to Serial
+    delay(10);
+    // Serial.print(" - Current: ");       
+    // Serial.print(current);              
+    
+    byte temp = getData(TEMPREG);       // Get surface temperature of the PCB in degrees centigrade.
+    delay(10);
+    // Serial.print(" - Temperature: ");
+    // Serial.print(temp);                
+    
+    // Serial.println(".");                // Point at the end of the line and an Enter
 }

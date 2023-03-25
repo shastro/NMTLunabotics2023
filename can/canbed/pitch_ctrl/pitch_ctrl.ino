@@ -34,12 +34,22 @@ enum DIR {
   STOP = 0,
 };
 
+// Pins
 #define P1_L 4
 #define P2_L 5
 #define P1_R 6
 #define P2_R 12
 #define HALL_L 0
 #define HALL_R 1
+
+// I2C Registers
+#define SOFTREG             0x07                    // Byte to read software
+#define CMDBYTE             0x00                    // Command byte
+#define SPEEDBYTE           0x02                    // Byte to write to speed register
+#define TEMPREG             0x04                    // Byte to read temperature
+#define CURRENTREG          0x05                    // Byte to read motor current
+#define STATUSREG           0x01
+#define ACCREG              0x03
 
 static const int64_t DEFAULT_TRIG_DELAY = 10000; // Microsecond delay
 static const int64_t DEFAULT_MAX_COUNT = 875-20;
@@ -83,25 +93,20 @@ bool estopped = false;
 bool homing = true;
 
 void set_control(enum MOTOR motor, enum DIR dir) {
-    if (last_dirs[motor] != dir) {
-        const static int MOTOR_ADDRESS[] = {0xB0, 0xB2};
-        Wire.beginTransmission(MOTOR_ADDRESS[motor]);
+    // if (last_dirs[motor] != dir) {
+        const static int MOTOR_ADDRESS[] = {0xB0, 0x58};
+	    sendData(MOTOR_ADDRESS[motor],ACCREG, 0x3);
+        sendData(MOTOR_ADDRESS[motor],SPEEDBYTE, 255);
+        sendData(MOTOR_ADDRESS[motor],CMDBYTE, dir);
         
-#define CMDBYTE             0x00                    // Command byte 
-#define SPEEDBYTE           0x02                    // Byte to write to speed register
-        Wire.write(SPEEDBYTE);                    
-        Wire.write(255);
-        Wire.write(CMDBYTE);
-        Wire.write(dir);
-    
-        Wire.endTransmission();
-    }
-    last_dirs[motor] = dir;
+    // }
+    // last_dirs[motor] = dir;
 }
 
 void setup()
 {
     Wire.begin();
+	delay(100);
     
   // PinModes
   pinMode(PIN_TABLE[MOTOR_LEFT][HALL], INPUT_PULLUP);
@@ -112,8 +117,8 @@ void setup()
   pinMode(PIN_TABLE[MOTOR_RIGHT][P2], OUTPUT);
 
   // Interrupts
-  attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_LEFT][HALL]), left_hall_handler, RISING);
-  attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_RIGHT][HALL]), right_hall_handler, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_LEFT][HALL]), left_hall_handler, FALLING);
+  attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_RIGHT][HALL]), right_hall_handler, FALLING);
 
   Serial.begin(115200);
   while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
@@ -130,7 +135,7 @@ void loop()
   unsigned char len = 0;
   unsigned char buf[8] = {0};
   
-  // Check for new messages
+// Check for new messages
   if(CAN_MSGAVAIL == CAN.checkReceive()) {
     // read data
     CAN.readMsgBuf(&len, buf);
@@ -217,22 +222,20 @@ void loop()
           left_target_count = 0;
           right_target_count = 0;
       }
+ } else {
+		
+}
+  
+// Standard movement towards target counts
+
+ if (!estopped && !homing) {
+     left_dir = get_direction(left_true_count, left_target_count, left_tolerance);
+     right_dir = get_direction(right_true_count, right_target_count, right_tolerance);
  }
   
-  // Standard movement towards target counts
-
-  if (!estopped && !homing) {
-      left_dir = get_direction(left_true_count, left_target_count, left_tolerance);
-      right_dir = get_direction(right_true_count, right_target_count, right_tolerance);
-  }
-  
-  set_control(MOTOR_LEFT, left_dir);
+  // set_control(MOTOR_LEFT, left_dir);
   set_control(MOTOR_RIGHT, right_dir);
-  // set_control(MOTOR_LEFT, EXTEND);
-  // set_control(MOTOR_RIGHT, EXTEND);
 
-  // Serial.print("Right dir");
-  // Serial.println(right_dir); 
   Serial.print("Right count:");
   Serial.println((long) right_true_count);
   // Send telemetry
@@ -315,4 +318,28 @@ int64_t extract_value(char buf[], int first_byte, int bytes) {
     count += temp << (8*i);
   }
   return count;  
+}
+
+void sendData(byte addr, byte reg, byte val){      // Function for sending data to MD03
+  Wire.beginTransmission(addr);      // Send data to MD03
+    Wire.write(reg);                    // Command like Direction, Speed
+    Wire.write(val);                    // Value for the command
+    int error = Wire.endTransmission();
+	if(error) {
+	  Serial.print("I2C ERROR:");
+	  Serial.println(error);
+	}
+	delay(10);
+}
+
+byte getData(byte addr, byte reg){                 // function for getting data from MD03
+  Wire.beginTransmission(addr);
+  Wire.write(reg);
+  Wire.endTransmission();
+  
+  Wire.requestFrom(addr, 1);         // Requests byte from MD03
+  while(Wire.available() < 1);          // Waits for byte to become available
+  byte data = Wire.read();
+
+  return(data);
 }
