@@ -83,16 +83,16 @@ bool homing = true;
 void set_control(enum MOTOR motor, enum DIR dir) {
     switch (dir) {
     case EXTEND:
-        analogWrite(PIN_TABLE[motor][P1], V0);
-        analogWrite(PIN_TABLE[motor][P2], V5);
+        digitalWrite(PIN_TABLE[motor][P1], HIGH);
+        digitalWrite(PIN_TABLE[motor][P2], HIGH);
         break;
     case RETRACT:
-        analogWrite(PIN_TABLE[motor][P1], V0);
-        analogWrite(PIN_TABLE[motor][P2], V0);
+        digitalWrite(PIN_TABLE[motor][P1], LOW);
+        digitalWrite(PIN_TABLE[motor][P2], HIGH);
         break;
     case STOP:
-        analogWrite(PIN_TABLE[motor][P1], V0);
-        analogWrite(PIN_TABLE[motor][P2], V2_5);
+        digitalWrite(PIN_TABLE[motor][P1], LOW);
+        digitalWrite(PIN_TABLE[motor][P2], LOW);
         break;
     }
 }
