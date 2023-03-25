@@ -34,6 +34,7 @@ int fd::into_raw() {
     return id_;
 }
 
+SocketCAN::SocketCAN() {}
 SocketCAN::SocketCAN(const string &interface) {
     sock = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if (*sock == -1)
@@ -61,7 +62,7 @@ void SocketCAN::transmit(const struct can_frame &cf) {
         throw string("Error transmitting CAN frame");
 }
 
-void SocketCAN::transmit(uint8_t data[8], int can_id) {
+void SocketCAN::transmit(int can_id, uint8_t data[8]) {
     struct can_frame frame;
     frame.can_id = can_id;
     frame.can_dlc = 8 * sizeof(data[0]);

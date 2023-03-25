@@ -11,6 +11,7 @@
 #include "can_interface.hpp"
 
 #define CAN_BUS "can0"
+SocketCAN can;
 
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
 
@@ -21,7 +22,6 @@ void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
               << std::endl;
 
     uint8_t message[8];
-    SocketCAN can(CAN_BUS);
     int can_id;
 
     if (m == LEFT) {
@@ -47,10 +47,12 @@ void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
         can_id = DAVID_PITCH_CTRL_BOTH_FRAME_ID;
     }
 
-    can.transmit(message, can_id);
+    can.transmit(can_id, message);
 }
 
 int main(int argc, char **argv) {
+    can = SocketCAN(CAN_BUS);
+
     ros::init(argc, argv, "pitch_ctrl_node");
     ros::NodeHandle nh;
     ros::Subscriber sub = nh.subscribe("pitch_control", 1024, pitchCallback);
