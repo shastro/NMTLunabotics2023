@@ -11,7 +11,6 @@ CONTAINER_NAME=lunabotics-2023-robot
 
 # Build the image.
 docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
-docker image rm ros:noetic-ros-core
 
 params=(
     # Detach from the container, and create a fake virtual terminal.
