@@ -44,7 +44,12 @@ enum DIR {
 // 30 is a fudge factor for how close we can 
 // get to the end
 static const float mm_per_count = 0.17896;
-static const int64_t MAX_COUNT = (int64_t)((152./mm_per_count) - 30);
+// static const int64_t MAX_COUNT = (int64_t)((152./mm_per_count) - 30);
+static const int64_t MAX_COUNT = 875-10;
+
+static const int64_t trig_delay = 10000; // Microsecond delay
+static int64_t left_last_trigger = 0;
+static int64_t right_last_trigger = 0;
 
 static const int PIN_TABLE[2][3] = {
     { HALL_L, P1_L, P2_L  },
@@ -237,12 +242,14 @@ void loop()
       }
   }
   
-  set_control(MOTOR_LEFT, left_dir);
-  set_control(MOTOR_RIGHT, right_dir);
+  right_dir = EXTEND;
+  left_dir = EXTEND;
+  // set_control(MOTOR_LEFT, left_dir);
+  // set_control(MOTOR_RIGHT, right_dir);
 
-  Serial.println((int)MAX_COUNT);
-  // Send telemetry
-  send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, right_target_count, left_done);
+  // Serial.println((int)MAX_COUNT);
+  // Send telemetry0.17896
+  send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, left_true_count, left_done);
   send_telemetry(DAVID_PITCH_TELEM_RIGHT_FRAME_ID, right_true_count, right_done);
 
 }
@@ -279,51 +286,47 @@ enum DIR get_direction(int64_t true_count, int64_t target_count, int64_t toleran
 
   return retdir;
 }
-// enum DIR get_direction(int64_t true_count, int64_t target_count, int64_t tolerance) {
-//   enum DIR retdir = STOP;
-
-//   if (true_count + tolerance > target_count) {
-//       retdir = RETRACT;
-//   }
-//   if (true_count - tolerance < target_count) {
-//       retdir = EXTEND;
-//   }
-  
-//   return retdir;
-// }
 
 void left_hall_handler(){
-  switch (left_dir) {
-    case RETRACT: 
-      // if (left_true_count == 0) {
-      //   // Should never happen ideally
-      //   // just going to clamp at zero
-      //   return;
-      // }
-      left_true_count -= 1;
-      break;
-    case EXTEND: 
-      left_true_count += 1;
-      break;
-    case STOP: 
-      // Should never happen
-      break;
-  }
+  if ((micros() - left_last_trigger) > trig_delay) {
+	  left_last_trigger = micros();
+	  switch (left_dir) {
+	    case RETRACT: 
+	      // if (left_true_count == 0) {
+	      //   // Should never happen ideally
+	      //   // just going to clamp at zero
+	      //   return;
+	      // }
+	      left_true_count -= 1;
+	      break;
+	    case EXTEND: 
+	      left_true_count += 1;
+	      break;
+	    case STOP: 
+	      // Should never happen
+	      break;
+	  }
+  } 
+
 }
 void right_hall_handler(){
-  switch (right_dir) {
-    case RETRACT: 
-      // if (right_true_count == 0) {
-      //   return;
-      // }
-      right_true_count -= 1;
-      break;
-    case EXTEND: 
-      right_true_count += 1;
-      break;
-    case STOP: 
-      break;
+  if ((micros() - right_last_trigger) > trig_delay) {
+	  right_last_trigger = micros();
+	  switch (right_dir) {
+	    case RETRACT: 
+	      // if (right_true_count == 0) {
+	      //   return;
+	      // }
+	      right_true_count -= 1;
+	      break;
+	    case EXTEND: 
+	      right_true_count += 1;
+	      break;
+	    case STOP: 
+	      break;
+	  }
   }
+
 }
 
 int64_t extract_count(char buf[]) {
