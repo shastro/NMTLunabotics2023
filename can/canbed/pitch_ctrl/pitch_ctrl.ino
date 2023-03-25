@@ -93,7 +93,7 @@ bool homing = true;
 
 void set_control(enum MOTOR motor, enum DIR dir) {
     const static int MOTOR_ADDRESS[] = {0xB0, 0x58};
-    sendData(MOTOR_ADDRESS[motor],ACCREG, 0x3);
+    sendData(MOTOR_ADDRESS[motor],ACCREG, 0x8);
     sendData(MOTOR_ADDRESS[motor],SPEEDBYTE, 255);
     sendData(MOTOR_ADDRESS[motor],CMDBYTE, dir);
 }
