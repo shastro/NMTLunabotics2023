@@ -26,7 +26,7 @@
         <NodeRef id="0"/>
       </Producer>
     </Message>
-    
+
     <Message id="0x010" name="PitchCtrlHome">
       <Producer>
         <NodeRef id="0"/>
@@ -40,7 +40,7 @@
       <Signal name="Microseconds" offset="0" length="48"/>
       <Signal name="MaxCount" offset="48" length="16" />
     </Message>
-    
+
     <Message id="0x101" name="PitchCtrlLeft">
       <Producer>
         <NodeRef id="0"/>
@@ -79,6 +79,22 @@
       </Producer>
       <Signal name="Count" offset="0" length="48"/>
       <Signal name="Done" offset="48"/>
+    </Message>
+
+    <Message id="0x300" name="LocoCtrlLeft">
+      <Producer>
+        <NodeRef id="0"/>
+      </Producer>
+      <Signal name="Velocity" offset="0" length="32"
+              slope="0.001" intercept="-100"/>
+    </Message>
+
+    <Message id="0x301" name="LocoCtrlRight">
+      <Producer>
+        <NodeRef id="0"/>
+      </Producer>
+      <Signal name="Velocity" offset="0" length="32"
+              slope="0.001" intercept="-100"/>
     </Message>
   </Bus>
 </NetworkDefinition>
