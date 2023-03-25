@@ -21,7 +21,7 @@ sudo docker run \
          cd $PWD
          export HOME="$HOME"
          export PS1='\u@\h:\w\$ '
-         [ -e $DIR/catkin_ws/devel/setup.sh ] && . $DIR/catkin_ws/devel/setup.sh
+         [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
          export ROS_MASTER_URI='http://jetson:11311'
          bash
      "
