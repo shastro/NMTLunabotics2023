@@ -46,8 +46,8 @@ trap cleanup INT
 # Set up the ROS core.
 docker run "${params[@]}" $IMAGE_NAME roscore
 
-# # Run the camera node.
-# docker exec $CONTAINER_NAME /ros_entrypoint.sh /scripts/unfuck_realsense
+# Run the camera node.
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh /scripts/unfuck_realsense
 
 # Run the motor_bridge node.
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun motor_bridge pitch_ctrl
