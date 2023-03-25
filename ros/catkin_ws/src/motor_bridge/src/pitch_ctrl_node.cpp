@@ -51,14 +51,18 @@ void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
 }
 
 int main(int argc, char **argv) {
-    can = SocketCAN(CAN_BUS);
+    try {
+        can = SocketCAN(CAN_BUS);
 
-    ros::init(argc, argv, "pitch_ctrl_node");
-    ros::NodeHandle nh;
-    ros::Subscriber sub = nh.subscribe("pitch_control", 1024, pitchCallback);
+        ros::init(argc, argv, "pitch_ctrl_node");
+        ros::NodeHandle nh;
+        ros::Subscriber sub =
+            nh.subscribe("pitch_control", 1024, pitchCallback);
 
-    // Callback event loop
-    ros::spin();
-
-    return 0;
+        // Callback event loop
+        ros::spin();
+    } catch (std::string err) {
+        std::cerr << err << std::endl;
+        return 1;
+    }
 }
