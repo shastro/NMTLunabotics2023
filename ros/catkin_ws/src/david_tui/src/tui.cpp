@@ -12,6 +12,8 @@ using namespace std;
 
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
 
+static void send_targets(int left_target, int right_target);
+
 #define print_bold(...)                                                        \
     do {                                                                       \
         attron(A_BOLD);                                                        \
@@ -19,7 +21,14 @@ enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
         attroff(A_BOLD);                                                       \
     } while (0)
 
+ros::Publisher publisher;
+
 int main(int argc, char **argv) {
+    ros::init(argc, argv, "david_tui");
+    ros::NodeHandle nh;
+    publisher = nh.advertise<motor_bridge::Pitch>("/pitch_control", 5);
+
+    // Setup ncurses.
     initscr();
     cbreak();
     keypad(stdscr, true);
@@ -95,6 +104,7 @@ int main(int argc, char **argv) {
                 right_target -= 64;
                 right_target = max(right_target, 0);
             }
+            send_targets(left_target, right_target);
             break;
         case ']':
             if (selected_motor != RIGHT) {
@@ -105,6 +115,7 @@ int main(int argc, char **argv) {
                 right_target += 64;
                 right_target = min(right_target, 1024);
             }
+            send_targets(left_target, right_target);
             break;
 
         case '{':
@@ -112,12 +123,14 @@ int main(int argc, char **argv) {
                 left_target = 0;
             if (selected_motor != LEFT)
                 right_target = 0;
+            send_targets(left_target, right_target);
             break;
         case '}':
             if (selected_motor != RIGHT)
                 left_target = 1024;
             if (selected_motor != LEFT)
                 right_target = 1024;
+            send_targets(left_target, right_target);
             break;
 
         case 'q':
@@ -129,4 +142,16 @@ int main(int argc, char **argv) {
             break;
         }
     }
+}
+
+static void send_targets(int left_target, int right_target) {
+    motor_bridge::Pitch p;
+
+    p.motor = LEFT;
+    p.length = left_target;
+    publisher.publish(p);
+
+    p.motor = RIGHT;
+    p.length = right_target;
+    publisher.publish(p);
 }
