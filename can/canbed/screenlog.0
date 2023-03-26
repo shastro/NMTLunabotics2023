@@ -1,10 +1,0 @@
-[?2004h]0;~/l/c/canbed[30m[m[32m┬─[1m[32m[[1m[33mshastro[1m[31m@[1m[34mshastro-legion[1m[37m:~/l/c/canbed[1m[32m][m[32m─[1m[32m[[mG:[32mmain=[1m[32m][K
-[m[m[32m╰─>[1m[31m$ [m[37m[K[5Cscreen -L[14C[9D[36mscreen[37m -L[14C[K[13C[K[12C-[13C[90mL[13C[37m-[90mL[13C[37m-[14C[90mhelp[14C[37ml[K[15C[K[14C[K[13Cl[14C[90mist[14C[37mi[90mst[15C[37ms[90mt[16C[37mt[17C[17C[17C
-[30m[m[?2004l]0;screen -list ~/l/c/canbed[30m[m[30m[mThere are screens on:
-	1029316.pts-0.shastro-legion	(Attached)
-	1021556.pts-0.shastro-legion	(Detached)
-	1017657.pts-1.shastro-legion	(Attached)
-3 Sockets in /run/screens/S-shastro.
-[2m⏎[m                                                                             ⏎ [K[?2004h]0;~/l/c/canbed[30m[m[32m┬─[1m[32m[[1m[33mshastro[1m[31m@[1m[34mshastro-legion[1m[37m:~/l/c/canbed[1m[32m][m[32m─[1m[32m[[mG:[32mmain=[1m[32m][K
-[m[m[32m╰─>[1m[31m$ [m[37m[K[5Ck[6C[90millall screen[6C[37m[31mk[90millall screen[6C[37m[31mi[90mllall screen[7C[37m[31ma[37m[K[8C[31ml[9C[37m[31ml[10C[37m[K[9C[K[8C[K[7C[31ml[8C[37m[90mlall screen[8C[37m[31ml[90mall screen[9C[37m[36mkill[90mall screen[9C[37mkillall screen[19C[19C[14D[36mkillall[37m [4mscreen[19C[24m[19C
-[30m[m[?2004l]0;killall screen ~/l/c/canbed[30m[m[30m[m
