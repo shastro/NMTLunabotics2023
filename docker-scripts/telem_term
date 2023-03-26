@@ -5,6 +5,9 @@ IFS=$'\n\t'
 # Generates a shell inside the ROS container, with ROS_MASTER_URI set
 # to the Jetson.
 
+JETSON_ADDRESS=129.138.172.198
+MY_ADDRESS=$(ip route get $JETSON_ADDRESS | sed 's/.* src //;s/ .*//;2,$d')
+
 DIR="$(realpath "$(dirname "$0")")"/..
 
 sudo docker build "$DIR/ros" -t lunabotics-2023-ros
@@ -13,6 +16,7 @@ sudo docker run \
      -it \
      -v $DIR:$DIR \
      -e DISPLAY \
+     -e ROS_IP=$MY_ADDRESS \
      -v /tmp/.X11-unix:/tmp/.X11-unix \
      -v /dev/dri:/dev/dri \
      --network=host \
@@ -22,7 +26,7 @@ sudo docker run \
          export HOME="$HOME"
          export PS1='\u@\h:\w\$ '
          [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
-         export ROS_MASTER_URI='http://jetson:11311'
+         export ROS_MASTER_URI='http://$JETSON_ADDRESS:11311'
          bash
      "
 
