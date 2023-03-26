@@ -5,20 +5,17 @@
 // We probably want an api where we set a speed for each motor,
 // not a spin count. 
 
-#include <SPI.h>
+#include <SPI.H>
 #include <Wire.h>
 #include "mcp_can.h"
 
-//#include "david.h"
+#include "david.h"
 
 enum PINS {
     PWM_1 = 0, // \_ Differential signals
     PWM_2 = 1, // /
     PIN_COUNT,
-    SPI_CS_PIN = 17,
 };
-
-MCP_CAN CAN(SPI_CS_PIN); 
 
 enum DIR {
     STOP = 0,
@@ -45,8 +42,8 @@ struct MotorState {
 
 static const int MOTOR_PIN_TABLE[MOTOR_COUNT][8] = {
     // PWM_1, PWM_2 
-    {9, 6, 0},
-    {3, 9, 0},
+    {05, 06, 0},
+    {03, 09, 0},
     {10, 11, 0},
 };
 
@@ -57,7 +54,7 @@ static MotorState MOTOR_STATES[MOTOR_COUNT] = {
     {0}
 };
 
-static const bool estopped = false;
+static const bool e_stopped = false;
 
 void setup() {
     Wire.begin();
@@ -65,7 +62,7 @@ void setup() {
 
     // Pins
     for (int m = 0; m < MOTOR_COUNT; m++) {
-        pinMode(MOTOR_PIN_TABLE[m][PWM_1], OUTPUT); // ? what pin modes / pins
+        pinMode(PIN_TABLE[m][P1]); // ? what pin modes / pins
     }
     
     // Interrupts
@@ -115,9 +112,11 @@ void loop() {
         // for sure we are gonna have to map speed to 0-255,
         // however we dont know how to do that for left/right yet.
         int voltage = speed; // what voltage to write ? (0-255)
-        analogWrite(MOTOR_PIN_TABLE[m][PWM_1], 255) // what pins to write to?
+        analogWrite(MOTOR_PIN_TABLE[m][?], val) // what pins to write to?
     }
     
 
     // Telemetry
+
+    
 }
