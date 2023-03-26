@@ -53,8 +53,8 @@ enum DIR {
 
 static const int64_t DEFAULT_TRIG_DELAY = 10000; // Microsecond delay
 static const int64_t DEFAULT_MAX_COUNT = 875-20;
-static const int64_t DEFAULT_HOMING_DELAY = 300;
-static const int64_t DEFAULT_TOLERANCE = 1;
+static const int64_t DEFAULT_HOMING_DELAY = 200;
+static const int64_t DEFAULT_TOLERANCE = 3;
 // static const float mm_per_count = 0.17896; 
 // static const int64_t MAX_COUNT = (int64_t)((152./mm_per_count) - 30);
 
@@ -224,6 +224,8 @@ void loop()
       }
  } else {
 		
+  // set_control(MOTOR_LEFT, EXTEND);
+  // set_control(MOTOR_RIGHT, EXTEND);
 }
   
 // Standard movement towards target counts
@@ -242,7 +244,7 @@ void loop()
 
 }
 
-void send_telemetry(uint32_t canId, int64_t true_count, bool done){
+void send_telemetry(uint32_t canId, int64_t true_count, int64_t dir){
   unsigned char buf[8] = {0};
   buf[0] = true_count >> 8*0;
   buf[1] = true_count >> 8*1;
@@ -250,12 +252,8 @@ void send_telemetry(uint32_t canId, int64_t true_count, bool done){
   buf[3] = true_count >> 8*3;
   buf[4] = true_count >> 8*4;
   buf[5] = true_count >> 8*5;
-
-  if (done) {
-    buf[6] = 0xff;
-  } else {
-    buf[6] = 0x0;
-  }
+  buf[6] = dir >> 8*0;
+  buf[7] = dir >> 8*1;
 
   CAN.sendMsgBuf(canId, 0, 8, buf);
 }

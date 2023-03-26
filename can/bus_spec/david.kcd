@@ -70,7 +70,7 @@
         <NodeRef id="2"/>
       </Producer>
       <Signal name="Count" offset="0" length="48"/>
-      <Signal name="Done" offset="48"/>
+      <Signal name="Direction" offset="48" length="16"/>
     </Message>
 
     <Message id="0x201" name="PitchTelemRight">
@@ -78,7 +78,7 @@
         <NodeRef id="2"/>
       </Producer>
       <Signal name="Count" offset="0" length="48"/>
-      <Signal name="Done" offset="48"/>
+      <Signal name="Direction" offset="48" length="16"/>
     </Message>
 
     <Message id="0x300" name="LocoCtrlLeft">
