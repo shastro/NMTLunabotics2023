@@ -1,5 +1,6 @@
 // Locomotion and excavation controllers.
 
+#include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
 #include <mcp_can.h>
@@ -106,20 +107,20 @@ void setup() {
 
     MotorController left(9, 10, 11);
     MotorController right(A0, A1, A2);
-    MotorController excav(6, A3, 12);
+    // MotorController excav(6, A3, 12);
 
     MCP_CAN can = setup_can();
 
     bool eStopped = false;
     while (true) {
-        /* left.setVel(0); */
-        /* delay(1000); */
-        /* left.setVel(1); */
-        /* delay(1000); */
-        /* left.setVel(0); */
-        /* delay(1000); */
-        /* left.setVel(-1); */
-        /* delay(1000); */
+        // left.setVel(0);
+        // delay(1000);
+        // left.setVel(1);
+        // delay(1000);
+        // left.setVel(0);
+        // delay(1000);
+        // left.setVel(-1);
+        // delay(1000);
 
         CANPacket packet = can_read(can);
         switch (packet.id) {
@@ -127,7 +128,6 @@ void setup() {
             eStopped = true;
             left.setVel(0);
             right.setVel(0);
-            excav.setVel(0);
             break;
         }
 
