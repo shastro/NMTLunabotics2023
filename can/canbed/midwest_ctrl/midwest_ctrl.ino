@@ -126,6 +126,8 @@ void setup() {
         case DAVID_E_STOP_FRAME_ID: {
             eStopped = true;
             left.setVel(0);
+            right.setVel(0);
+            excav.setVel(0);
             break;
         }
 
