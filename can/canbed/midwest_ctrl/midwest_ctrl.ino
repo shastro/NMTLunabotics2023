@@ -12,6 +12,12 @@
 // the motors are turned off.
 #define VEL_DEADZONE 0.01
 
+struct CANPacket {
+    uint32_t len;
+    uint32_t id;
+    unsigned char buf[8];
+};
+
 // Digital output pins.
 class DigOutPin {
     int num;
@@ -58,6 +64,12 @@ class MotorController {
         }
     }
 
+    void hardStop() {
+        setVel(1);
+        delay(1000);
+        setVel(0);
+    }
+
     // TODO: implement telemetry.
 };
 
@@ -72,6 +84,17 @@ MCP_CAN setup_can() {
     return can;
 }
 
+// Read a CAN packet. Blocks until one is available.
+CANPacket can_read(MCP_CAN &can) {
+    while (can.checkReceive() != CAN_MSGAVAIL)
+        ;
+    CANPacket packet;
+    can.readMsgBuf((unsigned char *)&packet.len, packet.buf);
+    packet.id = can.getCanId();
+
+    return packet;
+}
+
 void setup() {
     Serial.begin(115200);
 
@@ -81,24 +104,36 @@ void setup() {
 
     MCP_CAN can = setup_can();
 
-    while (1) {
-        // left.setVel(0);
-        // delay(1000);
+    bool eStopped = false;
+    while (true) {
+        CANPacket packet = can_read(can);
+        switch (packet.id) {
+        case DAVID_E_STOP_FRAME_ID: {
+            eStopped = true;
+            left.setVel(0);
+            break;
+        }
 
-        Serial.println("Counter-clockwise");
-        left.setVel(-10);
-        delay(2000);
+        case DAVID_E_START_FRAME_ID: {
+            eStopped = false;
+            break;
+        }
+        }
 
-        Serial.println("Stop");
-        left.setVel(0);
-        delay(2000);
+        // Avoid doing anything else if we're e-stopped.
+        if (eStopped)
+            continue;
 
-        Serial.println("Clockwise");
-        left.setVel(10);
-        delay(2000);
-
-        Serial.println("Stop");
-        left.setVel(0);
-        delay(2000);
+        switch (packet.id) {
+        case DAVID_LOCO_CTRL_LEFT_FRAME_ID: {
+            david_loco_ctrl_left_t lp;
+            david_loco_ctrl_left_unpack(&lp, packet.buf, packet.len);
+            double vel = (int32_t)lp.velocity * 0.001;
+            left.setVel(vel);
+            break;
+        }
+        }
     }
 }
+
+// no loop()
