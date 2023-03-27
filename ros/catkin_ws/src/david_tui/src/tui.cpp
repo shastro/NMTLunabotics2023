@@ -27,9 +27,7 @@ ros::Publisher pitch_pub;
 ros::Publisher loco_pub;
 
 int left_pitch_target = 0;
-int left_pitch_actual = 0;
 int right_pitch_target = 0;
-int right_pitch_actual = 0;
 int left_loco_target = 0;
 int right_loco_target = 0;
 int pitch_min = 0;
@@ -61,20 +59,14 @@ int main(int argc, char **argv) {
 
         int print_left_target = 0;
         int print_right_target = 0;
-        int print_left_actual = 0;
-        int print_right_actual = 0;
         if (selected_control == PITCH) {
             printw("Pitch motors:\n");
             print_left_target = left_pitch_target;
             print_right_target = right_pitch_target;
-            print_left_actual = left_pitch_actual;
-            print_right_actual = right_pitch_actual;
         } else if (selected_control == LOCO) {
             printw("Drive motors:\n");
             print_left_target = left_loco_target;
             print_right_target = right_loco_target;
-            print_left_actual = left_loco_target;
-            print_right_actual = right_loco_target;
         }
 
         if (selected_motor != RIGHT || selected_motor == BOTH)
@@ -82,20 +74,22 @@ int main(int argc, char **argv) {
         else
             print_bold("    ");
         print_bold("l");
-        printw("eft:  target %d actual %d\n", print_left_target, print_left_actual);
+        printw("eft:  target %d\n", print_left_target);
 
         if (selected_motor != LEFT || selected_motor == BOTH)
             print_bold("  > ");
         else
             print_bold("    ");
         print_bold("r");
-        printw("ight: target %d actual %d\n", print_right_target, print_right_actual);
+        printw("ight: target %d\n", print_right_target);
 
         printw("  Use ");
         print_bold("p");
         printw(" to select pitch, ");
         print_bold("d");
         printw(" to select drive");
+        print_bold('e');
+        printw(" to select extend");
         printw("\n");
 
         printw("  Use ");
@@ -222,6 +216,11 @@ int main(int argc, char **argv) {
                 }
                 break;
 
+            case 's':
+                send_targets(PITCH, BOTH, 0);
+                send_targets(LOCO, BOTH, 0);
+                break;
+
             case 'q':
                 send_targets(PITCH, BOTH, 0);
                 send_targets(LOCO, BOTH, 0);
@@ -260,15 +259,7 @@ static void send_targets(control c, motor m, int target) {
     } else if (c == LOCO) {
         motor_bridge::Drive d;
         d.speed = target;
-        if (m == BOTH) {
-            d.motor = (int) LEFT;
-            loco_pub.publish(d);
-            d.motor = (int) RIGHT;
-            loco_pub.publish(d);
-        } else {
-            d.motor = m;
-            loco_pub.publish(d);
-        }
+        d.motor = (int) m;
     }
 }
 
