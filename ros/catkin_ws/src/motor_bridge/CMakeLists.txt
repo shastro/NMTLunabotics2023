@@ -43,7 +43,8 @@ add_executable(loco_ctrl
   src/can_interface.cpp
 )
 
-target_link_libraries(pitch_ctrl loco_ctrl ${catkin_LIBRARIES})
+target_link_libraries(pitch_ctrl ${catkin_LIBRARIES})
+target_link_libraries(loco_ctrl ${catkin_LIBRARIES})
 add_dependencies(pitch_ctrl loco_ctrl ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 link_directories(${catkin_LIBRARY_DIRS})

@@ -71,8 +71,8 @@ int main(int argc, char **argv) {
             print_right_actual = right_pitch_actual;
         } else if (selected_control == LOCO) {
             printw("Drive motors:\n");
-            print_left_target = left_loco_target
-                print_right_target = right_loco_target;
+            print_left_target = left_loco_target;
+            print_right_target = right_loco_target;
             print_left_actual = left_loco_target;
             print_right_actual = right_loco_target;
         }
@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
         printw("  Use ");
         print_bold("p");
         printw(" to select pitch, ");
-        print_bold("l");
+        print_bold("d");
         printw(" to select drive");
         printw("\n");
 
@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
             case 'p':
                 selected_control = PITCH;
                 break;
-            case 'l':
+            case 'd':
                 selected_control = LOCO;
                 break;
 
@@ -233,12 +233,25 @@ int main(int argc, char **argv) {
                 break;
         }
 
-        send_targets(selected_control, selected_motor);
+        int target;
+
+        if (selected_control == PITCH) {
+            if (selected_motor == LEFT)
+                target = left_pitch_target;
+            else
+                target = right_pitch_target;
+        } else if (selected_control == LOCO) {
+            if (selected_motor == LEFT)
+                target = left_loco_target;
+            else
+                target = right_loco_target;
+        }
+
+        send_targets(selected_control, selected_motor, target);
     }
 }
 
-static void send_targets(control c, motor m) {
-    int target = get_target(control c, motor m);
+static void send_targets(control c, motor m, int target) {
     if (c == PITCH) {
         motor_bridge::Pitch p;
         p.length = target;
@@ -259,18 +272,3 @@ static void send_targets(control c, motor m) {
     }
 }
 
-static int get_target(control c, motor m) {
-    if (c == PITCH) {
-        if (m == LEFT || m == BOTH) {
-            return left_pitch_target;
-        } else {
-            return right_pitch_target;
-        }
-    } else if (c == LOCO) {
-        if (m == LEFT) {
-            return left_loco_target;
-        } else {
-            return right_loco_target;
-        }
-    }
-}

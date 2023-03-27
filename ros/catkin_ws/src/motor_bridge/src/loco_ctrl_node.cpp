@@ -23,6 +23,7 @@ void locoCallback(const motor_bridge::Drive::ConstPtr &msg) {
         << std::endl;
 
     uint8_t message[8];
+    int can_id;
 
     if (m == LEFT) {
         david_loco_ctrl_left_t left = {
