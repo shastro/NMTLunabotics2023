@@ -2,6 +2,7 @@
 #include <ncurses.h>
 
 #include <motor_bridge/Pitch.h>
+#include <motor_bridge/Drive.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <string>

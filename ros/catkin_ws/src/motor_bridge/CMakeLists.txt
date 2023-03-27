@@ -20,6 +20,7 @@ add_message_files(
   DIRECTORY msg
   FILES
   Pitch.msg
+  Drive.msg
 )
 
 generate_messages(DEPENDENCIES std_msgs)
@@ -35,10 +36,17 @@ add_executable(pitch_ctrl
   src/can_interface.cpp
 )
 
-target_link_libraries(pitch_ctrl ${catkin_LIBRARIES})
-add_dependencies(pitch_ctrl ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# loco_ctrl node
+add_executable(loco_ctrl
+  src/loco_ctrl_node.cpp
+  src/can/david.c
+  src/can_interface.cpp
+)
+
+target_link_libraries(pitch_ctrl loco_ctrl ${catkin_LIBRARIES})
+add_dependencies(pitch_ctrl loco_ctrl ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 link_directories(${catkin_LIBRARY_DIRS})
 
-install(TARGETS pitch_ctrl
+install(TARGETS pitch_ctrl loco_ctrl
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

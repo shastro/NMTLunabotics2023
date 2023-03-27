@@ -13,6 +13,8 @@
 #define CAN_BUS "can0"
 SocketCAN can;
 
+enum motor {LEFT = 1, RIGHT = 2};
+
 void locoCallback(const motor_bridge::Drive::ConstPtr &msg) {
     int speed = msg->speed;
     int m = msg->motor;
