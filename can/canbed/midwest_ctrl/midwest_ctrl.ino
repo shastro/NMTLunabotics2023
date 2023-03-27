@@ -40,9 +40,9 @@ class MotorController {
         relay_right.write(!clockwise);
     }
 
- public:
- MotorController(int relay_left, int relay_right, int relay_common)
-     : relay_left(relay_left), relay_right(relay_right),
+  public:
+    MotorController(int relay_left, int relay_right, int relay_common)
+      : relay_left(relay_left), relay_right(relay_right),
         relay_common(relay_common) {
         setVel(0);
     }
@@ -105,13 +105,22 @@ void setup() {
     Serial.begin(115200);
 
     MotorController left(9, 10, 11);
-    // MotorController right(5, 6, 7);
-    // MotorController excav(6, 7, 8);
+    MotorController right(A0, A1, A2);
+    MotorController excav(6, A3, 12);
 
     MCP_CAN can = setup_can();
 
     bool eStopped = false;
     while (true) {
+        /* left.setVel(0); */
+        /* delay(1000); */
+        /* left.setVel(1); */
+        /* delay(1000); */
+        /* left.setVel(0); */
+        /* delay(1000); */
+        /* left.setVel(-1); */
+        /* delay(1000); */
+
         CANPacket packet = can_read(can);
         switch (packet.id) {
         case DAVID_E_STOP_FRAME_ID: {
@@ -136,6 +145,14 @@ void setup() {
             david_loco_ctrl_left_unpack(&lp, packet.buf, packet.len);
             double vel = (int32_t)lp.velocity * 0.001;
             left.setVel(vel);
+            break;
+        }
+
+        case DAVID_LOCO_CTRL_RIGHT_FRAME_ID: {
+            david_loco_ctrl_right_t rp;
+            david_loco_ctrl_right_unpack(&rp, packet.buf, packet.len);
+            double vel = (int32_t)rp.velocity * 0.001;
+            right.setVel(vel);
             break;
         }
         }
