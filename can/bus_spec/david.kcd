@@ -101,7 +101,7 @@
       <Producer>
         <NodeRef id="0"/>
       </Producer>
-      <Signal name="Direction" offset="0" length="2"/>
+      <Signal name="Direction" offset="0" length="8"/>
     </Message>
   </Bus>
 </NetworkDefinition>
