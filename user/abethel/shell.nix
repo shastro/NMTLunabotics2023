@@ -41,6 +41,8 @@ let
     "rviz"
     "tf_remap"
     "view_frames"
+
+    "catkin_create_pkg"
   ];
   entrypoint = writeScript "entrypoint" ''
     #!/bin/bash
@@ -70,7 +72,7 @@ mkShell {
           # it at some point.
           prog_name: writeScriptBin prog_name ''
             #!${bash}/bin/bash
-            conman run ${./ros-env} ${entrypoint} ${prog_name} "$@"
+            conman run -- ${./ros-env} ${entrypoint} ${prog_name} "$@"
           ''
         )
         ros_progs;
@@ -81,11 +83,12 @@ mkShell {
     (writeScriptBin "rosterm"
       ''
         #!${bash}/bin/bash
-        conman run ${./ros-env} ${entrypoint} bash "$@"
+        conman run -- ${./ros-env} ${entrypoint} bash "$@"
       '')
 
     (import ./cantools { inherit pkgs; })
     (import ./arduino-nix { inherit pkgs; })
+    ncurses.dev
     # (import ./libcan { inherit pkgs; })
   ];
 }
