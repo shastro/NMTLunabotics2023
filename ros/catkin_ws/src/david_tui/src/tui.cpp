@@ -25,6 +25,17 @@ static void send_targets(control c, motor m, int target);
 ros::Publisher pitch_pub;
 ros::Publisher loco_pub;
 
+int left_pitch_target = 0;
+int left_pitch_actual = 0;
+int right_pitch_target = 0;
+int right_pitch_actual = 0;
+int left_loco_target = 0;
+int right_loco_target = 0;
+int pitch_min = 0;
+int pitch_max = 1024;
+int loco_min = -1024;
+int loco_max = 1024;
+
 int main(int argc, char **argv) {
     ros::init(argc, argv, "david_tui");
     ros::NodeHandle nh;
@@ -42,16 +53,6 @@ int main(int argc, char **argv) {
 
     motor selected_motor = BOTH;
     control selected_control = PITCH;
-    int left_pitch_target = 0;
-    int left_pitch_actual = 0;
-    int right_pitch_target = 0;
-    int right_pitch_actual = 0;
-    int left_loco_target = 0;
-    int right_loco_target = 0;
-    int pitch_min = 0;
-    int pitch_max = 1024;
-    int loco_min = -1024;
-    int loco_max = 1024;
 
     while (true) {
         clear();
@@ -70,7 +71,7 @@ int main(int argc, char **argv) {
         } else if (selected_control == LOCO) {
             printw("Drive motors:\n");
             print_left_target = left_loco_target
-            print_right_target = right_loco_target;
+                print_right_target = right_loco_target;
             print_left_actual = left_loco_target;
             print_right_actual = right_loco_target;
         }
@@ -143,6 +144,11 @@ int main(int argc, char **argv) {
                 break;
             case 'b':
                 selected_motor = BOTH;
+                if (selected_control == PITCH) {
+                    left_pitch_target = right_pitch_target;
+                } else if (selected_control == LOCO) {
+                    left_loco_target = right_loco_target;
+                }
                 break;
 
             case '[':
@@ -169,7 +175,7 @@ int main(int argc, char **argv) {
             case ']':
                 if (selected_control == PITCH) {
                     if (selected_motor != RIGHT) {
-                        left_pitch_target +-= 64;
+                        left_pitch_target += 64;
                         left_pitch_target = min(left_pitch_target, pitch_max);
                     }
                     if (selected_motor != LEFT) {
@@ -226,26 +232,44 @@ int main(int argc, char **argv) {
                 break;
         }
 
-        send_targets(selected_control, selected_motor, target);
+        send_targets(selected_control, selected_motor);
     }
 }
 
-static void send_targets(control c, motor m, int target) {
+static void send_targets(control c, motor m) {
+    int target = get_target(control c, motor m);
     if (c == PITCH) {
-        if (m == LEFT) {
+        motor_bridge::Pitch p;
+        p.length = target;
+        p.motor = (int) m;
+        pitch_pub.publish(p);
+    } else if (c == LOCO) {
+        motor_bridge::Drive d;
+        d.speed = target;
+        if (m == BOTH) {
+            d.motor = (int) LEFT;
+            loco_pub.publish(d);
+            d.motor = (int) RIGHT;
+            loco_pub.publish(d);
+        } else {
+            d.motor = m;
+            loco_pub.publish(d);
+        }
+    }
+}
 
-        } else if (m == RIGHT) {
-
-        } else if (m == BOTH) {
-
+static int get_target(control c, motor m) {
+    if (c == PITCH) {
+        if (m == LEFT || m == BOTH) {
+            return left_pitch_target;
+        } else {
+            return right_pitch_target;
         }
     } else if (c == LOCO) {
         if (m == LEFT) {
-
-        } else if (m == RIGHT) {
-
-        } else if (m == BOTH) {
-
+            return left_loco_target;
+        } else {
+            return right_loco_target;
         }
     }
 }
