@@ -11,8 +11,9 @@
 using namespace std;
 
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
+enum control { PITCH = 0, LOCO = 1};
 
-static void send_targets(int left_target, int right_target);
+static void send_targets(control c, motor m, int target);
 
 #define print_bold(...)                                                        \
     do {                                                                       \
@@ -21,12 +22,14 @@ static void send_targets(int left_target, int right_target);
         attroff(A_BOLD);                                                       \
     } while (0)
 
-ros::Publisher publisher;
+ros::Publisher pitch_pub;
+ros::Publisher loco_pub;
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "david_tui");
     ros::NodeHandle nh;
-    publisher = nh.advertise<motor_bridge::Pitch>("/pitch_control", 5);
+    pitch_pub = nh.advertise<motor_bridge::Pitch>("/pitch_control", 5);
+    loco_pub = nh.advertise<motor_bridge::Drive>("/loco_control", 5);
 
     // Setup ncurses.
     initscr();
@@ -38,120 +41,211 @@ int main(int argc, char **argv) {
     halfdelay(1);
 
     motor selected_motor = BOTH;
-    int left_target = 0;
-    int left_actual = 0;
-    int right_target = 0;
-    int right_actual = 0;
+    control selected_control = PITCH;
+    int left_pitch_target = 0;
+    int left_pitch_actual = 0;
+    int right_pitch_target = 0;
+    int right_pitch_actual = 0;
+    int left_loco_target = 0;
+    int right_loco_target = 0;
+    int pitch_min = 0;
+    int pitch_max = 1024;
+    int loco_min = -1024;
+    int loco_max = 1024;
 
     while (true) {
         clear();
         move(0, 0);
-        printw("Pitch motors:\n");
 
-        if (selected_motor != RIGHT)
+        int print_left_target = 0;
+        int print_right_target = 0;
+        int print_left_actual = 0;
+        int print_right_actual = 0;
+        if (selected_control == PITCH) {
+            printw("Pitch motors:\n");
+            print_left_target = left_pitch_target;
+            print_right_target = right_pitch_target;
+            print_left_actual = left_pitch_actual;
+            print_right_actual = right_pitch_actual;
+        } else if (selected_control == LOCO) {
+            printw("Drive motors:\n");
+            print_left_target = left_loco_target
+            print_right_target = right_loco_target;
+            print_left_actual = left_loco_target;
+            print_right_actual = right_loco_target;
+        }
+
+        if (selected_motor != RIGHT || selected_motor == BOTH)
             print_bold("  > ");
         else
             print_bold("    ");
         print_bold("l");
-        printw("eft:  target %d actual %d\n", left_target, left_actual);
+        printw("eft:  target %d actual %d\n", print_left_target, print_left_actual);
 
-        if (selected_motor != LEFT)
+        if (selected_motor != LEFT || selected_motor == BOTH)
             print_bold("  > ");
         else
             print_bold("    ");
         print_bold("r");
-        printw("ight: target %d actual %d\n", right_target, right_actual);
+        printw("ight: target %d actual %d\n", print_right_target, print_right_actual);
+
+        printw("  Use ");
+        print_bold("p");
+        printw(" to select pitch, ");
+        print_bold("l");
+        printw(" to select drive");
+        printw("\n");
 
         printw("  Use ");
         print_bold("b");
-        printw(" to select both.\n");
-
+        printw(" to select both, ");
+        print_bold("r");
+        printw(" to select right, ");
+        print_bold("l");
+        printw(" to select left");
         printw("\n");
 
-        printw("  Change pitch by 64: ");
+        printw("  Change target by 64: ");
         print_bold("[");
         printw(" decrease, ");
         print_bold("]");
-        printw(" increase\n");
+        printw(" increase");
+        printw("\n");
 
-        printw("  Set pitch length: ");
+        printw("  Set target length: ");
         print_bold("{");
-        printw(" zero, ");
+        printw(" min, ");
         print_bold("}");
-        printw(" max\n");
+        printw(" max");
+        printw("\n");
+
+        printw("  Quit: ");
+        print_bold("q");
+        printw("\n");
 
         refresh();
 
         int n = getch();
 
         switch (n) {
-        case 'l':
-            selected_motor = LEFT;
-            break;
-        case 'r':
-            selected_motor = RIGHT;
-            break;
-        case 'b':
-            selected_motor = BOTH;
-            break;
+            case 'p':
+                selected_control = PITCH;
+                break;
+            case 'l':
+                selected_control = LOCO;
+                break;
 
-        case '[':
-            if (selected_motor != RIGHT) {
-                left_target -= 64;
-                left_target = max(left_target, 0);
-            }
-            if (selected_motor != LEFT) {
-                right_target -= 64;
-                right_target = max(right_target, 0);
-            }
-            send_targets(left_target, right_target);
-            break;
-        case ']':
-            if (selected_motor != RIGHT) {
-                left_target += 64;
-                left_target = min(left_target, 1024);
-            }
-            if (selected_motor != LEFT) {
-                right_target += 64;
-                right_target = min(right_target, 1024);
-            }
-            send_targets(left_target, right_target);
-            break;
+            case 'l':
+                selected_motor = LEFT;
+                break;
+            case 'r':
+                selected_motor = RIGHT;
+                break;
+            case 'b':
+                selected_motor = BOTH;
+                break;
 
-        case '{':
-            if (selected_motor != RIGHT)
-                left_target = 0;
-            if (selected_motor != LEFT)
-                right_target = 0;
-            send_targets(left_target, right_target);
-            break;
-        case '}':
-            if (selected_motor != RIGHT)
-                left_target = 1024;
-            if (selected_motor != LEFT)
-                right_target = 1024;
-            send_targets(left_target, right_target);
-            break;
+            case '[':
+                if (selected_control == PITCH) {
+                    if (selected_motor != RIGHT) {
+                        left_pitch_target -= 64;
+                        left_pitch_target = max(left_pitch_target, pitch_min);
+                    }
+                    if (selected_motor != LEFT) {
+                        right_pitch_target -= 64;
+                        right_pitch_target = max(right_pitch_target, pitch_min);
+                    }
+                } else if (selected_control == LOCO) {
+                    if (selected_motor != RIGHT) {
+                        left_loco_target -= 64;
+                        left_loco_target = max(left_loco_target, loco_min);
+                    }
+                    if (selected_motor != LEFT) {
+                        right_loco_target -= 64;
+                        right_loco_target = max(right_loco_target, loco_min);
+                    }
+                }
+                break;
+            case ']':
+                if (selected_control == PITCH) {
+                    if (selected_motor != RIGHT) {
+                        left_pitch_target +-= 64;
+                        left_pitch_target = min(left_pitch_target, pitch_max);
+                    }
+                    if (selected_motor != LEFT) {
+                        right_pitch_target += 64;
+                        right_pitch_target = min(right_pitch_target, pitch_max);
+                    }
+                } else if (selected_control == LOCO) {
+                    if (selected_motor != RIGHT) {
+                        left_loco_target += 64;
+                        left_loco_target = min(left_loco_target, loco_max);
+                    }
+                    if (selected_motor != LEFT) {
+                        right_loco_target += 64;
+                        right_loco_target = min(right_loco_target, loco_max);
+                    }
+                }
+                break;
 
-        case 'q':
-            endwin();
-            return 0;
+            case '{':
+                if (selected_control == PITCH) {
+                    if (selected_motor != RIGHT)
+                        left_pitch_target = pitch_min;
+                    if (selected_motor != LEFT)
+                        right_pitch_target = pitch_min;
+                } else if (selected_control == LOCO) {
+                    if (selected_motor != RIGHT)
+                        left_loco_target = loco_min;
+                    if (selected_motor != LEFT)
+                        right_loco_target = loco_min;
+                }
+                break;
+            case '}':
+                if (selected_control == PITCH) {
+                    if (selected_motor != RIGHT)
+                        left_pitch_target = pitch_max;
+                    if (selected_motor != LEFT)
+                        right_pitch_target = pitch_max;
+                } else if (selected_control == LOCO) {
+                    if (selected_motor != RIGHT)
+                        left_loco_target = loco_max;
+                    if (selected_motor != LEFT)
+                        right_loco_target = loco_max;
+                }
+                break;
 
-        default:
-            // do nothing
-            break;
+            case 'q':
+                send_targets(PITCH, BOTH, 0);
+                send_targets(LOCO, BOTH, 0);
+                endwin();
+                return 0;
+
+            default:
+                // do nothing
+                break;
         }
+
+        send_targets(selected_control, selected_motor, target);
     }
 }
 
-static void send_targets(int left_target, int right_target) {
-    motor_bridge::Pitch p;
+static void send_targets(control c, motor m, int target) {
+    if (c == PITCH) {
+        if (m == LEFT) {
 
-    p.motor = LEFT;
-    p.length = left_target;
-    publisher.publish(p);
+        } else if (m == RIGHT) {
 
-    p.motor = RIGHT;
-    p.length = right_target;
-    publisher.publish(p);
+        } else if (m == BOTH) {
+
+        }
+    } else if (c == LOCO) {
+        if (m == LEFT) {
+
+        } else if (m == RIGHT) {
+
+        } else if (m == BOTH) {
+
+        }
+    }
 }
