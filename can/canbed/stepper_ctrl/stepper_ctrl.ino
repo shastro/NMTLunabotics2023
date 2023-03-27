@@ -53,10 +53,10 @@ void loop() {
 
   // step one step:
   if (!estopped) {
-      if (move_dir == 1) {
+      if (move_dir == FORWARD) {
           stepper1.step(-stepsPerTick);
           stepper2.step(stepsPerTick);
-      } else if (move_dir == -1) {
+      } else if (move_dir == BACKWARD) {
           stepper1.step(stepsPerTick);
           stepper2.step(-stepsPerTick);
       }
