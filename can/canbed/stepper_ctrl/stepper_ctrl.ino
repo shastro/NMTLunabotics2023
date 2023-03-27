@@ -7,10 +7,10 @@ const int stepsPerTick = 10;
 
 
 // initialize the stepper library on pins 8 through 11:
-#define PUL1 5
-#define DIR1 8
-#define PUL2 6
-#define DIR2 9
+#define PUL1 4
+#define DIR1 11
+#define PUL2 10
+#define DIR2 5
 Stepper stepper1(stepsPerRevolution, PUL1, DIR1);
 Stepper stepper2(stepsPerRevolution, PUL2, DIR2);
 
