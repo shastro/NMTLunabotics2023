@@ -40,10 +40,10 @@ class MotorController {
         relay_right.write(!clockwise);
     }
 
-  public:
-    MotorController(int relay_left, int relay_right, int relay_common)
-        : relay_left(relay_left), relay_right(relay_right),
-          relay_common(relay_common) {
+ public:
+ MotorController(int relay_left, int relay_right, int relay_common)
+     : relay_left(relay_left), relay_right(relay_right),
+        relay_common(relay_common) {
         setVel(0);
     }
 
@@ -51,9 +51,21 @@ class MotorController {
         // Currently we only support full forward, full backward, and
         // stopped velocity.
         if (abs(vel) < VEL_DEADZONE) {
-            // XXX: this *sometimes* turns off the motor, and
-            // sometimes doesn't.
-            set_direction(false);
+            // relay_common is also tied to MMP's pin 9
+            // "INHIBIT/ENABLE", so writing 0 to this also turns off
+            // the motor.
+
+            // Do you have any idea how fucking long it took to figure
+            // out how to turn off this motor? We tried turning off
+            // both inputs to the driver. We tried turning on both
+            // inputs to the driver. For hours we had this thing
+            // turning one direction or the other, but able to stop
+            // only about 75% of the time. The relevant data sheet
+            // section says "TTL level (+5V) inhibit/enable input.
+            // Pull to ground to inhibit drive (SW1-5 ON). Pull to
+            // ground to enable drive (SW1-5 OFF)." Ah, so it's not
+            // "stop," it's not "turn the fucking motor off," it's not
+            // "disable," it's fucking "INHIBIT."
             relay_common.write(false);
         } else if (vel > 0) {
             set_direction(true);
@@ -62,12 +74,6 @@ class MotorController {
             set_direction(false);
             relay_common.write(true);
         }
-    }
-
-    void hardStop() {
-        setVel(1);
-        delay(1000);
-        setVel(0);
     }
 
     // TODO: implement telemetry.
@@ -98,8 +104,8 @@ CANPacket can_read(MCP_CAN &can) {
 void setup() {
     Serial.begin(115200);
 
-    MotorController left(8, 9, 10);
-    // MotorController right(3, 4, 5);
+    MotorController left(9, 10, 11);
+    // MotorController right(5, 6, 7);
     // MotorController excav(6, 7, 8);
 
     MCP_CAN can = setup_can();
