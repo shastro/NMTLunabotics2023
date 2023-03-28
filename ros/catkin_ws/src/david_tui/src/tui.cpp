@@ -5,6 +5,7 @@
 #include <motor_bridge/Drive.h>
 #include <motor_bridge/Pitch.h>
 #include <motor_bridge/Stepp.h>
+#include <motor_bridge/Estop.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <string>
@@ -41,8 +42,8 @@ static std::unordered_map<char, std::string> bindings = {
     {'k', "Drive Backward"},
     {'J', "Pitch Down"},
     {'K', "Pitch Up"},
-    {'h', "Arm Out"},
-    {'l', "Arm In"},
+    {'H', "Arm Out"},
+    {'L', "Arm In"},
     {'s', "Stop Current"},
     {'c', "Stop All"},
     {'q', "Quit"},
@@ -52,6 +53,7 @@ static ros::Publisher pitch_pub;
 static ros::Publisher loco_pub;
 static ros::Publisher stepp_pub;
 static ros::Publisher excav_pub;
+static ros::Publisher estop_pub;
 
 struct target {
     int left;
@@ -197,14 +199,14 @@ int main(int argc, char **argv) {
             motorsys.pitch.length.left = PITCH_FORWARD;
             motorsys.pitch.length.right = PITCH_FORWARD;
             break;
-        case 'h': // Depth out
+        case 'H': // Depth out
             sel_c = STEPP;
             motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
             motorsys.stepp.dir.left = FORWARD;
             motorsys.stepp.rpm.right = motorsys.stepp.rpm.max;
             motorsys.stepp.dir.right = FORWARD;
             break;
-        case 'l': // Depth in
+        case 'L': // Depth in
             sel_c = STEPP;
             motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
             motorsys.stepp.dir.left = BACKWARD;
@@ -228,6 +230,7 @@ int main(int argc, char **argv) {
             break;
         case 'c': // Stop All
             estop();
+            /*
             motorsys.loco.speed.left = 0;
             motorsys.loco.speed.right = 0;
             motorsys.stepp.rpm.left = 0;
@@ -236,9 +239,11 @@ int main(int argc, char **argv) {
             motorsys.stepp.dir.right = STOP;
             motorsys.pitch.length.left = PITCH_STOP;
             motorsys.pitch.length.right = PITCH_STOP;
+            */
             break;
         case 'q': // Quit
-            //TODO send estop
+            estop();
+            /*
             motorsys.loco.speed.left = 0;
             motorsys.loco.speed.right = 0;
             motorsys.stepp.rpm.left = 0;
@@ -247,6 +252,7 @@ int main(int argc, char **argv) {
             motorsys.stepp.dir.right = STOP;
             motorsys.pitch.length.left = PITCH_STOP;
             motorsys.pitch.length.right = PITCH_STOP;
+            */
             endwin();
             return 0;
 
@@ -259,8 +265,9 @@ int main(int argc, char **argv) {
 }
 
 static void estop() {
-    //TODO
-    // Current ides: implement rosnode that recieves estop on topic and sends over can
+    motor_bridge::Estop msg;
+    msg.stop = true;
+    estop_pub.publish(msg);
 }
 
 static void send_targets() {
