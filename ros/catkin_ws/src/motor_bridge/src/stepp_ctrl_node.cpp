@@ -16,7 +16,7 @@ SocketCAN can;
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
 enum dir { BACKWARD = -1, STOP = 0, FORWARD = 0 };
 
-void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
+void steppCallback(const motor_bridge::Stepp::ConstPtr &msg) {
     motor m = (motor)msg->motor;
     dir d = (dir)msg->direction;
     int rpm = msg->rpm;
@@ -57,10 +57,10 @@ int main(int argc, char **argv) {
     try {
         can = SocketCAN(CAN_BUS);
 
-        ros::init(argc, argv, "stepp_ctrl_node");
+        ros::init(argc, argv, "stepp_ctrl");
         ros::NodeHandle nh;
         ros::Subscriber sub =
-            nh.subscribe("stepp_control", 1024, pitchCallback);
+            nh.subscribe("stepp_control", 1024, steppCallback);
 
         // Callback event loop
         ros::spin();

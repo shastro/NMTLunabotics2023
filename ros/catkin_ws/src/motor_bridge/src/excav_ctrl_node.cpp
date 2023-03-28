@@ -16,8 +16,7 @@ SocketCAN can;
 
 void excavCallback(const motor_bridge::Digger::ConstPtr &msg) {
     int speed = msg->speed;
-    int m = msg->motor;
-    std::cout << "Drive Message Received. motor: " << m
+    std::cout << "Drive Message Received."
         << "speed: " << speed
         << std::endl;
 
@@ -37,7 +36,7 @@ int main(int argc, char **argv) {
     try {
         can = SocketCAN(CAN_BUS);
 
-        ros::init(argc, argv, "excav_ctrl_node");
+        ros::init(argc, argv, "excav_ctrl");
         ros::NodeHandle nh;
         ros::Subscriber sub =
             nh.subscribe("excav_control", 1024, excavCallback);

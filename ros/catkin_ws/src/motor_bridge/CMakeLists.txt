@@ -45,9 +45,25 @@ add_executable(loco_ctrl
   src/can_interface.cpp
 )
 
+# stepp_ctrl node
+add_executable(stepp_ctrl
+  src/stepp_ctrl_node.cpp
+  src/can/david.c
+  src/can_interface.cpp
+)
+
+# excav_ctrl node
+add_executable(excav_ctrl
+  src/excav_ctrl_node.cpp
+  src/can/david.c
+  src/can_interface.cpp
+)
+
 target_link_libraries(pitch_ctrl ${catkin_LIBRARIES})
 target_link_libraries(loco_ctrl ${catkin_LIBRARIES})
-add_dependencies(pitch_ctrl loco_ctrl ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(excav_ctrl ${catkin_LIBRARIES})
+target_link_libraries(stepp_ctrl ${catkin_LIBRARIES})
+add_dependencies(pitch_ctrl loco_ctrl stepp_ctrl excav_ctrl ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 link_directories(${catkin_LIBRARY_DIRS})
 
