@@ -94,6 +94,7 @@ static struct {
 static control sel_c;
 static motor sel_m = BOTH;
 
+static void estop();
 static void send_targets();
 static void send_pitch(motor m);
 static void send_loco(motor m);
@@ -139,22 +140,23 @@ int main(int argc, char **argv) {
         int n = getch();
 
         switch (n) {
-        case 'p':
+        case 'p': // Select Pitch
             sel_c = PITCH;
             break;
-        case 'd':
+        case 'd': // Select Drive
             sel_c = LOCO;
             break;
-        case 'e':
+        case 'a': // Select Excavation Arm
             sel_c = STEPP;
+            break;
 
-        case 'l':
+        case 'l': // Left
             sel_m = LEFT;
             break;
-        case 'r':
+        case 'r': // Right
             sel_m = RIGHT;
             break;
-        case 'b':
+        case 'b': // Both
             sel_m = BOTH;
             if (sel_c == PITCH) {
                 motorsys.pitch.length.left = motorsys.pitch.length.right;
@@ -166,59 +168,51 @@ int main(int argc, char **argv) {
             }
             break;
 
-        case 'j':
+        case 'j': // Drive Forward
             // TODO implement changeable speed
             sel_c = LOCO;
             if (sel_m != RIGHT) {
                 motorsys.loco.speed.left = motorsys.loco.speed.max;
-            } else if (sel_m != LEFT) {
+            }
+            if (sel_m != LEFT) {
                 motorsys.loco.speed.right = motorsys.loco.speed.max;
             }
             break;
-        case 'k':
+        case 'k': // Drive Backward
             sel_c = LOCO;
             if (sel_m != RIGHT) {
                 motorsys.loco.speed.left = motorsys.loco.speed.min;
-            } else if (sel_m != LEFT) {
+            }
+            if (sel_m != LEFT) {
                 motorsys.loco.speed.right = motorsys.loco.speed.min;
             }
             break;
-        case 'J':
+        case 'J': // Pitch Down
             sel_c = PITCH;
-            if (sel_m != RIGHT)
-                motorsys.pitch.length.left = PITCH_BACKWARD;
-            if (sel_m != LEFT)
-                motorsys.pitch.length.right = PITCH_BACKWARD;
+            motorsys.pitch.length.left = PITCH_BACKWARD;
+            motorsys.pitch.length.right = PITCH_BACKWARD;
             break;
-        case 'K':
+        case 'K': // Pitch Up
             sel_c = PITCH;
-            if (sel_m != RIGHT)
-                motorsys.pitch.length.left = PITCH_FORWARD;
-            if (sel_m != LEFT)
-                motorsys.pitch.length.right = PITCH_FORWARD;
+            motorsys.pitch.length.left = PITCH_FORWARD;
+            motorsys.pitch.length.right = PITCH_FORWARD;
             break;
-        case 'o':
+        case 'h': // Depth out
             sel_c = STEPP;
-            if (sel_m != RIGHT) {
-                motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
-                motorsys.stepp.dir.left = FORWARD;
-            } else if (sel_m != LEFT) {
-                motorsys.stepp.rpm.right = motorsys.stepp.rpm.max;
-                motorsys.stepp.dir.right = FORWARD;
-            }
+            motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
+            motorsys.stepp.dir.left = FORWARD;
+            motorsys.stepp.rpm.right = motorsys.stepp.rpm.max;
+            motorsys.stepp.dir.right = FORWARD;
             break;
-        case 'i':
+        case 'l': // Depth in
             sel_c = STEPP;
-            if (sel_m != RIGHT) {
-                motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
-                motorsys.stepp.dir.left = BACKWARD;
-            } else if (sel_m != LEFT) {
-                motorsys.stepp.rpm.right = motorsys.stepp.rpm.max;
-                motorsys.stepp.dir.right = BACKWARD;
-            }
+            motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
+            motorsys.stepp.dir.left = BACKWARD;
+            motorsys.stepp.rpm.right = motorsys.stepp.rpm.max;
+            motorsys.stepp.dir.right = BACKWARD;
             break;
 
-        case 's':
+        case 's': // Stop Current
             if (sel_c == LOCO) {
                 motorsys.loco.speed.left = 0;
                 motorsys.loco.speed.right = 0;
@@ -232,7 +226,8 @@ int main(int argc, char **argv) {
                 motorsys.pitch.length.right = PITCH_STOP;
             }
             break;
-        case 'c':
+        case 'c': // Stop All
+            estop();
             motorsys.loco.speed.left = 0;
             motorsys.loco.speed.right = 0;
             motorsys.stepp.rpm.left = 0;
@@ -242,7 +237,8 @@ int main(int argc, char **argv) {
             motorsys.pitch.length.left = PITCH_STOP;
             motorsys.pitch.length.right = PITCH_STOP;
             break;
-        case 'q':
+        case 'q': // Quit
+            //TODO send estop
             motorsys.loco.speed.left = 0;
             motorsys.loco.speed.right = 0;
             motorsys.stepp.rpm.left = 0;
@@ -260,6 +256,11 @@ int main(int argc, char **argv) {
         }
         send_targets();
     }
+}
+
+static void estop() {
+    //TODO
+    // Current ides: implement rosnode that recieves estop on topic and sends over can
 }
 
 static void send_targets() {
