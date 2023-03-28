@@ -105,21 +105,29 @@ CANPacket can_read(MCP_CAN &can) {
 void setup() {
     Serial.begin(115200);
 
-    MotorController left(10, 9, 11);
-    MotorController right(A0, A1, A2);
-    // MotorController excav(6, A3, 12);
+    MotorController left(A0, A1, A2);
+    MotorController right(10, 9, 11);
 
     MCP_CAN can = setup_can();
 
     bool eStopped = false;
     while (true) {
-        // left.setVel(0);
-        // delay(1000);
         // left.setVel(1);
         // delay(1000);
         // left.setVel(0);
         // delay(1000);
         // left.setVel(-1);
+        // delay(1000);
+        // left.setVel(0);
+        // delay(1000);
+
+        // right.setVel(1);
+        // delay(1000);
+        // right.setVel(0);
+        // delay(1000);
+        // right.setVel(-1);
+        // delay(1000);
+        // right.setVel(0);
         // delay(1000);
 
         CANPacket packet = can_read(can);
@@ -154,6 +162,15 @@ void setup() {
             david_loco_ctrl_right_t rp;
             david_loco_ctrl_right_unpack(&rp, packet.buf, packet.len);
             double vel = (int32_t)rp.velocity * 0.001;
+            right.setVel(vel);
+            break;
+        }
+
+        case DAVID_LOCO_CTRL_BOTH_FRAME_ID: {
+            david_loco_ctrl_both_t bp;
+            david_loco_ctrl_both_unpack(&bp, packet.buf, packet.len);
+            double vel = (int32_t)bp.velocity * 0.001;
+            left.setVel(vel);
             right.setVel(vel);
             break;
         }
