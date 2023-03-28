@@ -25,9 +25,39 @@
         attroff(A_BOLD);                                                       \
     } while (0)
 
-enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
-enum control { PITCH = 0, LOCO = 1, STEPP = 2 };
-enum direction { STOP = 0, FORWARD = 1, BACKWARD = 2 };
+enum class motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
+enum class control { PITCH = 0, LOCO = 1, STEPP = 2 };
+enum class direction { STOP = 0, FORWARD = 1, BACKWARD = 2 };
+
+std::ostream &operator<<(std::ostream &s, control c) {
+    switch (c) {
+    case control::PITCH:
+        s << "pitch";
+        break;
+    case control::LOCO:
+        s << "loco";
+        break;
+    case control::STEPP:
+        s << "step";
+        break;
+    }
+    return s;
+}
+
+std::ostream &operator<<(std::ostream &s, motor m) {
+    switch (m) {
+    case motor::BOTH:
+        s << "both";
+        break;
+    case motor::LEFT:
+        s << "left";
+        break;
+    case motor::RIGHT:
+        s << "right";
+        break;
+    }
+    return s;
+}
 
 static std::unordered_map<char, std::string> bindings = {
     // Control
@@ -101,7 +131,7 @@ static struct {
 } motorsys;
 
 static control sel_c;
-static motor sel_m = BOTH;
+static motor sel_m = motor::BOTH;
 
 static void estop();
 static void send_targets();
@@ -150,28 +180,28 @@ int main(int argc, char **argv) {
 
         switch (n) {
         case 'p': // Select Pitch
-            sel_c = PITCH;
+            sel_c = control::PITCH;
             break;
         case 'd': // Select Drive
-            sel_c = LOCO;
+            sel_c = control::LOCO;
             break;
         case 'a': // Select Excavation Arm
-            sel_c = STEPP;
+            sel_c = control::STEPP;
             break;
 
         case 'l': // Left
-            sel_m = LEFT;
+            sel_m = motor::LEFT;
             break;
         case 'r': // Right
-            sel_m = RIGHT;
+            sel_m = motor::RIGHT;
             break;
         case 'b': // Both
-            sel_m = BOTH;
-            if (sel_c == PITCH) {
+            sel_m = motor::BOTH;
+            if (sel_c == control::PITCH) {
                 motorsys.pitch.length.left = motorsys.pitch.length.right;
-            } else if (sel_c == LOCO) {
+            } else if (sel_c == control::LOCO) {
                 motorsys.loco.speed.left = motorsys.loco.speed.right;
-            } else if (sel_c == STEPP) {
+            } else if (sel_c == control::STEPP) {
                 motorsys.stepp.rpm.left = motorsys.stepp.rpm.right;
                 motorsys.stepp.dir.left = motorsys.stepp.dir.right;
             }
@@ -179,58 +209,58 @@ int main(int argc, char **argv) {
 
         case 'j': // Drive Forward
             // TODO implement changeable speed
-            sel_c = LOCO;
-            if (sel_m != RIGHT) {
+            sel_c = control::LOCO;
+            if (sel_m != motor::RIGHT) {
                 motorsys.loco.speed.left = motorsys.loco.speed.max;
             }
-            if (sel_m != LEFT) {
+            if (sel_m != motor::LEFT) {
                 motorsys.loco.speed.right = motorsys.loco.speed.max;
             }
             break;
         case 'k': // Drive Backward
-            sel_c = LOCO;
-            if (sel_m != RIGHT) {
+            sel_c = control::LOCO;
+            if (sel_m != motor::RIGHT) {
                 motorsys.loco.speed.left = motorsys.loco.speed.min;
             }
-            if (sel_m != LEFT) {
+            if (sel_m != motor::LEFT) {
                 motorsys.loco.speed.right = motorsys.loco.speed.min;
             }
             break;
         case 'J': // Pitch Down
-            sel_c = PITCH;
+            sel_c = control::PITCH;
             motorsys.pitch.length.left = PITCH_BACKWARD;
             motorsys.pitch.length.right = PITCH_BACKWARD;
             break;
         case 'K': // Pitch Up
-            sel_c = PITCH;
+            sel_c = control::PITCH;
             motorsys.pitch.length.left = PITCH_FORWARD;
             motorsys.pitch.length.right = PITCH_FORWARD;
             break;
         case 'H': // Depth out
-            sel_c = STEPP;
+            sel_c = control::STEPP;
             motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
-            motorsys.stepp.dir.left = FORWARD;
+            motorsys.stepp.dir.left = direction::FORWARD;
             motorsys.stepp.rpm.right = motorsys.stepp.rpm.max;
-            motorsys.stepp.dir.right = FORWARD;
+            motorsys.stepp.dir.right = direction::FORWARD;
             break;
         case 'L': // Depth in
-            sel_c = STEPP;
+            sel_c = control::STEPP;
             motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
-            motorsys.stepp.dir.left = BACKWARD;
+            motorsys.stepp.dir.left = direction::BACKWARD;
             motorsys.stepp.rpm.right = motorsys.stepp.rpm.max;
-            motorsys.stepp.dir.right = BACKWARD;
+            motorsys.stepp.dir.right = direction::BACKWARD;
             break;
 
         case 's': // Stop Current
-            if (sel_c == LOCO) {
+            if (sel_c == control::LOCO) {
                 motorsys.loco.speed.left = 0;
                 motorsys.loco.speed.right = 0;
-            } else if (sel_c == STEPP) {
+            } else if (sel_c == control::STEPP) {
                 motorsys.stepp.rpm.left = 0;
                 motorsys.stepp.rpm.right = 0;
-                motorsys.stepp.dir.left = STOP;
-                motorsys.stepp.dir.right = STOP;
-            } else if (sel_c == PITCH) {
+                motorsys.stepp.dir.left = direction::STOP;
+                motorsys.stepp.dir.right = direction::STOP;
+            } else if (sel_c == control::PITCH) {
                 motorsys.pitch.length.left = PITCH_STOP;
                 motorsys.pitch.length.right = PITCH_STOP;
             }
@@ -279,15 +309,15 @@ static void estop() {
 
 static void send_targets() {
     send_pitch();
-    send_loco(LEFT);
-    send_loco(RIGHT);
+    send_loco(motor::LEFT);
+    send_loco(motor::RIGHT);
     send_stepp();
     send_digger();
 }
 
 static void send_pitch() {
     motor_bridge::Pitch msg;
-    msg.motor = BOTH;
+    msg.motor = (int)motor::BOTH;
     // for now only the right side controls everything, because they
     // have to stay in sync.
     msg.length = motorsys.pitch.length.right;
@@ -297,7 +327,7 @@ static void send_pitch() {
 static void send_loco(motor m) {
     motor_bridge::Drive msg;
     msg.motor = (int)m;
-    if (m == RIGHT) {
+    if (m == motor::RIGHT) {
         msg.speed = motorsys.loco.speed.right;
     } else {
         msg.speed = motorsys.loco.speed.left;
@@ -307,9 +337,9 @@ static void send_loco(motor m) {
 
 static void send_stepp() {
     motor_bridge::Stepp msg;
-    msg.motor = BOTH;
+    msg.motor = (int)motor::BOTH;
     msg.rpm = motorsys.stepp.rpm.right;
-    msg.direction = motorsys.stepp.dir.right;
+    msg.direction = (int)motorsys.stepp.dir.right;
     stepp_pub.publish(msg);
 }
 
