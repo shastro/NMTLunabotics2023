@@ -5,7 +5,7 @@
  R Stop   *Back*  *      *
 
    E-stop: *Disarmed [S]*
-   E-stop: *Armed [!]*
+   E-stop: *Armed [S]*
    E-stop: *Triggered*
 /controls here/
 
