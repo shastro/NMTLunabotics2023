@@ -56,6 +56,10 @@ void loop() {
             estopped = true;
         }
 
+        if (canId == DAVID_E_START_FRAME_ID) {
+            estopped = false;
+        }
+
         if ((canId == DAVID_STEPPER_CTRL_LEFT_FRAME_ID) ||
             (canId == DAVID_STEPPER_CTRL_RIGHT_FRAME_ID) ||
             (canId == DAVID_STEPPER_CTRL_BOTH_FRAME_ID))
