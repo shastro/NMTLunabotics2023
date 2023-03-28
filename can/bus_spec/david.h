@@ -39,7 +39,7 @@ extern "C" {
 #define DAVID_SET_TRIG_DELAY_LENGTH (8u)
 #define DAVID_PITCH_CTRL_LEFT_LENGTH (1u)
 #define DAVID_PITCH_CTRL_RIGHT_LENGTH (1u)
-#define DAVID_PITCH_CTRL_BOTH_LENGTH (8u)
+#define DAVID_PITCH_CTRL_BOTH_LENGTH (1u)
 #define DAVID_PITCH_TELEM_LEFT_LENGTH (8u)
 #define DAVID_PITCH_TELEM_RIGHT_LENGTH (8u)
 #define DAVID_LOCO_CTRL_LEFT_LENGTH (4u)
@@ -170,14 +170,7 @@ struct david_pitch_ctrl_both_t {
      * Scale: 1
      * Offset: 0
      */
-    uint64_t count;
-
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint16_t tolerance;
+    uint8_t command;
 };
 
 /**
@@ -652,7 +645,7 @@ int david_pitch_ctrl_both_unpack(
  *
  * @return Encoded signal.
  */
-uint64_t david_pitch_ctrl_both_count_encode(double value);
+uint8_t david_pitch_ctrl_both_command_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -661,7 +654,7 @@ uint64_t david_pitch_ctrl_both_count_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_pitch_ctrl_both_count_decode(uint64_t value);
+double david_pitch_ctrl_both_command_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -670,34 +663,7 @@ double david_pitch_ctrl_both_count_decode(uint64_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_pitch_ctrl_both_count_is_in_range(uint64_t value);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint16_t david_pitch_ctrl_both_tolerance_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_pitch_ctrl_both_tolerance_decode(uint16_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_pitch_ctrl_both_tolerance_is_in_range(uint16_t value);
+bool david_pitch_ctrl_both_command_is_in_range(uint8_t value);
 
 /**
  * Pack message PitchTelemLeft.

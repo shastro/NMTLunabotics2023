@@ -362,22 +362,15 @@ int david_pitch_ctrl_both_pack(
     const struct david_pitch_ctrl_both_t *src_p,
     size_t size)
 {
-    if (size < 8u) {
+    if (size < 1u) {
         return (-EINVAL);
     }
 
-    memset(&dst_p[0], 0, 8);
+    memset(&dst_p[0], 0, 1);
 
-    dst_p[0] |= pack_left_shift_u64(src_p->count, 0u, 0xffu);
-    dst_p[1] |= pack_right_shift_u64(src_p->count, 8u, 0xffu);
-    dst_p[2] |= pack_right_shift_u64(src_p->count, 16u, 0xffu);
-    dst_p[3] |= pack_right_shift_u64(src_p->count, 24u, 0xffu);
-    dst_p[4] |= pack_right_shift_u64(src_p->count, 32u, 0xffu);
-    dst_p[5] |= pack_right_shift_u64(src_p->count, 40u, 0xffu);
-    dst_p[6] |= pack_left_shift_u16(src_p->tolerance, 0u, 0xffu);
-    dst_p[7] |= pack_right_shift_u16(src_p->tolerance, 8u, 0xffu);
+    dst_p[0] |= pack_left_shift_u8(src_p->command, 0u, 0xffu);
 
-    return (8);
+    return (1);
 }
 
 int david_pitch_ctrl_both_unpack(
@@ -385,48 +378,26 @@ int david_pitch_ctrl_both_unpack(
     const uint8_t *src_p,
     size_t size)
 {
-    if (size < 8u) {
+    if (size < 1u) {
         return (-EINVAL);
     }
 
-    dst_p->count = unpack_right_shift_u64(src_p[0], 0u, 0xffu);
-    dst_p->count |= unpack_left_shift_u64(src_p[1], 8u, 0xffu);
-    dst_p->count |= unpack_left_shift_u64(src_p[2], 16u, 0xffu);
-    dst_p->count |= unpack_left_shift_u64(src_p[3], 24u, 0xffu);
-    dst_p->count |= unpack_left_shift_u64(src_p[4], 32u, 0xffu);
-    dst_p->count |= unpack_left_shift_u64(src_p[5], 40u, 0xffu);
-    dst_p->tolerance = unpack_right_shift_u16(src_p[6], 0u, 0xffu);
-    dst_p->tolerance |= unpack_left_shift_u16(src_p[7], 8u, 0xffu);
+    dst_p->command = unpack_right_shift_u8(src_p[0], 0u, 0xffu);
 
     return (0);
 }
 
-uint64_t david_pitch_ctrl_both_count_encode(double value)
+uint8_t david_pitch_ctrl_both_command_encode(double value)
 {
-    return (uint64_t)(value);
+    return (uint8_t)(value);
 }
 
-double david_pitch_ctrl_both_count_decode(uint64_t value)
-{
-    return ((double)value);
-}
-
-bool david_pitch_ctrl_both_count_is_in_range(uint64_t value)
-{
-    return (value <= 281474976710655ull);
-}
-
-uint16_t david_pitch_ctrl_both_tolerance_encode(double value)
-{
-    return (uint16_t)(value);
-}
-
-double david_pitch_ctrl_both_tolerance_decode(uint16_t value)
+double david_pitch_ctrl_both_command_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool david_pitch_ctrl_both_tolerance_is_in_range(uint16_t value)
+bool david_pitch_ctrl_both_command_is_in_range(uint8_t value)
 {
     (void)value;
 
