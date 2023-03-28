@@ -3,7 +3,7 @@
 #include "mcp_can.h"
 #include "david.h"
 
-const int stepsPerRevolution = 12800;  // change this to fit the number of steps per revolution
+const int stepsPerRevolution = 600;  // change this to fit the number of steps per revolution
 const int RPM = 1;
 const int stepsPerTick = 10;
 
@@ -65,22 +65,17 @@ void loop() {
         }
     }
 
-    if (!estopped) {
-        if (move_dir == FORWARD) {
-            for (int i = 0; i < stepsPerRevolution >> 2; i++) {
-                stepMotors(step);
+    if (!estopped && !(move_dir == STOP)) {
+        for (int i = 0; i < stepsPerRevolution; i++) {
+            stepMotors(step);
+            if (move_dir == FORWARD) {
                 step++;
-                delayMicroseconds(30);
-            }
-        } else if (move_dir == BACKWARD) {
-            for (int i = 0; i < stepsPerRevolution >> 2; i++) {
-                stepMotors(step);
+            } else if (move_dir == BACKWARD) {
                 step--;
-                delayMicroseconds(30);
             }
+            delayMicroseconds(1);
         }
     }
-    
 }
 
 
