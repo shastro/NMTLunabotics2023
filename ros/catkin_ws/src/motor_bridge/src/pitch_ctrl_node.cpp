@@ -38,8 +38,7 @@ void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
         can_id = DAVID_PITCH_CTRL_RIGHT_FRAME_ID;
     } else {
         david_pitch_ctrl_both_t both = {
-            .count = (uint64_t)length,
-            .tolerance = 100
+            .command = (uint8_t)length,
         };
         david_pitch_ctrl_both_pack(message, &both, sizeof(message));
         can_id = DAVID_PITCH_CTRL_BOTH_FRAME_ID;
