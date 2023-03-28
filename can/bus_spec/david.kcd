@@ -128,7 +128,13 @@
       <Signal name="RPM" offset="0" length="32"/>
       <Signal name="Direction" offset="32" length="32"/>
     </Message>
-  </Bus>
-  </Bus>
+
+    <Message id="0x500" name="ExcavCtrl">
+      <Producer>
+        <NodeRef id="0"/>
+      </Producer>
+      <Signal name="RPM" offset="0" length="32"
+              slope="0.001" type="signed" />
+    </Message>
   </Bus>
 </NetworkDefinition>
