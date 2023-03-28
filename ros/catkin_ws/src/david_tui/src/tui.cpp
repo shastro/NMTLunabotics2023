@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ncurses.h>
 
+#include <motor_bridge/Digger.h>
 #include <motor_bridge/Drive.h>
 #include <motor_bridge/Pitch.h>
 #include <motor_bridge/Stepp.h>
@@ -50,6 +51,7 @@ static std::unordered_map<char, std::string> bindings = {
 static ros::Publisher pitch_pub;
 static ros::Publisher loco_pub;
 static ros::Publisher stepp_pub;
+static ros::Publisher excav_pub;
 
 struct target {
     int left;
@@ -76,10 +78,17 @@ struct stepp_target {
     target_dir dir;
 };
 
+enum digger_target {
+    DIG_STOP,
+    DIG_FORWARD,
+    DIG_BACKWARD,
+};
+
 static struct {
     pitch_target pitch;
     loco_target loco;
     stepp_target stepp;
+    digger_target digger;
 } motorsys;
 
 static control sel_c;
@@ -89,7 +98,9 @@ static void send_targets();
 static void send_pitch(motor m);
 static void send_loco(motor m);
 static void send_stepp(motor m);
+static void send_digger();
 
+static void print_status();
 static void print_keybinds();
 
 int main(int argc, char **argv) {
@@ -99,6 +110,7 @@ int main(int argc, char **argv) {
     pitch_pub = nh.advertise<motor_bridge::Pitch>("/pitch_control", 5);
     loco_pub = nh.advertise<motor_bridge::Drive>("/loco_control", 5);
     stepp_pub = nh.advertise<motor_bridge::Stepp>("/stepp_control", 5);
+    excav_pub = nh.advertise<motor_bridge::Digger>("/excav_control", 5);
 
     // Setup motorsys
     motorsys.pitch.length.min = 0;
@@ -120,6 +132,7 @@ int main(int argc, char **argv) {
     while (true) {
         clear();
         move(0, 0);
+        print_status();
         print_keybinds();
         refresh();
 
@@ -256,6 +269,7 @@ static void send_targets() {
     send_loco(RIGHT);
     send_stepp(LEFT);
     send_stepp(RIGHT);
+    send_digger();
 }
 
 static void send_pitch(motor m) {
@@ -291,6 +305,20 @@ static void send_stepp(motor m) {
         msg.direction = motorsys.stepp.dir.left;
     }
     stepp_pub.publish(msg);
+}
+
+static void send_digger() {
+    motor_bridge::Digger msg;
+    msg.speed = 0;
+    if (motorsys.digger == DIG_FORWARD)
+        msg.speed = 100;
+    else if (motorsys.digger == DIG_BACKWARD)
+        msg.speed = -100;
+    excav_pub.publish(msg);
+}
+
+static void print_status() {
+    printw("status here\n");
 }
 
 static void print_keybinds() {
