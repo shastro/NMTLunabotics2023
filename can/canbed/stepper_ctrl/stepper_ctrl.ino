@@ -3,9 +3,8 @@
 #include "mcp_can.h"
 #include "david.h"
 
-const int stepsPerRevolution = 600;  // change this to fit the number of steps per revolution
-const int RPM = 1;
-const int stepsPerTick = 10;
+const int stepsPerTick = 600;  // change this to fit the number of steps per revolution
+const int stepDelayMicros = 10;
 
 enum PINS {
     PUL1 = 10,
@@ -66,14 +65,14 @@ void loop() {
     }
 
     if (!estopped && !(move_dir == STOP)) {
-        for (int i = 0; i < stepsPerRevolution; i++) {
+        for (int i = 0; i < stepsPerTick; i++) {
             stepMotors(step);
             if (move_dir == FORWARD) {
                 step++;
             } else if (move_dir == BACKWARD) {
                 step--;
             }
-            delayMicroseconds(1);
+            delayMicroseconds(stepDelayMicros);
         }
     }
 }
