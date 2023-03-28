@@ -50,7 +50,12 @@ docker run "${params[@]}" $IMAGE_NAME roscore
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh /scripts/unfuck_realsense
 
 # Run the motor_bridge node.
-docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun motor_bridge pitch_ctrl
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun motor_bridge pitch_ctrl_node
 
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun motor_bridge loco_ctrl_node
+
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun motor_bridge stepp_ctrl_node
+
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun motor_bridge excav_ctrl_node
 # # For now run keyboard control here.
 # docker exec -it $CONTAINER_NAME /ros_entrypoint.sh rosrun david_keyboard david_keyboard
