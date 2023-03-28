@@ -25,7 +25,7 @@
 
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
 enum control { PITCH = 0, LOCO = 1, STEPP = 2 };
-enum direction { BACKWARD = -1, STOP = 0, FORWARD = 1 };
+enum direction { STOP = 0, FORWARD = 1, BACKWARD = 2 };
 
 static std::unordered_map<char, std::string> bindings = {
     // Control
