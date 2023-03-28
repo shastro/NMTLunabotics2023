@@ -14,7 +14,7 @@
 SocketCAN can;
 
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
-enum dir { BACKWARD = -1, STOP = 1, FORWARD = 2 };
+enum dir { BACKWARD = -1, STOP = 0, FORWARD = 0 };
 
 void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
     motor m = (motor)msg->motor;
