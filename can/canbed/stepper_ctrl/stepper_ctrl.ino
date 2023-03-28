@@ -5,16 +5,17 @@
 #include "david.h"
 
 const int stepsPerRevolution = 200;  // change this to fit the number of steps per revolution
-const int RPM = 1;
+const int DEFAULT_RPM = 1;
+const int MAX_RPX = 128;
 const int stepsPerTick = 10;
 
 enum PINS {
     PUL1 = 4,
     DIR1 = 10,
-    
+
     PUL2 = 5,
     DIR2 = 9,
-    
+
     SPI_CS_PIN = 17
 };
 
@@ -26,67 +27,55 @@ Stepper stepper2(stepsPerRevolution, PUL2, DIR2);
 bool estopped = false;
 
 enum DIR {
+    BACKWARD = -1,
     STOP = 0,
     FORWARD = 1,
-    BACKWARD = 2,
 };
 int move_dir = STOP;
+int rpm = DEFAULT_RPM;
 
 void setup() {
     while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
-        {
-            /* Serial.println("CAN BUS FAIL!"); */
-        }
-
-    /* stepper1.setSpeed(1); */
-    /* stepper2.setSpeed(1); */
+    {
+        Serial.println("WHEELS ON BUS NOT GO ROUND");
+        delay(100);
+    }
+    Serial.println("THE WHEELS ON THE BUS GO ROUND AND ROUND");
 }
 
 void loop() {
+    stepper1.setSpeed(rpm);
+    stepper1.setSpeed(rpm);
 
-    /* // Check for new messages */
-    /* if(CAN_MSGAVAIL == CAN.checkReceive()) { */
-    /*     unsigned char len = 0; */
-    /*     unsigned char buf[8] = {0}; */
-    /*     // read data */
-    /*     CAN.readMsgBuf(&len, buf); */
-    /*     uint32_t canId = CAN.getCanId(); */
+    // Check for new messages 
+    if(CAN_MSGAVAIL == CAN.checkReceive()) { 
+        unsigned char len = 0; 
+        unsigned char buf[8] = {0}; 
+        // read data 
+        CAN.readMsgBuf(&len, buf); 
+        uint32_t canId = CAN.getCanId(); 
 
-    /*     // IF ESTOP stop other behaviors */
-    /*     if (canId == DAVID_E_STOP_FRAME_ID) { */
-    /*         estopped = true; */
-    /*     } */
+        // IF ESTOP stop other behaviors 
+        if (canId == DAVID_E_STOP_FRAME_ID) { 
+            estopped = true; 
+        } 
 
-    /*     if (canId == DAVID_STEPPER_CTRL_FRAME_ID) { */
-    /*         move_dir = extract_value(buf, 0, 1);               */
-    /*     } */
-    /* } */
+        if (canId == DAVID_STEPPER_CTRL_FRAME_ID) { 
+            rpm = map(extract_value(0, 4), 0, 1024, 0, MAX_RPM);
+            move_dir = extract_value(buf, 4, 4);
+        } 
+    } 
 
-    /* // step one step: */
-    /* if (!estopped) { */
-    /*     if (move_dir == FORWARD) { */
-    /*         stepper1.step(-stepsPerTick); */
-    /*         stepper2.step(stepsPerTick); */
-    /*     } else if (move_dir == BACKWARD) { */
-    /*         stepper1.step(stepsPerTick); */
-    /*         stepper2.step(-stepsPerTick); */
-    /*     } */
-    /* } */
-
-    /* for (int i = 0; i < 100; i++) { */
-    stepper1.step(stepsPerTick);
-    stepper2.step(-stepsPerTick);
-    /* } */
-
-    /* delay(1000); */
-
-    
-    /* for (int i = 0; i < 100; i++) { */
-    /*     stepper1.step(-stepsPerTick); */
-    /*     stepper2.step(-stepsPerTick); */
-    /* } */
-
-    /* delay(1000); */
+    // step one step: 
+    if (!estopped) { 
+        if (move_dir == FORWARD) { 
+            stepper1.step(-stepsPerTick); 
+            stepper2.step(stepsPerTick); 
+        } else if (move_dir == BACKWARD) { 
+            stepper1.step(stepsPerTick); 
+            stepper2.step(-stepsPerTick); 
+        }
+    }
 }
 
 int64_t extract_value(char buf[], int first_byte, int bytes) {
