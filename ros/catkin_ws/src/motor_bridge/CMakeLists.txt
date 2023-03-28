@@ -23,6 +23,7 @@ add_message_files(
   Drive.msg
   Stepp.msg
   Digger.msg
+  Estop.msg
 )
 
 generate_messages(DEPENDENCIES std_msgs)
@@ -61,6 +62,14 @@ add_executable(excav_ctrl
   src/can_interface.cpp
 )
 
+# estop node
+add_executable(estop
+  src/estop_node.cpp
+  src/can/david.c
+  src/can_interface.cpp
+)
+
+
 add_dependencies(pitch_ctrl
   ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(loco_ctrl
@@ -69,14 +78,22 @@ add_dependencies(stepp_ctrl
   ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(excav_ctrl
   ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(estop
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(pitch_ctrl ${catkin_LIBRARIES})
 target_link_libraries(loco_ctrl ${catkin_LIBRARIES})
 target_link_libraries(excav_ctrl ${catkin_LIBRARIES})
 target_link_libraries(stepp_ctrl ${catkin_LIBRARIES})
+target_link_libraries(estop ${catkin_LIBRARIES})
 
 
 link_directories(${catkin_LIBRARY_DIRS})
 
-install(TARGETS pitch_ctrl loco_ctrl
+install(TARGETS 
+    pitch_ctrl
+    loco_ctrl
+    stepp_ctrl
+    excav_ctrl
+    estop
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
