@@ -29,7 +29,9 @@ generate_messages(DEPENDENCIES std_msgs)
 
 catkin_package(CATKIN_DEPENDS std_msgs std_srvs message_runtime)
 
-include_directories(include ${catkin_INCLUDE_DIRS} ../../../../teknic/inc/inc-pub)
+include_directories(include ${catkin_INCLUDE_DIRS})
+
+
 
 # pitch_ctrl node
 add_executable(pitch_ctrl
@@ -59,11 +61,20 @@ add_executable(excav_ctrl
   src/can_interface.cpp
 )
 
+add_dependencies(pitch_ctrl
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(loco_ctrl
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(stepp_ctrl
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(excav_ctrl
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
 target_link_libraries(pitch_ctrl ${catkin_LIBRARIES})
 target_link_libraries(loco_ctrl ${catkin_LIBRARIES})
 target_link_libraries(excav_ctrl ${catkin_LIBRARIES})
 target_link_libraries(stepp_ctrl ${catkin_LIBRARIES})
-add_dependencies(pitch_ctrl loco_ctrl stepp_ctrl excav_ctrl ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
 
 link_directories(${catkin_LIBRARY_DIRS})
 
