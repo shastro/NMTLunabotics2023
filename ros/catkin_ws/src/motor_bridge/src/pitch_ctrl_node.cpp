@@ -26,15 +26,13 @@ void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
 
     if (m == LEFT) {
         david_pitch_ctrl_left_t left = {
-            .count = (uint64_t)length,
-            .tolerance = 100
+            .command = (uint8_t)length,
         };
         david_pitch_ctrl_left_pack(message, &left, sizeof(message));
         can_id = DAVID_PITCH_CTRL_LEFT_FRAME_ID;
     } else if (m == RIGHT) {
         david_pitch_ctrl_right_t right = {
-            .count = (uint64_t)length,
-            .tolerance = 100
+            .command = (uint8_t)length,
         };
         david_pitch_ctrl_right_pack(message, &right, sizeof(message));
         can_id = DAVID_PITCH_CTRL_RIGHT_FRAME_ID;

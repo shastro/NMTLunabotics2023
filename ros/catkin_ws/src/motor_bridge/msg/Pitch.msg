@@ -1,6 +1,6 @@
 # Pitch Control Message
 
-# Length of Pitch Extent: (0 = home, 1024 = fully extended)
+# Pitch motion direction: (0 = stop, 1 = extend, 2 = retract)
 int32 length
 
 # Which motor (0 = both, 1 = left, 2 = right)

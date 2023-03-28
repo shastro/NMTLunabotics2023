@@ -105,7 +105,7 @@ CANPacket can_read(MCP_CAN &can) {
 void setup() {
     Serial.begin(115200);
 
-    MotorController left(9, 10, 11);
+    MotorController left(10, 9, 11);
     MotorController right(A0, A1, A2);
     // MotorController excav(6, A3, 12);
 

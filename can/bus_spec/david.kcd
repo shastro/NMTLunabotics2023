@@ -45,16 +45,24 @@
       <Producer>
         <NodeRef id="0"/>
       </Producer>
-      <Signal name="Count" offset="0" length="48"/>
-      <Signal name="Tolerance" offset="48" length="16"/>
+      <!-- <Signal name="Count" offset="0" length="48"/> -->
+      <!-- <Signal name="Tolerance" offset="48" length="16"/> -->
+      <Signal name="Command" offset="0" length="8"/>
+      <!-- 0: stop -->
+      <!-- 1: forward -->
+      <!-- 2: retract -->
     </Message>
 
     <Message id="0x110" name="PitchCtrlRight">
       <Producer>
         <NodeRef id="0"/>
       </Producer>
-      <Signal name="Count" offset="0" length="48"/>
-      <Signal name="Tolerance" offset="48" length="16"/>
+      <!-- <Signal name="Count" offset="0" length="48"/> -->
+      <!-- <Signal name="Tolerance" offset="48" length="16"/> -->
+      <Signal name="Command" offset="0" length="8"/>
+      <!-- 0: stop -->
+      <!-- 1: forward -->
+      <!-- 2: retract -->
     </Message>
 
     <Message id="0x111" name="PitchCtrlBoth">

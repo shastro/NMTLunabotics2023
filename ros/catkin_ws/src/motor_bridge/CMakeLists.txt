@@ -21,6 +21,8 @@ add_message_files(
   FILES
   Pitch.msg
   Drive.msg
+  Stepp.msg
+  Digger.msg
 )
 
 generate_messages(DEPENDENCIES std_msgs)
