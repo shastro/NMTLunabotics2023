@@ -275,7 +275,6 @@ int main(int argc, char **argv) {
             motorsys.stepp.dir.right = direction::STOP;
             motorsys.pitch.length.left = PITCH_STOP;
             motorsys.pitch.length.right = PITCH_STOP;
-            send_targets();
             break;
         case 'q': // Quit
             estop();
