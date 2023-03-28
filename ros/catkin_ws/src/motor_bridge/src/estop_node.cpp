@@ -16,16 +16,24 @@ SocketCAN can;
 
 void estopCallback(const motor_bridge::Estop::ConstPtr &msg) {
     bool stop = msg->stop;
-    std::cout << "Stop Message Received."
-        << "stop: " << stop
-        << std::endl;
-    if (stop) {
-        uint8_t message[8];
-        int can_id;
 
+    uint8_t message[8];
+    int can_id;
+
+    std::cout << "Stop Message Received: ";
+
+    if (stop) {
+        std::cout << "Stop" << std::endl;
         david_e_stop_t estop = {};
         david_e_stop_pack(message, &estop, sizeof(message));
         can_id = DAVID_E_STOP_FRAME_ID;
+
+        can.transmit(can_id, message);
+    } else {
+        std::cout << "Not Stop" << std::endl;
+        david_e_start_t estart = {};
+        david_e_start_pack(message, &estart, sizeof(message));
+        can_id = DAVID_E_START_FRAME_ID;
 
         can.transmit(can_id, message);
     }
