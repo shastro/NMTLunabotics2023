@@ -13,7 +13,7 @@
 #define CAN_BUS "can0"
 SocketCAN can;
 
-enum motor {LEFT = 1, RIGHT = 2};
+enum motor {BOTH = 0, LEFT = 1, RIGHT = 2};
 
 void locoCallback(const motor_bridge::Drive::ConstPtr &msg) {
     int speed = msg->speed;
@@ -31,12 +31,18 @@ void locoCallback(const motor_bridge::Drive::ConstPtr &msg) {
         };
         david_loco_ctrl_left_pack(message, &left, sizeof(message));
         can_id = DAVID_LOCO_CTRL_LEFT_FRAME_ID;
-    } else {
+    } else if (m == RIGHT) {
         david_loco_ctrl_right_t right = {
             .velocity = (uint64_t)speed
         };
         david_loco_ctrl_right_pack(message, &right, sizeof(message));
         can_id = DAVID_LOCO_CTRL_RIGHT_FRAME_ID;
+    } else {
+        david_loco_ctrl_both_t both = {
+            .velocity = (uint64_t)speed
+        };
+        david_loco_ctrl_both_pack(message, &both, sizeof(message));
+        can_id = DAVID_LOCO_CTRL_BOTH_FRAME_ID;
     }
 
     can.transmit(can_id, message);
