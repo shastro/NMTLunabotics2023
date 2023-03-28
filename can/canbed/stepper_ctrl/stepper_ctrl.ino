@@ -1,4 +1,3 @@
-#include <Stepper.h>
 #include <Wire.h>
 
 #include "mcp_can.h"
@@ -20,9 +19,6 @@ enum PINS {
 
 MCP_CAN CAN(SPI_CS_PIN); // Set CS pin
 
-Stepper stepper1(stepsPerRevolution, DIR1, PUL1);
-Stepper stepper2(stepsPerRevolution, DIR2, PUL2);
-
 bool estopped = false;
 
 enum DIR {
@@ -32,20 +28,17 @@ enum DIR {
 };
 int move_dir = FORWARD;
 
+static int step = 0;
+
 void setup() {
     while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
         {
         }
 
-    // Declare pins as output:
-  /* pinMode(PUL1, OUTPUT); */
-  /* pinMode(DIR1, OUTPUT); */
-  /* pinMode(PUL2, OUTPUT); */
-  /* pinMode(DIR2, OUTPUT); */
-
-  // Set the spinning direction CW/CCW:
-  /* digitalWrite(DIR1, HIGH); */
-  /* digitalWrite(DIR2, HIGH); */
+    pinMode(PUL1, OUTPUT);
+    pinMode(DIR1, OUTPUT);
+    pinMode(PUL2, OUTPUT);
+    pinMode(DIR2, OUTPUT);
 }
 
 void loop() {
@@ -72,6 +65,18 @@ void loop() {
         }
     }
 
+    for (int i = 0; i < stepsPerRevolution; i++) {
+        stepMotors(step);
+        step++;
+        delayMicroseconds(500);
+    }
+
+    for (int i = 0; i < stepsPerRevolution; i++) {
+        stepMotors(step);
+        step--;
+        delayMicroseconds(500);
+    }
+
     /* // step one step: */
     /* if (!estopped) { */
     /*     if (move_dir == FORWARD) { */
@@ -83,95 +88,15 @@ void loop() {
     /*     } */
     /* } */
 
-    /* /\* for (int i = 0; i < 100; i++) { *\/ */
-    /* digitalWrite(PUL1, HIGH); */
-    /* digitalWrite(PUL2, HIGH); */
-    /* digitalWrite(DIR1, LOW); */
-    /* digitalWrite(DIR2, LOW); */
-    stepper1.step(-stepsPerRevolution);
-    stepper2.step(-stepsPerRevolution);
-
-    delay(1000);
-    /* /\* } *\/ */
-
-
-    
-    /* /\* for (int i = 0; i < 100; i++) { *\/ */
-    /* digitalWrite(PUL1, HIGH); */
-    /* digitalWrite(PUL2, HIGH); */
-        /* digitalWrite(DIR1, HIGH); */
-        /* digitalWrite(DIR2, HIGH); */
-    stepper1.step(+stepsPerRevolution);
-    stepper2.step(+stepsPerRevolution);
-    delay(1000);
-
-  /*   digitalWrite(DIR1, HIGH); // Enables the motor to move in a particular direction */
-  /*       digitalWrite(DIR2, HIGH); // Enables the motor to move in a particular direction */
-  /* for (int x = 0; x < 100; x++) */
-  /* { */
-  /*   digitalWrite(PUL1, HIGH); */
-  /*   digitalWrite(PUL2, HIGH); */
-  /*   delay(50); */
-  /*   digitalWrite(PUL1, LOW); */
-  /*   digitalWrite(PUL2, LOW); */
-  /*   delay(50); */
-  /* } */
-  /* delay(1000); // One second delay */
-  
-  /* digitalWrite(DIR1, LOW); // Enables the motor to move in a particular direction */
-  /* digitalWrite(DIR2, LOW); // Enables the motor to move in a particular direction */
-  /* for (int x = 0; x < 100; x++) */
-  /* { */
-  /*       digitalWrite(PUL1, HIGH); */
-  /*   digitalWrite(PUL2, HIGH); */
-  /*   delay(50); */
-  /*   digitalWrite(PUL1, LOW); */
-  /*   digitalWrite(PUL2, LOW); */
-  /*       delay(50); */
-  /* } */
-  /* delay(1000); */
-
-
-    /* digitalWrite(DIR1, HIGH); */
-    /* delayMicroseconds(500); */
-    /* digitalWrite(DIR2, HIGH); */
-    /* delayMicroseconds(500); */
-
-    
-    /* for (int i = 0; i < 5*stepsPerRevolution; i++) { */
-    /*     digitalWrite(PUL1, HIGH); */
-    /*     delayMicroseconds(500); */
-    /*     digitalWrite(PUL1, LOW); */
-    /*     delayMicroseconds(500); */
-
-    /*     digitalWrite(PUL2, HIGH); */
-    /*     delayMicroseconds(500); */
-    /*     digitalWrite(PUL2, LOW); */
-    /*     delayMicroseconds(500); */
-    /* } */
-
-    /* digitalWrite(DIR1, LOW); */
-    /* delayMicroseconds(500); */
-    /* digitalWrite(DIR2, LOW); */
-    /* delayMicroseconds(500); */
-
-    
-    /* for (int i = 0; i < 5*stepsPerRevolution; i++) { */
-    /*     digitalWrite(PUL1, HIGH); */
-    /*     delayMicroseconds(500); */
-    /*     digitalWrite(PUL1, LOW); */
-    /*     delayMicroseconds(500); */
-
-    /*     digitalWrite(PUL2, HIGH); */
-    /*     delayMicroseconds(500); */
-    /*     digitalWrite(PUL2, LOW); */
-    /*     delayMicroseconds(500); */
-    /* } */
-
-    
-    /* /\* } *\/ */
+    /* stepper1.step(-stepsPerRevolution); */
+    /* stepper2.step(-stepsPerRevolution); */
 
     /* delay(1000); */
+
+    /* stepper1.step(+stepsPerRevolution); */
+    /* stepper2.step(+stepsPerRevolution); */
+    /* delay(1000); */
+
     send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, 0x255, 0x255);    
 }
 
@@ -200,3 +125,34 @@ int64_t extract_value(char buf[], int first_byte, int bytes) {
     }
     return count;  
 }
+
+void stepMotors(int step)
+{
+    switch (step % 4) {
+    case 0:  // 01
+        digitalWrite(DIR1, LOW);
+        digitalWrite(PUL1, HIGH);
+        digitalWrite(DIR2, LOW);
+        digitalWrite(PUL2, HIGH);
+        break;
+    case 1:  // 11
+        digitalWrite(DIR1, HIGH);
+        digitalWrite(PUL1, HIGH);
+        digitalWrite(DIR2, HIGH);
+        digitalWrite(PUL2, HIGH);
+        break;
+    case 2:  // 10
+        digitalWrite(DIR1, HIGH);
+        digitalWrite(PUL1, LOW);
+        digitalWrite(DIR2, HIGH);
+        digitalWrite(PUL2, LOW);
+        break;
+    case 3:  // 00
+        digitalWrite(DIR1, LOW);
+        digitalWrite(PUL1, LOW);
+        digitalWrite(DIR2, LOW);
+        digitalWrite(PUL2, LOW);
+        break;
+    }
+}
+
