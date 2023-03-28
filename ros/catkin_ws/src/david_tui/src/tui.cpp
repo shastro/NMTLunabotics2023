@@ -3,10 +3,11 @@
 
 #include <motor_bridge/Digger.h>
 #include <motor_bridge/Drive.h>
+#include <motor_bridge/Estop.h>
 #include <motor_bridge/Pitch.h>
 #include <motor_bridge/Stepp.h>
-#include <motor_bridge/Estop.h>
 #include <ros/ros.h>
+#include <sstream>
 #include <std_msgs/String.h>
 #include <string>
 #include <unistd.h>
@@ -60,6 +61,12 @@ struct target {
     int right;
     int min;
     int max;
+    friend std::ostream &operator<<(std::ostream &s, const target &t) {
+        s << "  left: " << t.left << "  right: " << t.right << std::endl
+          << "  min: " << t.min << std::endl
+          << "  max: " << t.max;
+        return s;
+    }
 };
 
 struct target_dir {
@@ -326,7 +333,16 @@ static void send_digger() {
 }
 
 static void print_status() {
-    printw("status here\n");
+    std::ostringstream status;
+    status << "Pitch target: " << std::endl
+           << motorsys.pitch.length << std::endl
+           << "Loco target: " << std::endl
+           << motorsys.loco.speed << std::endl
+           << "Stepper target: " << std::endl
+           << motorsys.stepp.rpm << std::endl
+           << "Digger target: " << std::endl
+           << "  " << motorsys.digger << std::endl;
+    printw("%s", status.str().c_str());
 }
 
 static void print_keybinds() {
