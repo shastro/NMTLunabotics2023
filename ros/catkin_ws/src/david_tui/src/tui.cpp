@@ -341,7 +341,9 @@ static void print_status() {
            << "Stepper target: " << std::endl
            << motorsys.stepp.rpm << std::endl
            << "Digger target: " << std::endl
-           << "  " << motorsys.digger << std::endl;
+           << "  " << motorsys.digger << std::endl
+           << "Selected control: " << sel_c << "  Selected motor: " << sel_m
+           << std::endl;
     printw("%s", status.str().c_str());
 }
 
