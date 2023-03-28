@@ -26,6 +26,7 @@ enum DIR {
     BACKWARD = 2,
 };
 int move_dir = STOP;
+int rpm = 0; //TODO implement
 
 static int step = 0;
 
@@ -64,7 +65,8 @@ void loop() {
             (canId == DAVID_STEPPER_CTRL_RIGHT_FRAME_ID) ||
             (canId == DAVID_STEPPER_CTRL_BOTH_FRAME_ID))
             {
-                move_dir = extract_value(buf, 0, 1);
+                rpm = extract_value(buf, 0, 4);
+                move_dir = extract_value(buf, 4, 4);
         }
     }
 
