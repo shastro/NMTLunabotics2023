@@ -11,6 +11,10 @@
 #include <unordered_map>
 #include <vector>
 
+#define PITCH_STOP 0
+#define PITCH_FORWARD 1
+#define PITCH_BACKWARD 2
+
 #define print_bold(...)                                                        \
     do {                                                                       \
         attron(A_BOLD);                                                        \
@@ -34,8 +38,8 @@ static std::unordered_map<char, std::string> bindings = {
     // Command
     {'j', "Drive Forward"},
     {'k', "Drive Backward"},
-    {'J', "Pitch Up"},
-    {'K', "Pitch Down"},
+    {'J', "Pitch Down"},
+    {'K', "Pitch Up"},
     {'h', "Arm Out"},
     {'l', "Arm In"},
     {'s', "Stop Current"},
@@ -167,25 +171,17 @@ int main(int argc, char **argv) {
             break;
         case 'J':
             sel_c = PITCH;
-            if (sel_m != RIGHT) {
-                motorsys.pitch.length.left = std::min(
-                    motorsys.pitch.length.left + 64, motorsys.pitch.length.max);
-            } else if (sel_m != LEFT) {
-                motorsys.pitch.length.right =
-                    std::min(motorsys.pitch.length.right + 64,
-                             motorsys.pitch.length.max);
-            }
+            if (sel_m != RIGHT)
+                motorsys.pitch.length.left = PITCH_BACKWARD;
+            if (sel_m != LEFT)
+                motorsys.pitch.length.right = PITCH_BACKWARD;
             break;
         case 'K':
             sel_c = PITCH;
-            if (sel_m != RIGHT) {
-                motorsys.pitch.length.left = std::max(
-                    motorsys.pitch.length.left - 64, motorsys.pitch.length.min);
-            } else if (sel_m != LEFT) {
-                motorsys.pitch.length.right =
-                    std::max(motorsys.pitch.length.right - 64,
-                             motorsys.pitch.length.min);
-            }
+            if (sel_m != RIGHT)
+                motorsys.pitch.length.left = PITCH_FORWARD;
+            if (sel_m != LEFT)
+                motorsys.pitch.length.right = PITCH_FORWARD;
             break;
         case 'o':
             sel_c = STEPP;
@@ -229,8 +225,8 @@ int main(int argc, char **argv) {
             motorsys.stepp.rpm.right = 0;
             motorsys.stepp.dir.left = STOP;
             motorsys.stepp.dir.right = STOP;
-            motorsys.pitch.length.left = motorsys.pitch.length.max;
-            motorsys.pitch.length.right = motorsys.pitch.length.max;
+            motorsys.pitch.length.left = PITCH_STOP;
+            motorsys.pitch.length.right = PITCH_STOP;
             break;
         case 'q':
             motorsys.loco.speed.left = 0;
@@ -239,8 +235,8 @@ int main(int argc, char **argv) {
             motorsys.stepp.rpm.right = 0;
             motorsys.stepp.dir.left = STOP;
             motorsys.stepp.dir.right = STOP;
-            motorsys.pitch.length.left = motorsys.pitch.length.max;
-            motorsys.pitch.length.right = motorsys.pitch.length.max;
+            motorsys.pitch.length.left = PITCH_STOP;
+            motorsys.pitch.length.right = PITCH_STOP;
             endwin();
             return 0;
 
