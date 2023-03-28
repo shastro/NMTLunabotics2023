@@ -22,7 +22,11 @@ RUN apt-get install -y \
     
 
 COPY scripts /scripts
-COPY catkin_ws /catkin_ws
+# COPY catkin_ws /catkin_ws
+COPY catkin_ws/.catkin_workspace /catkin_ws/.catkin_workspace
+# COPY catkin_ws/src/CMakeLists.txt /catkin_ws/src/CMakeLists.txt
+COPY catkin_ws/src/david_tui /catkin_ws/src/david_tui
+COPY catkin_ws/src/motor_bridge /catkin_ws/src/david_tui
 
 RUN cd /catkin_ws && \
     rm -rf /catkin_ws/build /catkin_ws/devel && \
