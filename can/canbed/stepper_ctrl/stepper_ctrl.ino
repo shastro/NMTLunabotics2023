@@ -26,7 +26,7 @@ enum DIR {
     FORWARD = 1,
     BACKWARD = 2,
 };
-int move_dir = FORWARD;
+int move_dir = STOP;
 
 static int step = 0;
 
@@ -65,39 +65,22 @@ void loop() {
         }
     }
 
-    for (int i = 0; i < stepsPerRevolution; i++) {
-        stepMotors(step);
-        step++;
-        delayMicroseconds(500);
+    if (!estopped) {
+        if (move_dir == FORWARD) {
+            for (int i = 0; i < stepsPerRevolution >> 2; i++) {
+                stepMotors(step);
+                step++;
+                delayMicroseconds(30);
+            }
+        } else if (move_dir == BACKWARD) {
+            for (int i = 0; i < stepsPerRevolution >> 2; i++) {
+                stepMotors(step);
+                step--;
+                delayMicroseconds(30);
+            }
+        }
     }
-
-    for (int i = 0; i < stepsPerRevolution; i++) {
-        stepMotors(step);
-        step--;
-        delayMicroseconds(500);
-    }
-
-    /* // step one step: */
-    /* if (!estopped) { */
-    /*     if (move_dir == FORWARD) { */
-    /*         stepper1.step(-stepsPerTick); */
-    /*         stepper2.step(stepsPerTick); */
-    /*     } else if (move_dir == BACKWARD) { */
-    /*         stepper1.step(stepsPerTick); */
-    /*         stepper2.step(-stepsPerTick); */
-    /*     } */
-    /* } */
-
-    /* stepper1.step(-stepsPerRevolution); */
-    /* stepper2.step(-stepsPerRevolution); */
-
-    /* delay(1000); */
-
-    /* stepper1.step(+stepsPerRevolution); */
-    /* stepper2.step(+stepsPerRevolution); */
-    /* delay(1000); */
-
-    send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, 0x255, 0x255);    
+    
 }
 
 
