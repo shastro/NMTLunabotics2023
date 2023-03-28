@@ -105,9 +105,9 @@ static motor sel_m = BOTH;
 
 static void estop();
 static void send_targets();
-static void send_pitch(motor m);
+static void send_pitch();
 static void send_loco(motor m);
-static void send_stepp(motor m);
+static void send_stepp();
 static void send_digger();
 
 static void print_status();
@@ -278,23 +278,19 @@ static void estop() {
 }
 
 static void send_targets() {
-    send_pitch(LEFT);
-    send_pitch(RIGHT);
+    send_pitch();
     send_loco(LEFT);
     send_loco(RIGHT);
-    send_stepp(LEFT);
-    send_stepp(RIGHT);
+    send_stepp();
     send_digger();
 }
 
-static void send_pitch(motor m) {
+static void send_pitch() {
     motor_bridge::Pitch msg;
-    msg.motor = (int)m;
-    if (m == RIGHT) {
-        msg.length = motorsys.pitch.length.right;
-    } else {
-        msg.length = motorsys.pitch.length.left;
-    }
+    msg.motor = BOTH;
+    // for now only the right side controls everything, because they
+    // have to stay in sync.
+    msg.length = motorsys.pitch.length.right;
     pitch_pub.publish(msg);
 }
 
@@ -309,16 +305,11 @@ static void send_loco(motor m) {
     loco_pub.publish(msg);
 }
 
-static void send_stepp(motor m) {
+static void send_stepp() {
     motor_bridge::Stepp msg;
-    msg.motor = (int)m;
-    if (m == RIGHT) {
-        msg.rpm = motorsys.stepp.rpm.right;
-        msg.direction = motorsys.stepp.dir.right;
-    } else {
-        msg.rpm = motorsys.stepp.rpm.left;
-        msg.direction = motorsys.stepp.dir.left;
-    }
+    msg.motor = BOTH;
+    msg.rpm = motorsys.stepp.rpm.right;
+    msg.direction = motorsys.stepp.dir.right;
     stepp_pub.publish(msg);
 }
 
