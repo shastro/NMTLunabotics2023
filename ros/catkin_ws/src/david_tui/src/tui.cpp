@@ -266,17 +266,16 @@ int main(int argc, char **argv) {
             }
             break;
         case 'c': // Stop All
-            estop();
-            /*
+            // estop();
             motorsys.loco.speed.left = 0;
             motorsys.loco.speed.right = 0;
             motorsys.stepp.rpm.left = 0;
             motorsys.stepp.rpm.right = 0;
-            motorsys.stepp.dir.left = STOP;
-            motorsys.stepp.dir.right = STOP;
+            motorsys.stepp.dir.left = direction::STOP;
+            motorsys.stepp.dir.right = direction::STOP;
             motorsys.pitch.length.left = PITCH_STOP;
             motorsys.pitch.length.right = PITCH_STOP;
-            */
+            send_targets();
             break;
         case 'q': // Quit
             estop();
