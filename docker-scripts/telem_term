@@ -5,7 +5,7 @@ IFS=$'\n\t'
 # Generates a shell inside the ROS container, with ROS_MASTER_URI set
 # to the Jetson.
 
-JETSON_ADDRESS=129.138.172.198
+JETSON_ADDRESS=129.138.173.40
 MY_ADDRESS=$(ip route get $JETSON_ADDRESS | sed 's/.* src //;s/ .*//;2,$d')
 
 DIR="$(realpath "$(dirname "$0")")"/..
