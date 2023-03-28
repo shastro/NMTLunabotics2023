@@ -9,6 +9,11 @@ DIR=../ros
 IMAGE_NAME=lunabotics-2023-ros
 CONTAINER_NAME=lunabotics-2023-robot
 
+# Fix `can` symlink issue. This is smooth brain but it works
+cp -rL ../ros/catkin_ws/src/motor_bridge/src/can ../ros/catkin_ws/src/motor_bridge/src/can_
+rm -rf ../ros/catkin_ws/src/motor_bridge/src/can
+mv ../ros/catkin_ws/src/motor_bridge/src/can_ ../ros/catkin_ws/src/motor_bridge/src/can
+
 # Build the image.
 docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
 
