@@ -1,8 +1,0 @@
-    id  Name               Data                        Interpretation
----------------------------------------------------------------------------------------------
-        id                 Name                        Format
-   0x0  ESTOP              None                        E-STOP
- 0x100  PITCH_CTRL_LEFT    Count[6 bytes]Tolerance[2]  Sets the length of the pitch actuator
- 0x101  PITCH_TELEM_LEFT   Count[6 bytes]DoneByte[1]
- 0x102  PITCH_CTRL_RIGHT   Count[6 bytes]Tolerance[2]
- 0x103  PITCH_TELEM_RIGHT  Count[6 bytes]DoneByte[1]

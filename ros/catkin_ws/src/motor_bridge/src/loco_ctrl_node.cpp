@@ -41,7 +41,7 @@ void locoCallback(const motor_bridge::Drive::ConstPtr &msg) {
         david_loco_ctrl_both_t both = {
             .velocity = (uint64_t)speed
         };
-        david_loco_ctrl_both_pack(message, &right, sizeof(message));
+        david_loco_ctrl_both_pack(message, &both, sizeof(message));
         can_id = DAVID_LOCO_CTRL_BOTH_FRAME_ID;
     }
 
