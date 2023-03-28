@@ -299,10 +299,9 @@ static void send_stepp(motor m) {
 static void print_keybinds() {
     printw("Keybinds\n");
     for (auto k : bindings) {
-        std::string name{k.first};
-        print_bold(name.c_str());
+        print_bold("%c", k.first);
         printw(" : ");
-        printw(k.second.c_str());
+        printw("%s", k.second.c_str());
         printw("\n");
     }
 }
