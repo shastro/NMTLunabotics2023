@@ -44,7 +44,8 @@ static std::unordered_map<char, std::string> bindings = {
     {'l', "Arm In"},
     {'s', "Stop Current"},
     {'c', "Stop All"},
-    {'q', "Quit"}};
+    {'q', "Quit"},
+};
 
 static ros::Publisher pitch_pub;
 static ros::Publisher loco_pub;
@@ -214,8 +215,8 @@ int main(int argc, char **argv) {
                 motorsys.stepp.dir.left = STOP;
                 motorsys.stepp.dir.right = STOP;
             } else if (sel_c == PITCH) {
-                motorsys.pitch.length.left = motorsys.pitch.length.max;
-                motorsys.pitch.length.right = motorsys.pitch.length.max;
+                motorsys.pitch.length.left = PITCH_STOP;
+                motorsys.pitch.length.right = PITCH_STOP;
             }
             break;
         case 'c':
