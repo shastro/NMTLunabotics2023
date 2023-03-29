@@ -240,16 +240,24 @@ int main(int argc, char **argv) {
             break;
         case 'H': // Depth out
             sel_c = control::STEPP;
-            motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
+            // motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
+            // motorsys.stepp.dir.left = direction::FORWARD;
+            // motorsys.stepp.rpm.right = motorsys.stepp.rpm.max;
+            // motorsys.stepp.dir.right = direction::FORWARD;
+            motorsys.stepp.rpm.left = (int)direction::FORWARD;
             motorsys.stepp.dir.left = direction::FORWARD;
-            motorsys.stepp.rpm.right = motorsys.stepp.rpm.max;
+            motorsys.stepp.rpm.right = (int)direction::FORWARD;
             motorsys.stepp.dir.right = direction::FORWARD;
             break;
         case 'L': // Depth in
             sel_c = control::STEPP;
-            motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
+            // motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
+            // motorsys.stepp.dir.left = direction::BACKWARD;
+            // motorsys.stepp.rpm.right = motorsys.stepp.rpm.max;
+            // motorsys.stepp.dir.right = direction::BACKWARD;
+            motorsys.stepp.rpm.left = (int)direction::BACKWARD;
             motorsys.stepp.dir.left = direction::BACKWARD;
-            motorsys.stepp.rpm.right = motorsys.stepp.rpm.max;
+            motorsys.stepp.rpm.right = (int)direction::BACKWARD;
             motorsys.stepp.dir.right = direction::BACKWARD;
             break;
 
