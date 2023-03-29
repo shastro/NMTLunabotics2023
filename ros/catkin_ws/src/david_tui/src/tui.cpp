@@ -69,8 +69,8 @@ static std::unordered_map<char, std::string> bindings = {
     {'l', "Left"},
     {'r', "Right"},
     // Command
-    {'j', "Drive Forward"},
-    {'k', "Drive Backward"},
+    {'k', "Drive Forward"},
+    {'j', "Drive Backward"},
     {'J', "Pitch Down"},
     {'K', "Pitch Up"},
     {'H', "Arm Out"},
@@ -209,7 +209,7 @@ int main(int argc, char **argv) {
             }
             break;
 
-        case 'j': // Drive Forward
+        case 'k': // Drive Forward
             // TODO implement changeable speed
             sel_c = control::LOCO;
             if (sel_m != motor::RIGHT) {
@@ -219,7 +219,7 @@ int main(int argc, char **argv) {
                 motorsys.loco.speed.right = motorsys.loco.speed.max;
             }
             break;
-        case 'k': // Drive Backward
+        case 'j': // Drive Backward
             sel_c = control::LOCO;
             if (sel_m != motor::RIGHT) {
                 motorsys.loco.speed.left = motorsys.loco.speed.min;
