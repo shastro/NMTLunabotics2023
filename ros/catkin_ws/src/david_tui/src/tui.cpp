@@ -26,19 +26,76 @@
 
 // Control maps
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
-enum control { PITCH = 0, LOCO = 1, STEPP = 2, DIGGER = 3 };
+enum control { PITCH = 0, DRIVE = 1, DEPTH = 2, DIGGER = 3 };
 enum direction { STOP = 0, FORWARD = 1, BACKWARD = 2 };
+
+std::ostream &operator<<(std::ostream &s, control c) {
+    switch (c) {
+        case control::PITCH:
+            s << "pitch";
+            break;
+        case control::LOCO:
+            s << "loco";
+            break;
+        case control::STEPP:
+            s << "step";
+            break;
+    }
+    return s;
+}
+
+std::ostream &operator<<(std::ostream &s, motor m) {
+    switch (m) {
+        case motor::BOTH:
+            s << "both";
+            break;
+        case motor::LEFT:
+            s << "left";
+            break;
+        case motor::RIGHT:
+            s << "right";
+            break;
+    }
+    return s;
+}
+
+std::ostream &operator<<(std::ostream &s, direction d) {
+    switch (d) {
+        case direction::STOP:
+            s << "stop";
+            break;
+        case direction::FORWARD:
+            s << "forward";
+            break;
+        case direction::BACKWARD:
+            s << "backward";
+            break;
+    }
+    return s;
+}
 
 // State holders
 struct pitch_target {
     direction dir;
+    friend std::ostream &operator<<(std::ostream &s, const pitch_target &t) {
+        s << "Pitch Direction: " << t.dir;
+        return s;
+    }
 };
 
 struct loco_target {
-    int l_speed;
-    int r_speed;
+    int left_speed;
+    int right_speed;
     int min;
     int max;
+    friend std::ostream &operator<<(std::ostream &s, const loco_target &t) {
+        s << "Drive left: " << t.left_speed
+            << ", Right: " << t.right_speed
+            << ", Min: " << t.min
+            << ", Max: " << t.max
+            << std::endl;
+        return s;
+    }
 };
 
 struct stepp_target {
@@ -46,41 +103,50 @@ struct stepp_target {
     direction dir;
     int min;
     int max;
+    friend std::ostream &operator<<(std::ostream &s, const stepp_target &t) {
+        s << "Stepper Direction: " << t.dir
+            << ", RPM: " << t.rpm
+            << ", Min: " << t.min
+            << ", Max: " << t.max
+            << std::endl;
+        return s;
+    }
 };
 
 struct digger_target {
     int speed;
     int min;
     int max;
-}
+    friend std::ostream &operator<<(std::ostream &s, const loco_target &t) {
+        s << "Digger speed: " << t.speed
+            << ", Min: " << t.min
+            << ", Max: " << t.max
+            << std::endl;
+        return s;
+    }
+};
 
-static struct {
+struct sys {
     pitch_target pitch;
     loco_target loco;
     stepp_target stepp;
     digger_target digger;
-} motorsys;
+};
 
-// Initialize min and max states
-motorsys.loco.min = -1024;
-motorsys.loco.max = 1024;
-motorsys.stepp.min = 0;
-motorsys.stepp.max = 1024;
-motorsus.digger.min = -1024;
-motorsus.digger.max = 1024;
+static sys motorsys;
 
 // Selectors
 static control sel_c;
 static motor sel_m = BOTH;
 
 // Keybind functions
-static void sel_pitch() { sel_c = PITCH };
-static void sel_drive() { sel_c = DRIVE };
-static void sel_depth() { sel_c = DEPTH };
+static void sel_pitch() { sel_c = PITCH; }
+static void sel_drive() { sel_c = DRIVE; }
+static void sel_depth() { sel_c = DEPTH; }
 
-static void sel_both() { sel_m = BOTH };
-static void sel_left() { sel_m = LEFT };
-static void sel_right() { sel_m = RIGHT };
+static void sel_both() { sel_m = BOTH; }
+static void sel_left() { sel_m = LEFT; }
+static void sel_right() { sel_m = RIGHT; }
 
 static void drive_forward();
 static void drive_backward();
@@ -96,7 +162,7 @@ static void depth_stop();
 
 static void digger_forward();
 static void digger_backward();
-static void digger_stop()
+static void digger_stop();
 
 static void stop_selected();
 static void stop_all();
@@ -143,9 +209,9 @@ static std::tuple<char, std::string, std::function<void()>> bindings[] = {
     {'D', "Digger backward", digger_backward},
     {'s', "Stop Current", stop_selected},
     {'c', "Stop All", stop_all},
-    {'Q', "Emergency Stop". estop},
+    {'Q', "Emergency Stop", estop},
     {'R', "Restart", estart},
-    {'q', "Quit", quit},
+    {'q', "Quit", quit}
 };
 
 int main(int argc, char **argv) {
@@ -158,13 +224,13 @@ int main(int argc, char **argv) {
     excav_pub = nh.advertise<motor_bridge::Digger>("/excav_control", 5);
     estop_pub = nh.advertise<motor_bridge::Estop>("/estop", 5);
 
-    // Setup motorsys
-    motorsys.pitch.length.min = 0;
-    motorsys.pitch.length.max = 1024;
-    motorsys.loco.speed.min = -1024;
-    motorsys.loco.speed.max = 1024;
-    motorsys.stepp.rpm.min = 0;
-    motorsys.stepp.rpm.max = 1024;
+    // Initialize min and max states
+    motorsys.loco.min = -1024;
+    motorsys.loco.max = 1024;
+    motorsys.stepp.min = 0;
+    motorsys.stepp.max = 1024;
+    motorsys.digger.min = -1024;
+    motorsys.digger.max = 1024;
 
     // Setup ncurses.
     initscr();
@@ -194,7 +260,7 @@ int main(int argc, char **argv) {
 
 static void drive_forward() {
     //TODO implement changing speed
-    sel_c = LOCO;
+    sel_c = DRIVE;
     if (sel_m != RIGHT)
         motorsys.loco.left_speed = motorsys.loco.max;
     if (sel_m != LEFT)
@@ -203,7 +269,7 @@ static void drive_forward() {
 
 static void drive_backward() {
     //TODO implement changing speed
-    sel_c = LOCO;
+    sel_c = DRIVE;
     if (sel_m != RIGHT)
         motorsys.loco.left_speed = motorsys.loco.min;
     if (sel_m != LEFT)
@@ -211,7 +277,7 @@ static void drive_backward() {
 }
 
 static void drive_stop() {
-    sel_c = LOCO;
+    sel_c = DRIVE;
     if (sel_m != RIGHT)
         motorsys.loco.left_speed = 0;
     if (sel_m != LEFT)
@@ -271,7 +337,7 @@ static void stop_selected() {
         pitch_stop();
     if (sel_c == DEPTH)
         depth_stop();
-    if (sel_C = LOCO)
+    if (sel_c = DRIVE)
         drive_stop();
 }
 
@@ -344,10 +410,10 @@ static void print_status() {
 
 static void print_keybinds() {
     printw("Keybinds\n");
-    for (auto k : bindings) {
-        print_bold("%c", k.first);
+    for (auto bind : bindings) {
+        print_bold("%c", std::get<0>(bind));
         printw(" : ");
-        printw("%s", k.second.c_str());
+        printw("%s", std::get<1>(bind).c_str());
         printw("\n");
     }
 }
