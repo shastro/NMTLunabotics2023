@@ -34,10 +34,10 @@ std::ostream &operator<<(std::ostream &s, control c) {
         case control::PITCH:
             s << "pitch";
             break;
-        case control::LOCO:
-            s << "loco";
+        case control::DRIVE:
+            s << "drive";
             break;
-        case control::STEPP:
+        case control::DEPTH:
             s << "step";
             break;
     }
@@ -117,7 +117,7 @@ struct digger_target {
     int speed;
     int min;
     int max;
-    friend std::ostream &operator<<(std::ostream &s, const loco_target &t) {
+    friend std::ostream &operator<<(std::ostream &s, const digger_target &t) {
         s << "Digger speed: " << t.speed
             << ", Min: " << t.min
             << ", Max: " << t.max
@@ -131,6 +131,10 @@ struct sys {
     loco_target loco;
     stepp_target stepp;
     digger_target digger;
+    friend std::ostream &operator<<(std::ostream &s, const sys &t) {
+        s << t.pitch << t.loco << t.stepp << t.digger << std::endl;
+        return s;
+    }
 };
 
 static sys motorsys;
@@ -150,6 +154,12 @@ static void sel_right() { sel_m = RIGHT; }
 
 static void drive_forward();
 static void drive_backward();
+static void drive_right_forward();
+static void drive_left_forward();
+static void drive_right_backward();
+static void drive_left_backward();
+static void drive_spin_right();
+static void drive_spin_left();
 static void drive_stop();
 
 static void pitch_down();
@@ -195,22 +205,28 @@ static std::tuple<char, std::string, std::function<void()>> bindings[] = {
     {'d', "Drive", sel_drive},
     {'a', "Excavation Arm", sel_depth},
     // Motor
-    {'b', "Both", sel_both},
-    {'l', "Left", sel_left},
-    {'r', "Right", sel_both},
+    {'0', "Both", sel_both},
+    {'1', "Left", sel_left},
+    {'2', "Right", sel_both},
     // Command
-    {'j', "Drive Forward", drive_forward},
-    {'k', "Drive Backward", drive_backward},
+    {'j', "Drive Both Forward", drive_forward},
+    {'k', "Drive Both Backward", drive_backward},
+    {'h', "Drive Right Motor Forward", drive_right_forward},
+    {'l', "Drive Left Motor Forward", drive_left_forward},
+    {'H', "Drive Right Motor Backward", drive_right_backward},
+    {'L', "Drive Left Motor Backward", drive_left_backward},
+    {'r', "Spin Right (Right backward, Left forward)", drive_spin_right},
+    {'R', "Spin Left (Right forward, Left backward)", drive_spin_left},
     {'J', "Pitch Down", pitch_down},
     {'K', "Pitch Up", pitch_up},
-    {'H', "Extend depth", depth_extend},
-    {'L', "Retract depth", depth_retract},
+    {'o', "Extend depth", depth_extend},
+    {'i', "Retract depth", depth_retract},
     {'d', "Digger forward", digger_forward},
     {'D', "Digger backward", digger_backward},
     {'s', "Stop Current", stop_selected},
     {'c', "Stop All", stop_all},
     {'Q', "Emergency Stop", estop},
-    {'R', "Restart", estart},
+    {'b', "Restart", estart},
     {'q', "Quit", quit}
 };
 
@@ -261,27 +277,57 @@ int main(int argc, char **argv) {
 static void drive_forward() {
     //TODO implement changing speed
     sel_c = DRIVE;
-    if (sel_m != RIGHT)
-        motorsys.loco.left_speed = motorsys.loco.max;
-    if (sel_m != LEFT)
-        motorsys.loco.right_speed = motorsys.loco.max;
+    motorsys.loco.left_speed = motorsys.loco.max;
+    motorsys.loco.right_speed = motorsys.loco.max;
 }
 
 static void drive_backward() {
     //TODO implement changing speed
     sel_c = DRIVE;
-    if (sel_m != RIGHT)
-        motorsys.loco.left_speed = motorsys.loco.min;
-    if (sel_m != LEFT)
-        motorsys.loco.right_speed = motorsys.loco.min;
+    motorsys.loco.left_speed = motorsys.loco.min;
+    motorsys.loco.right_speed = motorsys.loco.min;
+}
+
+static void drive_right_forward() {
+    sel_c = DRIVE;
+    motorsys.loco.right_speed = motorsys.loco.max;
+    motorsys.loco.left_speed = 0;
+}
+
+static void drive_left_forward() {
+    sel_c = DRIVE;
+    motorsys.loco.left_speed = motorsys.loco.max;
+    motorsys.loco.right_speed = 0;
+}
+
+static void drive_right_backward() {
+    sel_c = DRIVE;
+    motorsys.loco.right_speed = motorsys.loco.min;
+    motorsys.loco.left_speed = 0;
+}
+
+static void drive_left_backward() {
+    sel_c = DRIVE;
+    motorsys.loco.left_speed = motorsys.loco.min;
+    motorsys.loco.right_speed = 0;
+}
+
+static void drive_spin_right() {
+    sel_c = DRIVE;
+    motorsys.loco.right_speed = motorsys.loco.min;
+    motorsys.loco.left_speed = motorsys.loco.max;
+}
+
+static void drive_spin_left() {
+    sel_c = DRIVE;
+    motorsys.loco.right_speed = motorsys.loco.max;
+    motorsys.loco.left_speed = motorsys.loco.min;
 }
 
 static void drive_stop() {
     sel_c = DRIVE;
-    if (sel_m != RIGHT)
-        motorsys.loco.left_speed = 0;
-    if (sel_m != LEFT)
-        motorsys.loco.right_speed = 0;
+    motorsys.loco.left_speed = 0;
+    motorsys.loco.right_speed = 0;
 }
 
 static void pitch_down() {
@@ -405,7 +451,9 @@ static void send_digger() {
 }
 
 static void print_status() {
-    printw("status here\n");
+    std::stringstream s;
+    s << motorsys;
+    printw(s.str());
 }
 
 static void print_keybinds() {
