@@ -71,6 +71,8 @@ static std::unordered_map<char, std::string> bindings = {
     // Command
     {'j', "Drive Forward"},
     {'k', "Drive Backward"},
+    {'[', "Spin Left"},
+    {'[', "Spin Right"},
     {'J', "Pitch Down"},
     {'K', "Pitch Up"},
     {'H', "Arm Out"},
@@ -226,6 +228,17 @@ int main(int argc, char **argv) {
                 motorsys.loco.speed.right = motorsys.loco.speed.min;
             }
             break;
+        case '[':
+            sel_c = control::LOCO;
+            motorsys.loco.speed.left = motorsys.loco.speed.max;
+            motorsys.loco.speed.right = motorsys.loco.speed.min;
+            break;
+        case ']':
+            sel_c = control::LOCO;
+            motorsys.loco.speed.left = motorsys.loco.speed.min;
+            motorsys.loco.speed.right = motorsys.loco.speed.max;
+            break;
+
         case 'J': // Pitch Down
             sel_c = control::PITCH;
             motorsys.pitch.length.left = PITCH_BACKWARD;
