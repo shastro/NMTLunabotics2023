@@ -75,6 +75,8 @@ static std::unordered_map<char, std::string> bindings = {
     {'K', "Pitch Up"},
     {'H', "Arm Out"},
     {'L', "Arm In"},
+    {',', "Dig Forward"},
+    {'.', "Dig Backward"},
     {'s', "Stop Current"},
     {'c', "Stop All"},
     {'q', "Quit"},
@@ -251,6 +253,13 @@ int main(int argc, char **argv) {
             motorsys.stepp.dir.right = direction::BACKWARD;
             break;
 
+        case ',': // Dig forward
+            motorsys.digger = DIG_FORWARD;
+            break;
+        case '.':
+            motorsys.digger = DIG_BACKWARD;
+            break;
+
         case 's': // Stop Current
             if (sel_c == control::LOCO) {
                 motorsys.loco.speed.left = 0;
@@ -275,19 +284,20 @@ int main(int argc, char **argv) {
             motorsys.stepp.dir.right = direction::STOP;
             motorsys.pitch.length.left = PITCH_STOP;
             motorsys.pitch.length.right = PITCH_STOP;
+            motorsys.digger = DIG_STOP;
             break;
         case 'q': // Quit
-            estop();
-            /*
+            // estop();
+
             motorsys.loco.speed.left = 0;
             motorsys.loco.speed.right = 0;
             motorsys.stepp.rpm.left = 0;
             motorsys.stepp.rpm.right = 0;
-            motorsys.stepp.dir.left = STOP;
-            motorsys.stepp.dir.right = STOP;
+            motorsys.stepp.dir.left = direction::STOP;
+            motorsys.stepp.dir.right = direction::STOP;
             motorsys.pitch.length.left = PITCH_STOP;
             motorsys.pitch.length.right = PITCH_STOP;
-            */
+            motorsys.digger = DIG_STOP;
             endwin();
             return 0;
 
