@@ -89,6 +89,7 @@ mkShell {
     (import ./cantools { inherit pkgs; })
     (import ./arduino-nix { inherit pkgs; })
     ncurses.dev
+    can-utils
     # (import ./libcan { inherit pkgs; })
   ];
 }
