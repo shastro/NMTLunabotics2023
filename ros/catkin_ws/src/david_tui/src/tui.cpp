@@ -65,16 +65,16 @@ static std::unordered_map<char, std::string> bindings = {
     {'d', "Drive"},
     {'a', "Excavation Arm"},
     // Motor
-    {'b', "Both"},
-    {'l', "Left"},
-    {'r', "Right"},
+    {'h', "Both"},
+    {'F', "Left"},
+    {'U', "Right"},
     // Command
-    {'k', "Drive Forward"},
-    {'j', "Drive Backward"},
-    {'J', "Pitch Down"},
-    {'K', "Pitch Up"},
-    {'H', "Arm Out"},
-    {'L', "Arm In"},
+    {'e', "Drive Forward"},
+    {'n', "Drive Backward"},
+    {'N', "Pitch Down"},
+    {'E', "Pitch Up"},
+    {'O', "Arm Out"},
+    {'Y', "Arm In"},
     {',', "Dig Forward"},
     {'.', "Dig Backward"},
     {'s', "Stop Current"},
@@ -191,13 +191,7 @@ int main(int argc, char **argv) {
             sel_c = control::STEPP;
             break;
 
-        case 'l': // Left
-            sel_m = motor::LEFT;
-            break;
-        case 'r': // Right
-            sel_m = motor::RIGHT;
-            break;
-        case 'b': // Both
+        case 'h': // Both
             sel_m = motor::BOTH;
             if (sel_c == control::PITCH) {
                 motorsys.pitch.length.left = motorsys.pitch.length.right;
@@ -208,8 +202,14 @@ int main(int argc, char **argv) {
                 motorsys.stepp.dir.left = motorsys.stepp.dir.right;
             }
             break;
+        case 'F': // Left
+            sel_m = motor::LEFT;
+            break;
+        case 'U': // Right
+            sel_m = motor::RIGHT;
+            break;
 
-        case 'k': // Drive Forward
+        case 'e': // Drive Forward
             // TODO implement changeable speed
             sel_c = control::LOCO;
             if (sel_m != motor::RIGHT) {
@@ -219,7 +219,7 @@ int main(int argc, char **argv) {
                 motorsys.loco.speed.right = motorsys.loco.speed.max;
             }
             break;
-        case 'j': // Drive Backward
+        case 'n': // Drive Backward
             sel_c = control::LOCO;
             if (sel_m != motor::RIGHT) {
                 motorsys.loco.speed.left = motorsys.loco.speed.min;
@@ -228,17 +228,17 @@ int main(int argc, char **argv) {
                 motorsys.loco.speed.right = motorsys.loco.speed.min;
             }
             break;
-        case 'J': // Pitch Down
+        case 'N': // Pitch Down
             sel_c = control::PITCH;
             motorsys.pitch.length.left = PITCH_BACKWARD;
             motorsys.pitch.length.right = PITCH_BACKWARD;
             break;
-        case 'K': // Pitch Up
+        case 'E': // Pitch Up
             sel_c = control::PITCH;
             motorsys.pitch.length.left = PITCH_FORWARD;
             motorsys.pitch.length.right = PITCH_FORWARD;
             break;
-        case 'H': // Depth out
+        case 'O': // Depth out
             sel_c = control::STEPP;
             // motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
             // motorsys.stepp.dir.left = direction::FORWARD;
@@ -249,7 +249,7 @@ int main(int argc, char **argv) {
             motorsys.stepp.rpm.right = (int)direction::FORWARD;
             motorsys.stepp.dir.right = direction::FORWARD;
             break;
-        case 'L': // Depth in
+        case 'Y': // Depth in
             sel_c = control::STEPP;
             // motorsys.stepp.rpm.left = motorsys.stepp.rpm.max;
             // motorsys.stepp.dir.left = direction::BACKWARD;
