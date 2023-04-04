@@ -13,6 +13,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "joystick/gamepad.hpp"
+
 #define PITCH_STOP 0
 #define PITCH_FORWARD 1
 #define PITCH_BACKWARD 2
@@ -28,7 +30,9 @@
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
 enum control { PITCH = 0, DRIVE = 1, DEPTH = 2, DIGGER = 3 };
 enum direction { STOP = 0, FORWARD = 1, BACKWARD = 2 };
+enum input { GAMEPAD = 0, KEYBOARD = 1 };
 
+// Print helpers
 std::ostream &operator<<(std::ostream &s, control c) {
     switch (c) {
         case control::PITCH:
@@ -69,6 +73,18 @@ std::ostream &operator<<(std::ostream &s, direction d) {
             break;
         case direction::BACKWARD:
             s << "backward";
+            break;
+    }
+    return s;
+}
+
+std::ostream &operator<<(std::ostream &s, input in) {
+    switch(in) {
+        case input::GAMEPAD:
+            s << "gamepad";
+            break;
+        case input::KEYBOARD:
+            s << "keyboard";
             break;
     }
     return s;
@@ -179,6 +195,15 @@ static void stop_all();
 static void estop(); //technically a can handler but mapped to keybind
 static void estart();
 static void quit();
+static void input_switch();
+
+//Joystick functions
+//TODO find a better way to map these to bindings
+static void stick_drive();
+static void stick_pitch();
+static void stick_extend();
+static void trigger_dig();
+static void buttons();
 
 // Can handlers
 static void send_targets();
@@ -190,6 +215,7 @@ static void send_digger();
 // Display functions
 static void print_status();
 static void print_keybinds();
+static void print_gamebinds();
 
 // Publishers
 static ros::Publisher pitch_pub;
@@ -204,6 +230,7 @@ static std::tuple<char, std::string, std::function<void()>> bindings[] = {
     {'p', "Pitch", sel_pitch},
     {'d', "Drive", sel_drive},
     {'a', "Excavation Arm", sel_depth},
+    {'y', "Switch to Gamepad", input_switch},
     // Motor
     {'0', "Both", sel_both},
     {'1', "Left", sel_left},
@@ -230,6 +257,28 @@ static std::tuple<char, std::string, std::function<void()>> bindings[] = {
     {'q', "Quit", quit}
 };
 
+// Gamebinds - string bind string description
+static std::pair<std::string, std::string> gamebinds[] = {
+    {"Left Stick", "Drive"},
+    {"Right Stick Y", "Pitch"},
+    {"Right Stick X", "Extend"},
+    {"Left Trigger", "Dig Forward"},
+    {"Right Trigger", "Dig Reverse"},
+    {"B", "Stop all"},
+    {"xbox", "Emergency Stop"},
+    {"Left & Right Bumper", "Restart after Emergency Stop"}
+};
+
+//Max range of input/outputs
+const static int rmax = 1024;
+//Joy stick center deadzone, 50-200 recommended
+const static int dead = 100;
+// Input type
+static input in = KEYBOARD;
+
+// Game Controller
+static GamepadHandler gh("/dev/input/js0", rmax, dead);
+
 int main(int argc, char **argv) {
     // Setup ROS
     ros::init(argc, argv, "david_tui");
@@ -241,12 +290,12 @@ int main(int argc, char **argv) {
     estop_pub = nh.advertise<motor_bridge::Estop>("/estop", 5);
 
     // Initialize min and max states
-    motorsys.loco.min = -1024;
-    motorsys.loco.max = 1024;
+    motorsys.loco.min = -rmax;
+    motorsys.loco.max = rmax;
     motorsys.stepp.min = 0;
-    motorsys.stepp.max = 1024;
-    motorsys.digger.min = -1024;
-    motorsys.digger.max = 1024;
+    motorsys.stepp.max = rmax;
+    motorsys.digger.min = -rmax;
+    motorsys.digger.max = rmax;
 
     // Setup ncurses.
     initscr();
@@ -261,14 +310,25 @@ int main(int argc, char **argv) {
         clear();
         move(0, 0);
         print_status();
-        print_keybinds();
-        refresh();
+        gh.update();
 
-        int n = getch();
+        if (in == KEYBOARD) {
+            print_keybinds();
+            refresh();
 
-        for (auto bind : bindings)
-            if (n == std::get<0>(bind))
-                std::get<2>(bind)();
+            int n = getch();
+
+            for (auto bind : bindings)
+                if (n == std::get<0>(bind))
+                    std::get<2>(bind)();
+        } else if (in == GAMEPAD) {
+            print_gamebinds();
+            stick_drive();
+            stick_pitch();
+            stick_extend();
+            trigger_dig();
+            buttons();
+        }
 
         send_targets();
     }
@@ -406,6 +466,62 @@ static void estart() {
     estop_pub.publish(msg);
 }
 
+static void input_switch() {
+    if (in == KEYBOARD)
+        in = GAMEPAD;
+    else
+        in = KEYBOARD;
+}
+
+static void stick_drive() {
+    int left = gh.left_stick.x + gh.left_stick.y;
+    int right = gh.left_stick.y - gh.left_stick.x;
+    left = (left > motorsys.loco.max) ? motorsys.loco.max : left;
+    left = (left < motorsys.loco.min) ? motorsys.loco.min : left;
+    right = (right > motorsys.loco.max) ? motorsys.loco.max : right;
+    right = (right < motorsys.loco.min) ? motorsys.loco.min : right;
+    motorsys.loco.left_speed = left;
+    motorsys.loco.right_speed = right;
+}
+
+static void stick_pitch() {
+    if (gh.right_stick.y > 0)
+        pitch_up();
+    else if (gh.right_stick.y < 0)        
+        pitch_down();
+    else
+        pitch_stop();
+}
+
+static void stick_extend() {
+    if (gh.right_stick.x > 0)
+        depth_extend();
+    else if (gh.right_stick.x < 0)
+        depth_retract();
+    else
+        depth_stop();
+}
+
+static void trigger_dig() {
+    if (gh.right_trigger > 0)
+        digger_forward();
+    else if (gh.left_trigger > 0)
+        digger_backward();
+    else
+        digger_stop();
+}
+
+static void buttons() {
+    if (gh.buttons.B)
+        stop_all();
+    if (gh.buttons.xbox)
+        estop();
+    if (gh.buttons.leftBumper && gh.buttons.rightBumper)
+        estart();
+    if (gh.buttons.Y)
+        input_switch();
+}
+
 static void quit() {
     estop();
     endwin();
@@ -453,7 +569,7 @@ static void send_digger() {
 static void print_status() {
     std::stringstream s;
     s << motorsys;
-    printw(s.str());
+    printw(s.str().c_str());
 }
 
 static void print_keybinds() {
@@ -462,6 +578,16 @@ static void print_keybinds() {
         print_bold("%c", std::get<0>(bind));
         printw(" : ");
         printw("%s", std::get<1>(bind).c_str());
+        printw("\n");
+    }
+}
+
+static void print_gamebinds() {
+    printw("Gamepad bindings\n");
+    for (auto bind : gamebinds) {
+        print_bold("%s", bind.first.c_str());
+        printw(" : ");
+        printw("%s", bind.second.c_str());
         printw("\n");
     }
 }
