@@ -94,7 +94,7 @@ std::ostream &operator<<(std::ostream &s, input in) {
 struct pitch_target {
     direction dir;
     friend std::ostream &operator<<(std::ostream &s, const pitch_target &t) {
-        s << "Pitch Direction: " << t.dir;
+        s << "Pitch Direction: " << t.dir << std::endl;
         return s;
     }
 };
@@ -277,7 +277,11 @@ const static int dead = 100;
 static input in = KEYBOARD;
 
 // Game Controller
-static GamepadHandler gh("/dev/input/js0", rmax, dead);
+static GamepadHandler* gh;
+static bool controller_available = false;
+
+// Loop condition
+static bool still_going = true;
 
 int main(int argc, char **argv) {
     // Setup ROS
@@ -303,26 +307,41 @@ int main(int argc, char **argv) {
     keypad(stdscr, true);
     noecho();
 
+    try {
+        gh = new GamepadHandler("/dev/input/js0", rmax, dead);
+        controller_available = true;
+    } catch (std::string err) {
+        controller_available = false;
+    }
+
     // Refresh at 0.1-second interval.
     halfdelay(1);
+    
+    // input char
+    int n;
+    // Previous char, allows for 2 character commands
+    int pn;
 
-    while (true) {
+    while (still_going) {
         clear();
         move(0, 0);
         print_status();
-        gh.update();
+        pn = n;
+        n = getch();
+
+        //quit done outside keyboard loop for obvious reasons
+        if (n == 'q')
+            quit();
 
         if (in == KEYBOARD) {
             print_keybinds();
-            refresh();
-
-            int n = getch();
 
             for (auto bind : bindings)
                 if (n == std::get<0>(bind))
                     std::get<2>(bind)();
         } else if (in == GAMEPAD) {
             print_gamebinds();
+            gh->update();
             stick_drive();
             stick_pitch();
             stick_extend();
@@ -330,8 +349,12 @@ int main(int argc, char **argv) {
             buttons();
         }
 
-        send_targets();
+        refresh();
+        
+        //send_targets();
     }
+    delete gh;
+    return 0;
 }
 
 static void drive_forward() {
@@ -467,15 +490,15 @@ static void estart() {
 }
 
 static void input_switch() {
-    if (in == KEYBOARD)
+    if (in == KEYBOARD && controller_available)
         in = GAMEPAD;
     else
         in = KEYBOARD;
 }
 
 static void stick_drive() {
-    int left = gh.left_stick.x + gh.left_stick.y;
-    int right = gh.left_stick.y - gh.left_stick.x;
+    int left = gh->left_stick.x + gh->left_stick.y;
+    int right = gh->left_stick.y - gh->left_stick.x;
     left = (left > motorsys.loco.max) ? motorsys.loco.max : left;
     left = (left < motorsys.loco.min) ? motorsys.loco.min : left;
     right = (right > motorsys.loco.max) ? motorsys.loco.max : right;
@@ -485,46 +508,48 @@ static void stick_drive() {
 }
 
 static void stick_pitch() {
-    if (gh.right_stick.y > 0)
+    if (gh->right_stick.y > 0)
         pitch_up();
-    else if (gh.right_stick.y < 0)        
+    else if (gh->right_stick.y < 0)        
         pitch_down();
     else
         pitch_stop();
 }
 
 static void stick_extend() {
-    if (gh.right_stick.x > 0)
+    if (gh->right_stick.x > 0)
         depth_extend();
-    else if (gh.right_stick.x < 0)
+    else if (gh->right_stick.x < 0)
         depth_retract();
     else
         depth_stop();
 }
 
 static void trigger_dig() {
-    if (gh.right_trigger > 0)
+    if (gh->right_trigger > 0)
         digger_forward();
-    else if (gh.left_trigger > 0)
+    else if (gh->left_trigger > 0)
         digger_backward();
     else
         digger_stop();
 }
 
 static void buttons() {
-    if (gh.buttons.B)
+    if (gh->buttons.B)
         stop_all();
-    if (gh.buttons.xbox)
+    if (gh->buttons.xbox)
         estop();
-    if (gh.buttons.leftBumper && gh.buttons.rightBumper)
+    if (gh->buttons.leftBumper && gh->buttons.rightBumper)
         estart();
-    if (gh.buttons.Y)
+    if (gh->buttons.Y)
         input_switch();
 }
 
 static void quit() {
+    clear();
     estop();
     endwin();
+    still_going = false;
 }
 
 static void send_targets() {
@@ -568,6 +593,8 @@ static void send_digger() {
 
 static void print_status() {
     std::stringstream s;
+    if (!controller_available)
+        s << "Controller not available" << std::endl;
     s << motorsys;
     printw(s.str().c_str());
 }
