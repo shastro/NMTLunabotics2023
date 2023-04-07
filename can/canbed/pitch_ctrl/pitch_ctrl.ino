@@ -6,25 +6,19 @@
 // Import CAN message constants
 #include "david.h"
 
-enum MOTOR {
-    MOTOR_LEFT = 0,
-    MOTOR_RIGHT = 1,
-    MOTOR_COUNT 
+enum MOTORS {
+    MOTOR_LEFT,
+    MOTOR_RIGHT,
+    MOTOR_COUNT
 };
 
-// Define pins
-// P1 is direction
-// P2 is power
 enum PINS {
-    HALL = 0, // See below tables for right/left motors
-    /* P1 = 1, */
-    /* P2 = 2, */
+    HALL_PIN = 0,
     PIN_COUNT,
-    
-    SPI_CS_PIN = 17
 };
+#define SPI_CS_PIN 17
 
-enum DIR {
+enum DIRS {
     STOP = 0,
     EXTEND = 1,
     RETRACT = 2,
@@ -32,8 +26,8 @@ enum DIR {
 };
 
 // Pins
-#define HALL_L 5
-#define HALL_R 6
+#define HALL_PIN_L 5
+#define HALL_PIN_R 6
 
 // I2C Registers
 #define SOFTREG             0x07                    // Byte to read software
@@ -50,25 +44,11 @@ static const int64_t DEFAULT_HOMING_DELAY = 100;
 static const int64_t DEFAULT_TOLERANCE = 3;
 
 static const int PIN_TABLE[MOTOR_COUNT][3] = {
-    { HALL_L, }, // P1_L, P2_L  },
-    { HALL_R, }, // P1_R, P2_R },
+    { HALL_PIN_L, }, // P1_L, P2_L  },
+    { HALL_PIN_R, }, // P1_R, P2_R },
 };
 
 MCP_CAN CAN(SPI_CS_PIN); // Set CS pin
-
-/* // Left State */
-/* static volatile int64_t left_true_count = 0; */
-/* static int64_t left_prev_count = 0; */
-/* static int64_t left_target_count = 0; */
-/* static int64_t left_tolerance = DEFAULT_TOLERANCE; */
-/* static int64_t left_last_trigger = 0; */
-
-/* // Right state */
-/* static volatile int64_t right_true_count = 0; */
-/* static int64_t right_prev_count = 0; */
-/* static int64_t right_target_count = 0; */
-/* static int64_t right_tolerance = DEFAULT_TOLERANCE; */
-/* static int64_t right_last_trigger = 0; */
 
 struct MotorState {
     int64_t tolerance;
@@ -76,8 +56,8 @@ struct MotorState {
     volatile int64_t true_count;
     int64_t prev_count;
     int64_t target_count;
-    enum DIR dir;
-    enum DIR last_dir;
+    int dir;
+    int last_dir;
     int stationary_timer;
 };
 struct MotorState Motors[MOTOR_COUNT];
@@ -96,12 +76,12 @@ void setup()
     delay(100);
 
     // PinModes
-    pinMode(PIN_TABLE[MOTOR_LEFT][HALL], INPUT_PULLUP);
-    pinMode(PIN_TABLE[MOTOR_RIGHT][HALL], INPUT_PULLUP);
+    pinMode(PIN_TABLE[MOTOR_LEFT][HALL_PIN], INPUT_PULLUP);
+    pinMode(PIN_TABLE[MOTOR_RIGHT][HALL_PIN], INPUT_PULLUP);
 
     // Interrupts
-    attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_LEFT][HALL]), left_hall_handler, FALLING);
-    attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_RIGHT][HALL]), right_hall_handler, FALLING);
+    attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_LEFT][HALL_PIN]), left_hall_handler, FALLING);
+    attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_RIGHT][HALL_PIN]), right_hall_handler, FALLING);
 
     Serial.begin(115200);
     while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
@@ -206,12 +186,12 @@ void loop()
     // Standard movement towards target counts
     if (!estopped && !homing) {
         ForEachMotor {
-            enum DIR newdir = STOP; // Should be stop
+            int newdir = STOP; // Should be stop
             if (abs(Motors[m].true_count - Motors[m].target_count) >= DEFAULT_TOLERANCE) {
                 if (Motors[m].true_count > Motors[m].target_count) {
-                    retdir = RETRACT;  
+                    newdir = RETRACT;  
                 } else {
-                    retdir = EXTEND;  
+                    newdir = EXTEND;  
                 }
             }
             Motors[m].dir = newdir;
@@ -222,8 +202,8 @@ void loop()
         const static int MOTOR_ADDRESS[] = {0x59, 0x58};
         sendData(MOTOR_ADDRESS[m],ACCREG, 0x03);
         sendData(MOTOR_ADDRESS[m],SPEEDBYTE, 0xAA);
-        enum DIR command = (Motors[m].dir == HOMING)? RETRACT : Motors[m].dir;
-        sendData(MOTOR_ADDRESS[m],CMDBYTE, command);
+        int dir = (Motors[m].dir == HOMING)? RETRACT : Motors[m].dir;
+        sendData(MOTOR_ADDRESS[m],CMDBYTE, dir);
     }
     
     // Send telemetry
@@ -308,7 +288,8 @@ byte getData(byte addr, byte reg){                 // function for getting data 
     Wire.write(reg);
     Wire.endTransmission();
 
-    Wire.requestFrom(addr, 1);         // Requests byte from MD03
+    byte mdo3 = 1;
+    Wire.requestFrom(addr, mdo3);         // Requests byte from MD03
     while(Wire.available() < 1);          // Waits for byte to become available
     byte data = Wire.read();
 
