@@ -1,18 +1,9 @@
 #include <iostream>
-#include <ncurses.h>
-#include <unistd.h>
-#include <vector>
+#include "joystick/gamepad.hpp"
+#include <string>
 
 int main(int argc, char *argv[]) {
-    initscr();
-    cbreak();
-    keypad(stdscr, true);
-    noecho();
-
-    char n;
-    while (true) {
-        n = getch();
-        if (n == 'f')
-            printw("yes");
-    }
+    GamepadHandler* g;
+    g = new GamepadHandler("dev/input/js0", 1024, 100);
+    delete g;
 }

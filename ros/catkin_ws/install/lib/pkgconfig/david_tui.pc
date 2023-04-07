@@ -1,0 +1,8 @@
+prefix=/home/ndev/Documents/NMTLunabotics2023/ros/catkin_ws/install
+
+Name: david_tui
+Description: Description of david_tui
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: roscpp geometry_msgs motor_bridge std_msgs

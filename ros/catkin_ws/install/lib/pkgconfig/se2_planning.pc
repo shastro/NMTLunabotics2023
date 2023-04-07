@@ -1,0 +1,8 @@
+prefix=/home/ndev/Documents/NMTLunabotics2023/ros/catkin_ws/install
+
+Name: se2_planning
+Description: Description of se2_planning
+Version: 0.1.0
+Cflags: -I${prefix}/include -I/usr/include/eigen3 -I/usr/include
+Libs: -L${prefix}/lib -lse2_planning /opt/ros/noetic/lib/x86_64-linux-gnu/libompl.so /usr/lib/x86_64-linux-gnu/libboost_serialization.so /usr/lib/x86_64-linux-gnu/libboost_filesystem.so /usr/lib/x86_64-linux-gnu/libboost_system.so -lode
+Requires: grid_map_core

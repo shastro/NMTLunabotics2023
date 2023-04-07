@@ -1,0 +1,8 @@
+prefix=/home/ndev/Documents/NMTLunabotics2023/ros/catkin_ws/install
+
+Name: se2_grid_map_generator
+Description: Description of se2_grid_map_generator
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: roscpp grid_map_ros se2_grid_map_generator_msgs

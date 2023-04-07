@@ -307,16 +307,17 @@ int main(int argc, char **argv) {
     keypad(stdscr, true);
     noecho();
 
-    try {
+    controller_available = false;
+    //try {
         gh = new GamepadHandler("/dev/input/js0", rmax, dead);
         controller_available = true;
-    } catch (std::string err) {
-        controller_available = false;
-    }
+    //} catch (std::string err) {
+    //    controller_available = false;
+    //}
 
     // Refresh at 0.1-second interval.
     halfdelay(1);
-    
+
     // input char
     int n;
     // Previous char, allows for 2 character commands
@@ -326,16 +327,16 @@ int main(int argc, char **argv) {
         clear();
         move(0, 0);
         print_status();
-        pn = n;
-        n = getch();
 
         //quit done outside keyboard loop for obvious reasons
-        if (n == 'q')
-            quit();
+        //if (n == 'q')
+        //    quit();
+
 
         if (in == KEYBOARD) {
             print_keybinds();
-
+            pn = n;
+            n = getch();
             for (auto bind : bindings)
                 if (n == std::get<0>(bind))
                     std::get<2>(bind)();
@@ -350,7 +351,7 @@ int main(int argc, char **argv) {
         }
 
         refresh();
-        
+
         //send_targets();
     }
     delete gh;
@@ -595,7 +596,7 @@ static void print_status() {
     std::stringstream s;
     if (!controller_available)
         s << "Controller not available" << std::endl;
-    s << motorsys;
+    //s << motorsys;
     printw(s.str().c_str());
 }
 

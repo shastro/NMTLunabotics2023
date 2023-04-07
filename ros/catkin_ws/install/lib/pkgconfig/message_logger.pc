@@ -1,0 +1,8 @@
+prefix=/home/ndev/Documents/NMTLunabotics2023/ros/catkin_ws/install
+
+Name: message_logger
+Description: Description of message_logger
+Version: 0.2.11
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib -lmessage_logger
+Requires: roscpp

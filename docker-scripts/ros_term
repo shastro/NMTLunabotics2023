@@ -7,23 +7,48 @@ IFS=$'\n\t'
 DIR="$(realpath "$(dirname "$0")")"/..
 
 sudo docker build "$DIR/ros" -t lunabotics-2023-ros
-sudo docker run \
-     --rm \
-     -it \
-     --device=/dev/input/js0 \
-     -v $DIR:$DIR \
-     -e DISPLAY \
-     -v /tmp/.X11-unix:/tmp/.X11-unix \
-     -v /dev/dri:/dev/dri \
-     -h "$(hostname)-ROS" \
-     lunabotics-2023-ros \
-     sh -c "
-         cd $PWD
-         export HOME="$HOME"
-         export PS1='\u@\h:\w\$ '
-         [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
-         bash
-     "
+
+echo "Xbox Controller? (y/n):"
+read yn
+
+if [ "$yn" = "y" ]; then
+    sudo docker run \
+        --rm \
+        -it \
+        --device=/dev/input/js0 \
+        -v $DIR:$DIR \
+        -e DISPLAY \
+        -v /tmp/.X11-unix:/tmp/.X11-unix \
+        -v /dev/dri:/dev/dri \
+        -h "$(hostname)-ROS" \
+        lunabotics-2023-ros \
+        sh -c "
+            cd $PWD
+            export HOME="$HOME"
+            export PS1='\u@\h:\w\$ '
+            [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
+            bash
+            "
+else
+    sudo docker run \
+        --rm \
+        -it \
+        --device=/dev/input/event0 \
+        -v $DIR:$DIR \
+        -e DISPLAY \
+        -v /tmp/.X11-unix:/tmp/.X11-unix \
+        -v /dev/dri:/dev/dri \
+        -h "$(hostname)-ROS" \
+        lunabotics-2023-ros \
+        sh -c "
+            cd $PWD
+            export HOME="$HOME"
+            export PS1='\u@\h:\w\$ '
+            [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
+            bash
+            "
+fi
+
 
 # ROS might create files owned by root here; it'll cause all kinds of
 # problems with git.
