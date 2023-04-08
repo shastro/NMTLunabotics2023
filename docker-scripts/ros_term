@@ -10,10 +10,12 @@ sudo docker build "$DIR/ros" -t lunabotics-2023-ros
 sudo docker run \
      --rm \
      -it \
+     --device-cgroup-rule "c 81:* rmw" \
+     --device-cgroup-rule "c 189:* rmw" \
      -v $DIR:$DIR \
      -e DISPLAY \
      -v /tmp/.X11-unix:/tmp/.X11-unix \
-     -v /dev/dri:/dev/dri \
+     -v /dev:/dev \
      -h "$(hostname)-ROS" \
      lunabotics-2023-ros \
      sh -c "
