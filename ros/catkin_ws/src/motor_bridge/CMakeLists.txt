@@ -19,10 +19,9 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   DIRECTORY msg
   FILES
+  Motor.msg
   Pitch.msg
-  Drive.msg
   Stepp.msg
-  Digger.msg
   System.msg
 )
 

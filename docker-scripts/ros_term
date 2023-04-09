@@ -11,6 +11,9 @@ sudo docker build "$DIR/ros" -t lunabotics-2023-ros
 echo "Xbox Controller? (y/n):"
 read yn
 
+# for testing ROS_MASTER_URI is set to raspberry pi
+# Change this to ip of jetson
+
 if [ "$yn" = "y" ]; then
     sudo docker run \
         --rm \
@@ -18,6 +21,7 @@ if [ "$yn" = "y" ]; then
         --device=/dev/input/js0 \
         -v $DIR:$DIR \
         -e DISPLAY \
+        -e ROS_MASTER_URI='http://192.168.0.60:11311' \
         -v /tmp/.X11-unix:/tmp/.X11-unix \
         -v /dev/dri:/dev/dri \
         -h "$(hostname)-ROS" \
@@ -36,6 +40,7 @@ else
         --device=/dev/input/event0 \
         -v $DIR:$DIR \
         -e DISPLAY \
+        -e ROS_MASTER_URI='http://192.168.0.60:11311' \
         -v /tmp/.X11-unix:/tmp/.X11-unix \
         -v /dev/dri:/dev/dri \
         -h "$(hostname)-ROS" \

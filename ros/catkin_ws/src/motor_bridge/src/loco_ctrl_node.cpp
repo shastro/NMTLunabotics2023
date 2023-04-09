@@ -5,7 +5,7 @@
 
 #include <std_msgs/String.h>
 
-#include <motor_bridge/Drive.h>
+#include <motor_bridge/System.h>
 
 #include "can/david.h"
 #include "can_interface.hpp"
@@ -13,38 +13,29 @@
 #define CAN_BUS "can0"
 SocketCAN can;
 
-enum motor {BOTH = 0, LEFT = 1, RIGHT = 2};
-
-void locoCallback(const motor_bridge::Drive::ConstPtr &msg) {
-    int speed = msg->speed;
-    int m = msg->motor;
-    std::cout << "Drive Message Received. motor: " << m
-        << "speed: " << speed
+void locoCallback(const motor_bridge::System::ConstPtr &msg) {
+    int lspeed = msg->left.rpm;
+    int rspeed = msg->left.rpm;
+    std::cout << "Drive Message Received."
+        << " left motor: " << lspeed
+        << ", right motor: " << rspeed
         << std::endl;
 
     uint8_t message[8];
     int can_id;
 
-    if (m == LEFT) {
-        david_loco_ctrl_left_t left = {
-            .velocity = (uint64_t)speed
-        };
-        david_loco_ctrl_left_pack(message, &left, sizeof(message));
-        can_id = DAVID_LOCO_CTRL_LEFT_FRAME_ID;
-    } else if (m == RIGHT) {
-        david_loco_ctrl_right_t right = {
-            .velocity = (uint64_t)speed
-        };
-        david_loco_ctrl_right_pack(message, &right, sizeof(message));
-        can_id = DAVID_LOCO_CTRL_RIGHT_FRAME_ID;
-    } else {
-        david_loco_ctrl_both_t both = {
-            .velocity = (uint64_t)speed
-        };
-        david_loco_ctrl_both_pack(message, &both, sizeof(message));
-        can_id = DAVID_LOCO_CTRL_BOTH_FRAME_ID;
-    }
+    david_loco_ctrl_left_t left = {
+        .velocity = (uint64_t)lspeed
+    };
+    david_loco_ctrl_left_pack(message, &left, sizeof(message));
+    can_id = DAVID_LOCO_CTRL_LEFT_FRAME_ID;
+    can.transmit(can_id, message);
 
+    david_loco_ctrl_right_t right = {
+        .velocity = (uint64_t)rspeed
+    };
+    david_loco_ctrl_right_pack(message, &right, sizeof(message));
+    can_id = DAVID_LOCO_CTRL_RIGHT_FRAME_ID;
     can.transmit(can_id, message);
 }
 
@@ -55,7 +46,7 @@ int main(int argc, char **argv) {
         ros::init(argc, argv, "loco_ctrl_node");
         ros::NodeHandle nh;
         ros::Subscriber sub =
-            nh.subscribe("loco_control", 1024, locoCallback);
+            nh.subscribe("/system", 5, locoCallback);
 
         // Callback event loop
         ros::spin();

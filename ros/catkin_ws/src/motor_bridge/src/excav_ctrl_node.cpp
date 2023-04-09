@@ -5,7 +5,7 @@
 
 #include <std_msgs/String.h>
 
-#include <motor_bridge/Digger.h>
+#include <motor_bridge/System.h>
 
 #include "can/david.h"
 #include "can_interface.hpp"
@@ -14,8 +14,8 @@
 SocketCAN can;
 
 
-void excavCallback(const motor_bridge::Digger::ConstPtr &msg) {
-    int speed = msg->speed;
+void excavCallback(const motor_bridge::System::ConstPtr &msg) {
+    int speed = msg->digger.rpm;
     std::cout << "Drive Message Received."
         << "speed: " << speed
         << std::endl;

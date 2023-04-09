@@ -1,7 +1,8 @@
 # System message, all in one neat package
 
-Digger digger
-Drive drive
+Motor left
+Motor right
+Motor digger
 Stepp extend
 Pitch pitch
 bool estop

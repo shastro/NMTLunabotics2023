@@ -5,7 +5,7 @@
 
 #include <std_msgs/String.h>
 
-#include <motor_bridge/Estop.h>
+#include <motor_bridge/System.h>
 
 #include "can/david.h"
 #include "can_interface.hpp"
@@ -14,8 +14,8 @@
 SocketCAN can;
 
 
-void estopCallback(const motor_bridge::Estop::ConstPtr &msg) {
-    bool stop = msg->stop;
+void estopCallback(const motor_bridge::System::ConstPtr &msg) {
+    bool stop = msg->estop;
 
     uint8_t message[8];
     int can_id;

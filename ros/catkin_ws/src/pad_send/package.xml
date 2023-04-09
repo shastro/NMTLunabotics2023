@@ -55,9 +55,7 @@
   <depend>roscpp_serializion</depend>
   <depend>roslib</depend>
   <depend>rostime</depend>
-  <build_depend>message_generation</build_depend>
-  <exec_depend>message_runtime</exec_depend>
-
+  <depend>motor_bridge</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

@@ -5,7 +5,7 @@
 
 #include <std_msgs/String.h>
 
-#include <motor_bridge/Pitch.h>
+#include <motor_bridge/System.h>
 
 #include "can/david.h"
 #include "can_interface.hpp"
@@ -15,9 +15,9 @@ SocketCAN can;
 
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
 
-void pitchCallback(const motor_bridge::Pitch::ConstPtr &msg) {
-    int dir = msg->direction;
-    motor m = (motor)msg->motor;
+void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
+    int dir = msg->pitch.direction;
+    motor m = (motor)msg->pitch.motor;
     std::cout << "Pitch Message Received. dir: " << dir << " motor: " << m
               << std::endl;
 

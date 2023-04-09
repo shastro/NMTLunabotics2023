@@ -1,50 +1,61 @@
 #include <iostream>
-#include <pad_send/Gamepad.h>
+#include <motor_bridge/System.h>
 #include <ros/ros.h>
 #include "joystick/gamepad.hpp"
 
 int main(int argc, char *argv[]) {
-    ros::init(argc, argv, "david_joystick");
+    ros::init(argc, argv, "pad_send");
     ros::NodeHandle nh;
     int max = 1024;
+    int min = -max;
     int dead = 200;
-    ros::Publisher pub = nh.advertise<pad_send::Gamepad>("/gamepad", 5);
-    GamepadHandler gh("/dev/input/js0", max, dead);
-    pad_send::Gamepad g;
+    ros::Publisher pub = nh.advertise<motor_bridge::System>("/system", 5);
+    GamepadHandler g("/dev/input/js0", max, dead);
+    motor_bridge::System s;
     bool going = true;
+    bool estopped = false;
     while (going) {
-        gh.update();
+        g.update();
+        std::cout << g << std::endl;
 
-        g.max = max;
+        // Drive left stick
+        int left = g.left_stick.x + g.left_stick.y;
+        int right = g.left_stick.y - g.left_stick.x;
+        left = (left > max) ? max : left;
+        left = (left < min) ? min : left;
+        right = (right > max) ? max : right;
+        right = (right < min) ? min : right;
+        s.left.rpm = left;
+        s.right.rpm = right;
 
-        g.left_stick_x = gh.left_stick.x;
-        g.left_stick_y = gh.left_stick.y;
-        g.right_stick_x = gh.right_stick.x;
-        g.right_stick_y = gh.right_stick.y;
+        // Pitch dpad up/down
+        s.pitch.direction = g.dpad.up ? 1 : 0;
+        s.pitch.direction = g.dpad.down ? 2 : s.pitch.direction;
+        s.pitch.motor = 0;
 
-        g.left_trigger = gh.left_trigger;
-        g.right_trigger = gh.right_trigger;
+        // Extend bumpers
+        s.extend.direction = g.buttons.left_bumper ? 2 : 0;
+        s.extend.direction = g.buttons.right_bumper ? 1 : s.extend.direction;
+        s.extend.rpm = (s.extend.direction != 0) ? max : 0;
+        s.extend.motor = 0;
 
-        g.dpad_left = gh.dpad.left;
-        g.dpad_right = gh.dpad.right;
-        g.dpad_up = gh.dpad.up;
-        g.dpad_down = gh.dpad.down;
+        // Digger triggers
+        s.digger.rpm = g.right_trigger;
+        s.digger.rpm = (g.left_trigger > 0) ? -g.left_trigger : s.digger.rpm;
 
-        g.A = gh.buttons.A;
-        g.B = gh.buttons.B;
-        g.X = gh.buttons.X;
-        g.Y = gh.buttons.Y;
-        g.left_bumper = gh.buttons.left_bumper;
-        g.right_bumper = gh.buttons.right_bumper;
-        g.left_extra = gh.buttons.left_extra;
-        g.right_extra = gh.buttons.right_extra;
-        g.xbox = gh.buttons.xbox;
-        g.left_thumb = gh.buttons.left_thumb;
-        g.right_thumb = gh.buttons.right_thumb;
+        // Estop
+        if (g.buttons.A)
+            estopped = true;
+        if (g.buttons.B)
+            estopped = false;
+        s.estop = estopped;
 
-        pub.publish(g);
-        //if (gh.buttons.left_extra)
-        //    going = false;
+        if (g.buttons.xbox) {
+            s.estop = true;
+            going = false;
+        }
+
+        pub.publish(s);
     }
     return 0;
 }
