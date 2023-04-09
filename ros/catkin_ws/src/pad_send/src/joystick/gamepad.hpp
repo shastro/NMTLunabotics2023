@@ -9,24 +9,24 @@ enum class Button {
     B = 1,
     X = 2,
     Y = 3,
-    leftBumper = 4,
-    rightBumper = 5,
-    leftExtra = 6,
-    rightExtra = 7,
+    left_bumper = 4,
+    right_bumper = 5,
+    left_extra = 6,
+    right_extra = 7,
     xbox = 8,
-    thumbLeft = 9,
-    thumbRight = 10
+    left_thumb = 9,
+    right_thumb = 10
 };
 
 enum class Axis {
-    leftThumbX = 0,
-    leftThumbY = 1,
-    leftTrigger = 2,
-    rightThumbX = 3,
-    rightThumbY = 4,
-    rightTrigger = 5,
-    dpadX = 6,
-    dpadY = 7,
+    left_thumb_x = 0,
+    left_thumb_y = 1,
+    left_trigger = 2,
+    right_thumb_x = 3,
+    right_thumb_y = 4,
+    right_trigger = 5,
+    dpad_x = 6,
+    dpad_y = 7,
 };
 
 struct Stick {
@@ -65,13 +65,13 @@ struct Buttons {
     bool B;
     bool X;
     bool Y;
-    bool leftBumper;
-    bool rightBumper;
+    bool left_bumper;
+    bool right_bumper;
     bool xbox;
-    bool leftExtra;
-    bool rightExtra;
-    bool thumbLeft;
-    bool thumbRight;
+    bool left_extra;
+    bool right_extra;
+    bool left_thumb;
+    bool right_thumb;
 
     friend std::ostream &operator<<(std::ostream &s, const Buttons &t) {
         s << "buttons: ";
@@ -83,15 +83,15 @@ struct Buttons {
             s << "X ";
         if (t.Y)
             s << "Y ";
-        if (t.leftBumper)
+        if (t.left_bumper)
             s << "LeftBumper ";
-        if (t.rightBumper)
+        if (t.right_bumper)
             s << "RightBumper ";
         if (t.xbox)
             s << "xbox ";
-        if (t.leftExtra)
+        if (t.left_extra)
             s << "Left Extra ";
-        if (t.rightExtra)
+        if (t.right_extra)
             s << "Right Extra ";
         s << std::endl;
         return s;
@@ -120,7 +120,7 @@ class GamepadHandler{
         int trig_max;
         int stick_min;
         int stick_max;
-        int stick_dead;
+        int dead;
 
         void getLeftStick(JoystickEvent& event);
         void getRightStick(JoystickEvent& event);

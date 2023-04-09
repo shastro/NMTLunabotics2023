@@ -13,9 +13,9 @@ GamepadHandler::GamepadHandler(std::string pad_path, int sig_max, int dead) {
     }
     this->stick_min = -1 * sig_max;
     this->stick_max = sig_max;
-    this->stick_dead = dead;
     this->trig_min = 0;
     this->trig_max = sig_max;
+    this->dead = dead;
 }
 
 GamepadHandler::~GamepadHandler() {
@@ -25,22 +25,22 @@ GamepadHandler::~GamepadHandler() {
 void  GamepadHandler::getLeftStick(JoystickEvent& event) {
     if (event.isAxis()) {
         Axis axis = static_cast<Axis>(event.number);
-        if (axis == Axis::leftThumbX) {
+        if (axis == Axis::left_thumb_x) {
             this->left_stick.x = this->scale(event.value,
                     event.MIN_AXES_VALUE,
                     event.MAX_AXES_VALUE,
                     this->stick_min,
                     this->stick_max);
-            if (abs(this->left_stick.x) < this->stick_dead)
+            if (abs(this->left_stick.x) < this->dead)
                 this->left_stick.x = 0;
             return;
-        } else if (axis == Axis::leftThumbY) {
+        } else if (axis == Axis::left_thumb_y) {
             this->left_stick.y = -1 * this->scale(event.value,
                     event.MIN_AXES_VALUE,
                     event.MAX_AXES_VALUE,
                     this->stick_min,
                     this->stick_max);
-            if (abs(this->left_stick.y) < this->stick_dead)
+            if (abs(this->left_stick.y) < this->dead)
                 this->left_stick.y = 0;
             return;
         }
@@ -50,22 +50,22 @@ void  GamepadHandler::getLeftStick(JoystickEvent& event) {
 void  GamepadHandler::getRightStick(JoystickEvent& event) {
     if (event.isAxis()) {
         Axis axis = static_cast<Axis>(event.number);
-        if (axis == Axis::rightThumbX) {
+        if (axis == Axis::right_thumb_x) {
             this->right_stick.x = scale(event.value,
                     event.MIN_AXES_VALUE,
                     event.MAX_AXES_VALUE,
                     this->stick_min,
                     this->stick_max);
-            if (abs(this->right_stick.x) < this->stick_dead)
+            if (abs(this->right_stick.x) < this->dead)
                 this->right_stick.x = 0;
             return;
-        } else if (axis == Axis::rightThumbY) {
+        } else if (axis == Axis::right_thumb_y) {
             this->right_stick.y = -1 * scale(event.value,
                     event.MIN_AXES_VALUE,
                     event.MAX_AXES_VALUE,
                     this->stick_min,
                     this->stick_max);
-            if (abs(this->right_stick.y) < this->stick_dead)
+            if (abs(this->right_stick.y) < this->dead)
                 this->right_stick.y = 0;
             return;
         }
@@ -75,12 +75,13 @@ void  GamepadHandler::getRightStick(JoystickEvent& event) {
 void GamepadHandler::getLeftTrigger(JoystickEvent& event) {
     if (event.isAxis()) {
         Axis axis = static_cast<Axis>(event.number);
-        if (axis == Axis::leftTrigger) {
+        if (axis == Axis::left_trigger) {
             this->left_trigger = scale(event.value,
                     event.MIN_AXES_VALUE,
                     event.MAX_AXES_VALUE,
                     this->trig_min,
                     this->trig_max);
+            this->left_trigger = (this->left_trigger > this->dead) ? this->left_trigger : 0;
             return;
         }
     }
@@ -89,12 +90,13 @@ void GamepadHandler::getLeftTrigger(JoystickEvent& event) {
 void GamepadHandler::getRightTrigger(JoystickEvent& event) {
     if (event.isAxis()) {
         Axis axis = static_cast<Axis>(event.number);
-        if (axis == Axis::rightTrigger) {
+        if (axis == Axis::right_trigger) {
             this->right_trigger = scale(event.value,
                     event.MIN_AXES_VALUE,
                     event.MAX_AXES_VALUE,
                     this->trig_min,
                     this->trig_max);
+            this->right_trigger = (this->right_trigger > this->dead) ? this->right_trigger : 0;
             return;
         }
     }
@@ -103,21 +105,21 @@ void GamepadHandler::getRightTrigger(JoystickEvent& event) {
 void GamepadHandler::getDpad(JoystickEvent& event) {
     if (event.isAxis()) {
         Axis axis = static_cast<Axis>(event.number);
-        if (axis == Axis::dpadX) {
-            if (event.value > 0) {
+        if (axis == Axis::dpad_x) {
+            if (event.value > this->dead) {
                 this->dpad.left = true;
-            } else if (event.value < 0) {
+            } else if (event.value < -this->dead) {
                 this->dpad.right = true;
-            } else if (event.value == 0) {
+            } else if (event.value > -this->dead && event.value < this->dead) {
                 this->dpad.left = false;
                 this->dpad.right = false;
             }
-        } else if (axis == Axis::dpadY) {
-            if (event.value > 0) {
+        } else if (axis == Axis::dpad_y) {
+            if (event.value > this->dead) {
                 this->dpad.down = true;
-            } else if (event.value < 0) {
+            } else if (event.value < -this->dead) {
                 this->dpad.up = true;
-            } else if (event.value == 0) {
+            } else if (event.value > -this->dead && event.value < this->dead) {
                 this->dpad.up = false;
                 this->dpad.down = false;
             }
@@ -152,23 +154,23 @@ void GamepadHandler::getButtons(JoystickEvent& event) {
                 else
                     this->buttons.Y = false;
                 break;
-            case Button::leftBumper:
+            case Button::left_bumper:
                 if (event.value == 1)
-                    this->buttons.leftBumper = true;
+                    this->buttons.left_bumper = true;
                 else
-                    this->buttons.leftBumper = false;
+                    this->buttons.left_bumper = false;
                 break;
-            case Button::rightBumper:
+            case Button::right_bumper:
                 if (event.value == 1)
-                    this->buttons.rightBumper = true;
+                    this->buttons.right_bumper = true;
                 else
-                    this->buttons.rightBumper = false;
+                    this->buttons.right_bumper = false;
                 break;
-            case Button::leftExtra:
+            case Button::left_extra:
                 if (event.value == 1)
-                    this->buttons.leftExtra = true;
+                    this->buttons.left_extra = true;
                 else
-                    this->buttons.leftExtra = false;
+                    this->buttons.left_extra = false;
                 break;
             case Button::xbox:
                 if (event.value == 1)
@@ -176,17 +178,17 @@ void GamepadHandler::getButtons(JoystickEvent& event) {
                 else
                     this->buttons.xbox = false;
                 break;
-            case Button::thumbLeft:
+            case Button::left_thumb:
                 if (event.value == 1)
-                    this->buttons.thumbLeft = true;
+                    this->buttons.left_thumb = true;
                 else
-                    this->buttons.thumbLeft = false;
+                    this->buttons.left_thumb = false;
                 break;
-            case Button::thumbRight:
+            case Button::right_thumb:
                 if (event.value == 1)
-                    this->buttons.thumbRight = true;
+                    this->buttons.right_thumb = true;
                 else
-                    this->buttons.thumbRight = false;
+                    this->buttons.right_thumb = false;
                 break;
             default:
                 break;

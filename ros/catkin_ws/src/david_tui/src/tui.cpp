@@ -13,8 +13,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "joystick/gamepad.hpp"
-
 #define PITCH_STOP 0
 #define PITCH_FORWARD 1
 #define PITCH_BACKWARD 2
@@ -195,15 +193,6 @@ static void stop_all();
 static void estop(); //technically a can handler but mapped to keybind
 static void estart();
 static void quit();
-static void input_switch();
-
-//Joystick functions
-//TODO find a better way to map these to bindings
-static void stick_drive();
-static void stick_pitch();
-static void stick_extend();
-static void trigger_dig();
-static void buttons();
 
 // Can handlers
 static void send_targets();
@@ -215,7 +204,6 @@ static void send_digger();
 // Display functions
 static void print_status();
 static void print_keybinds();
-static void print_gamebinds();
 
 // Publishers
 static ros::Publisher pitch_pub;
@@ -230,7 +218,6 @@ static std::tuple<char, std::string, std::function<void()>> bindings[] = {
     {'p', "Pitch", sel_pitch},
     {'d', "Drive", sel_drive},
     {'a', "Excavation Arm", sel_depth},
-    {'y', "Switch to Gamepad", input_switch},
     // Motor
     {'0', "Both", sel_both},
     {'1', "Left", sel_left},
@@ -257,28 +244,10 @@ static std::tuple<char, std::string, std::function<void()>> bindings[] = {
     {'q', "Quit", quit}
 };
 
-// Gamebinds - string bind string description
-static std::pair<std::string, std::string> gamebinds[] = {
-    {"Left Stick", "Drive"},
-    {"Right Stick Y", "Pitch"},
-    {"Right Stick X", "Extend"},
-    {"Left Trigger", "Dig Forward"},
-    {"Right Trigger", "Dig Reverse"},
-    {"B", "Stop all"},
-    {"xbox", "Emergency Stop"},
-    {"Left & Right Bumper", "Restart after Emergency Stop"}
-};
-
 //Max range of input/outputs
 const static int rmax = 1024;
 //Joy stick center deadzone, 50-200 recommended
 const static int dead = 100;
-// Input type
-static input in = KEYBOARD;
-
-// Game Controller
-static GamepadHandler* gh;
-static bool controller_available = false;
 
 // Loop condition
 static bool still_going = true;
@@ -307,14 +276,6 @@ int main(int argc, char **argv) {
     keypad(stdscr, true);
     noecho();
 
-    controller_available = false;
-    //try {
-        gh = new GamepadHandler("/dev/input/js0", rmax, dead);
-        controller_available = true;
-    //} catch (std::string err) {
-    //    controller_available = false;
-    //}
-
     // Refresh at 0.1-second interval.
     halfdelay(1);
 
@@ -328,33 +289,17 @@ int main(int argc, char **argv) {
         move(0, 0);
         print_status();
 
-        //quit done outside keyboard loop for obvious reasons
-        //if (n == 'q')
-        //    quit();
-
-
-        if (in == KEYBOARD) {
             print_keybinds();
             pn = n;
             n = getch();
             for (auto bind : bindings)
                 if (n == std::get<0>(bind))
                     std::get<2>(bind)();
-        } else if (in == GAMEPAD) {
-            print_gamebinds();
-            gh->update();
-            stick_drive();
-            stick_pitch();
-            stick_extend();
-            trigger_dig();
-            buttons();
-        }
 
         refresh();
 
         //send_targets();
     }
-    delete gh;
     return 0;
 }
 
@@ -490,62 +435,6 @@ static void estart() {
     estop_pub.publish(msg);
 }
 
-static void input_switch() {
-    if (in == KEYBOARD && controller_available)
-        in = GAMEPAD;
-    else
-        in = KEYBOARD;
-}
-
-static void stick_drive() {
-    int left = gh->left_stick.x + gh->left_stick.y;
-    int right = gh->left_stick.y - gh->left_stick.x;
-    left = (left > motorsys.loco.max) ? motorsys.loco.max : left;
-    left = (left < motorsys.loco.min) ? motorsys.loco.min : left;
-    right = (right > motorsys.loco.max) ? motorsys.loco.max : right;
-    right = (right < motorsys.loco.min) ? motorsys.loco.min : right;
-    motorsys.loco.left_speed = left;
-    motorsys.loco.right_speed = right;
-}
-
-static void stick_pitch() {
-    if (gh->right_stick.y > 0)
-        pitch_up();
-    else if (gh->right_stick.y < 0)        
-        pitch_down();
-    else
-        pitch_stop();
-}
-
-static void stick_extend() {
-    if (gh->right_stick.x > 0)
-        depth_extend();
-    else if (gh->right_stick.x < 0)
-        depth_retract();
-    else
-        depth_stop();
-}
-
-static void trigger_dig() {
-    if (gh->right_trigger > 0)
-        digger_forward();
-    else if (gh->left_trigger > 0)
-        digger_backward();
-    else
-        digger_stop();
-}
-
-static void buttons() {
-    if (gh->buttons.B)
-        stop_all();
-    if (gh->buttons.xbox)
-        estop();
-    if (gh->buttons.leftBumper && gh->buttons.rightBumper)
-        estart();
-    if (gh->buttons.Y)
-        input_switch();
-}
-
 static void quit() {
     clear();
     estop();
@@ -594,9 +483,7 @@ static void send_digger() {
 
 static void print_status() {
     std::stringstream s;
-    if (!controller_available)
-        s << "Controller not available" << std::endl;
-    //s << motorsys;
+    s << motorsys;
     printw(s.str().c_str());
 }
 
@@ -610,12 +497,3 @@ static void print_keybinds() {
     }
 }
 
-static void print_gamebinds() {
-    printw("Gamepad bindings\n");
-    for (auto bind : gamebinds) {
-        print_bold("%s", bind.first.c_str());
-        printw(" : ");
-        printw("%s", bind.second.c_str());
-        printw("\n");
-    }
-}

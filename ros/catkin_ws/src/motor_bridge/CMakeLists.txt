@@ -23,7 +23,7 @@ add_message_files(
   Drive.msg
   Stepp.msg
   Digger.msg
-  Estop.msg
+  System.msg
 )
 
 generate_messages(DEPENDENCIES std_msgs)
@@ -31,8 +31,6 @@ generate_messages(DEPENDENCIES std_msgs)
 catkin_package(CATKIN_DEPENDS std_msgs std_srvs message_runtime)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
-
-
 
 # pitch_ctrl node
 add_executable(pitch_ctrl
