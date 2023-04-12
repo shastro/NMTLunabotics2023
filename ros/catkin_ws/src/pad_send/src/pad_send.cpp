@@ -14,8 +14,12 @@ int main(int argc, char *argv[]) {
     motor_bridge::System s;
     bool going = true;
     bool estopped = false;
+    int count = 0;
     while (going) {
         g.update();
+        if (count < 100)
+            count++;
+
         std::cout << g << std::endl;
 
         // Drive left stick
@@ -50,7 +54,7 @@ int main(int argc, char *argv[]) {
             estopped = false;
         s.estop = estopped;
 
-        if (g.buttons.xbox) {
+        if (g.buttons.xbox && count > 50) {
             s.estop = true;
             going = false;
         }
