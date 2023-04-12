@@ -26,8 +26,10 @@ if [ "$yn" = "y" ]; then
         --device=/dev/input/js0 \
         -v $DIR:$DIR \
         -e DISPLAY \
-        -v /tmp/.X11-unix:/tmp/.X11-unix \
-        -v /dev/dri:/dev/dri \
+        -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+        -v /dev:/dev:rw \
+        --device-cgroup-rule "c 81:* rmw" \
+        --device-cgroup-rule "c 189:* rmw" \
         lunabotics-2023-ros \
         sh -c "
             cd $PWD
@@ -44,7 +46,7 @@ else
         -v $DIR:$DIR \
         -e DISPLAY \
         -v /tmp/.X11-unix:/tmp/.X11-unix \
-        -v /dev/dri:/dev/dri \
+        -v /dev:/dev \
         lunabotics-2023-ros \
         sh -c "
             cd $PWD

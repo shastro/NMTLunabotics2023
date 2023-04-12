@@ -33,6 +33,10 @@ params=(
     # Device rules for accessing Realsense cameras.
     --device-cgroup-rule "c 81:* rmw"
     --device-cgroup-rule "c 189:* rmw"
+    
+    # Environmental variables - change to match ip
+    -e ROS_MASTER_URI=http://129.138.170.202:11311
+    -e ROS_IP=129.138.170.202
 
     # Name the container.
     --name=$CONTAINER_NAME
