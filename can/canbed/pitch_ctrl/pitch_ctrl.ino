@@ -22,7 +22,6 @@ enum DIRS {
     STOP = 0,
     EXTEND = 1,
     RETRACT = 2,
-    HOMING = 3,
 };
 
 // Pins
@@ -40,7 +39,7 @@ enum DIRS {
 
 static const int64_t DEFAULT_TRIG_DELAY = 10000; // Microsecond delay
 static const int64_t DEFAULT_MAX_COUNT = 875-20;
-static const int64_t DEFAULT_HOMING_DELAY = 100;
+static const int64_t DEFAULT_HOMING_DELAY = 300;
 static const int64_t DEFAULT_TOLERANCE = 3;
 
 static const int PIN_TABLE[MOTOR_COUNT][3] = {
@@ -57,6 +56,8 @@ struct MotorState {
     int64_t prev_count;
     int64_t target_count;
     int dir;
+    volatile int64_t hall_triggered;
+    int homing;
     int last_dir;
     int stationary_timer;
 };
@@ -75,13 +76,16 @@ void setup()
     Wire.begin();
     delay(100);
 
+    Motors[MOTOR_LEFT].homing = true;
+    Motors[MOTOR_RIGHT].homing = true;
+
     // PinModes
     pinMode(PIN_TABLE[MOTOR_LEFT][HALL_PIN], INPUT_PULLUP);
     pinMode(PIN_TABLE[MOTOR_RIGHT][HALL_PIN], INPUT_PULLUP);
 
     // Interrupts
-    attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_LEFT][HALL_PIN]), left_hall_handler, FALLING);
-    attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_RIGHT][HALL_PIN]), right_hall_handler, FALLING);
+    attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_LEFT][HALL_PIN]), left_hall_handler, RISING);
+    attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_RIGHT][HALL_PIN]), right_hall_handler, RISING);
 
     Serial.begin(115200);
     while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
@@ -122,10 +126,14 @@ void loop()
         if (!estopped && !homing) {    
             if (canId == DAVID_PITCH_CTRL_HOME_FRAME_ID) {
                 homing = true;
-                Motors[MOTOR_LEFT].prev_count = 0;
-                Motors[MOTOR_RIGHT].prev_count = 0;
+                Motors[MOTOR_LEFT].true_count = 1000000;
+                Motors[MOTOR_RIGHT].true_count = 1000000;
+                Motors[MOTOR_LEFT].prev_count = 1000001;
+                Motors[MOTOR_RIGHT].prev_count = 1000001;
                 Motors[MOTOR_LEFT].target_count = 0;
                 Motors[MOTOR_RIGHT].target_count = 0;
+                Motors[MOTOR_LEFT].homing = true;
+                Motors[MOTOR_RIGHT].homing = true;
             }
         }
 
@@ -134,9 +142,9 @@ void loop()
             // If PITCH_CTRL_BOTH both if statements will fire.
             if (canId == DAVID_PITCH_CTRL_BOTH_FRAME_ID) {
                 Motors[MOTOR_LEFT].target_count = extract_value(buf, 0, 6);
-                Motors[MOTOR_RIGHT].target_count = extract_value(buf, 0, 6);
                 Motors[MOTOR_LEFT].tolerance = extract_value(buf, 6, 2);
-                Motors[MOTOR_RIGHT].tolerance = extract_value(buf, 6, 2);
+                Motors[MOTOR_RIGHT].target_count = Motors[MOTOR_LEFT].target_count;
+                Motors[MOTOR_RIGHT].tolerance = Motors[MOTOR_LEFT].tolerance;
             }
             if (canId == DAVID_PITCH_CTRL_LEFT_FRAME_ID) {
                 Motors[MOTOR_LEFT].target_count = extract_value(buf, 0, 6);
@@ -148,7 +156,12 @@ void loop()
             }
 
             ForEachMotor {
-                Motors[m].target_count = constrain(Motors[m].target_count, 0, max_count);
+                if (Motors[m].target_count < 0) {
+                    Motors[m].target_count = 0;
+                }
+                if (Motors[m].target_count > max_count) {
+                    Motors[m].target_count = max_count;
+                }
             }
         }
 
@@ -161,24 +174,23 @@ void loop()
     // Do homing
     if (!estopped && homing) {
         ForEachMotor {
-            Motors[m].dir = HOMING;
+            if (homing) {
+                Motors[m].dir = RETRACT;
+                if (Motors[m].true_count == Motors[m].prev_count) {
+                    Motors[m].stationary_timer++;
+                } else {
+                    Motors[m].stationary_timer = 0;
+                }
+                Motors[m].prev_count = Motors[m].true_count;
 
-            if (Motors[m].true_count == Motors[m].prev_count) {
-                Motors[m].stationary_timer++;
-            } else {
-                Motors[m].stationary_timer = 0;
-            }
-
-            Motors[m].prev_count = Motors[m].true_count;
-        
-            if (Motors[m].stationary_timer > homing_delay) {
-                Motors[m].dir = STOP;
-                Motors[m].true_count = 0;
-                Motors[m].target_count = 0;
+                if (Motors[m].stationary_timer > homing_delay) {
+                    Motors[m].homing = false;
+                    Motors[m].dir = STOP;
+                }
             }
         }
 
-        if ((Motors[MOTOR_LEFT].dir != HOMING) && (Motors[MOTOR_RIGHT].dir != HOMING)) {
+        if ((!Motors[MOTOR_LEFT].homing) && (!Motors[MOTOR_RIGHT].homing)) {
             homing = false;
         }
     }
@@ -200,44 +212,59 @@ void loop()
     
     ForEachMotor {
         const static int MOTOR_ADDRESS[] = {0x59, 0x58};
-        sendData(MOTOR_ADDRESS[m],ACCREG, 0x03);
+        sendData(MOTOR_ADDRESS[m],ACCREG, 0x0A);
         sendData(MOTOR_ADDRESS[m],SPEEDBYTE, 0xAA);
-        int dir = (Motors[m].dir == HOMING)? RETRACT : Motors[m].dir;
-        sendData(MOTOR_ADDRESS[m],CMDBYTE, dir);
+        sendData(MOTOR_ADDRESS[m],CMDBYTE, Motors[m].dir);
     }
     
     // Send telemetry
-    send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, Motors[MOTOR_LEFT].true_count, Motors[MOTOR_LEFT].dir);
-    send_telemetry(DAVID_PITCH_TELEM_RIGHT_FRAME_ID, Motors[MOTOR_RIGHT].true_count, Motors[MOTOR_RIGHT].dir);
+    /* const static int TELEM_MSG_IDS[MOTOR_COUNT] = {DAVID_PITCH_TELEM_LEFT_FRAME_ID, DAVID_PITCH_TELEM_RIGHT_FRAME_ID}; */
+    /* ForEachMotor { */
+    /*     buf[0] = Motors[m].true_count >> 8*0; */
+    /*     buf[1] = Motors[m].true_count >> 8*1; */
+    /*     buf[2] = Motors[m].true_count >> 8*2; */
+    /*     buf[3] = Motors[m].true_count >> 8*3; */
+    /*     buf[4] = Motors[m].true_count >> 8*4; */
+    /*     buf[5] = Motors[m].true_count >> 8*5; */
+    /*     buf[6] = homing + Motors[m].dir >> 8*0; */
+    /*     buf[7] = Motors[m].hall_triggered >> 8*1; */
+    /*     CAN.sendMsgBuf(TELEM_MSG_IDS[m], 0, 8, buf); */
+    /*     Motors[m].hall_triggered = 0; */
+    /* } */
+    buf[0] = Motors[MOTOR_LEFT].hall_triggered >> 8*0;
+    buf[1] = Motors[MOTOR_LEFT].hall_triggered >> 8*1;
+    buf[2] = Motors[MOTOR_LEFT].hall_triggered >> 8*2;
+    buf[3] = Motors[MOTOR_LEFT].hall_triggered >> 8*3;
+    buf[4] = Motors[MOTOR_LEFT].hall_triggered >> 8*4;
+    buf[5] = Motors[MOTOR_LEFT].hall_triggered >> 8*5;
+    buf[6] = homing + Motors[MOTOR_LEFT].dir >> 8*0;
+    buf[7] = Motors[MOTOR_LEFT].dir >> 8*1;
+    CAN.sendMsgBuf(DAVID_PITCH_TELEM_LEFT_FRAME_ID, 0, 8, buf);
+    Motors[MOTOR_LEFT].hall_triggered = 0;
 
-}
-
-void send_telemetry(uint32_t canId, int64_t true_count, int64_t dir){
-    unsigned char buf[8] = {0};
-    buf[0] = true_count >> 8*0;
-    buf[1] = true_count >> 8*1;
-    buf[2] = true_count >> 8*2;
-    buf[3] = true_count >> 8*3;
-    buf[4] = true_count >> 8*4;
-    buf[5] = true_count >> 8*5;
-    buf[6] = dir >> 8*0;
-    buf[7] = dir >> 8*1;
-    CAN.sendMsgBuf(canId, 0, 8, buf);
+    buf[0] = Motors[MOTOR_LEFT].hall_triggered >> 8*0;
+    buf[1] = Motors[MOTOR_LEFT].hall_triggered >> 8*1;
+    buf[2] = Motors[MOTOR_LEFT].hall_triggered >> 8*2;
+    buf[3] = Motors[MOTOR_LEFT].hall_triggered >> 8*3;
+    buf[4] = Motors[MOTOR_LEFT].hall_triggered >> 8*4;
+    buf[5] = Motors[MOTOR_LEFT].hall_triggered >> 8*5;
+    buf[6] = homing + Motors[MOTOR_RIGHT].dir >> 8*0;
+    buf[7] = Motors[MOTOR_RIGHT].dir >> 8*1;
+    CAN.sendMsgBuf(DAVID_PITCH_TELEM_RIGHT_FRAME_ID, 0, 8, buf);
+    Motors[MOTOR_RIGHT].hall_triggered = 0;
 }
 
 void left_hall_handler(){
     int64_t timestamp = micros();
+    Motors[MOTOR_LEFT].hall_triggered++;;
     if ((timestamp - Motors[MOTOR_LEFT].last_trigger) > trig_delay) {
         Motors[MOTOR_LEFT].last_trigger = timestamp;
         switch (Motors[MOTOR_LEFT].dir) {
         case RETRACT:
-        case HOMING:
             Motors[MOTOR_LEFT].true_count -= 1;
             break;
         case EXTEND: 
             Motors[MOTOR_LEFT].true_count += 1;
-            break;
-        case STOP: 
             break;
         }
     } 
@@ -245,17 +272,15 @@ void left_hall_handler(){
 
 void right_hall_handler(){
     int64_t timestamp = micros();
+    Motors[MOTOR_RIGHT].hall_triggered++;
     if ((timestamp - Motors[MOTOR_RIGHT].last_trigger) > trig_delay) {
         Motors[MOTOR_RIGHT].last_trigger = timestamp;
         switch (Motors[MOTOR_RIGHT].dir) {
         case RETRACT: 
-        case HOMING:
             Motors[MOTOR_RIGHT].true_count -= 1;
             break;
         case EXTEND: 
             Motors[MOTOR_RIGHT].true_count += 1;
-            break;
-        case STOP: 
             break;
         }
     } 
@@ -276,22 +301,6 @@ void sendData(byte addr, byte reg, byte val){      // Function for sending data 
     Wire.write(reg);                    // Command like Direction, Speed
     Wire.write(val);                    // Value for the command
     int error = Wire.endTransmission();
-    if(error) {
-        Serial.print("I2C ERROR:");
-        Serial.println(error);
-    }
     delay(10);
 }
 
-byte getData(byte addr, byte reg){                 // function for getting data from MD03
-    Wire.beginTransmission(addr);
-    Wire.write(reg);
-    Wire.endTransmission();
-
-    byte mdo3 = 1;
-    Wire.requestFrom(addr, mdo3);         // Requests byte from MD03
-    while(Wire.available() < 1);          // Waits for byte to become available
-    byte data = Wire.read();
-
-    return(data);
-}
