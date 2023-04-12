@@ -11,8 +11,12 @@ sudo docker build "$DIR/ros" -t lunabotics-2023-ros
 echo "Xbox Controller? (y/n):"
 read yn
 
-# for testing ROS_MASTER_URI is set to raspberry pi
-# Change this to ip of jetson
+# On Jetson and laptop (change IP to match)
+# ROS_MASTER_URI=http://129.138.170.202:11311
+# On Jetson
+# ROS_IP=129.138.170.202
+# On Laptop
+# ROS_IP=laptop ip
 
 if [ "$yn" = "y" ]; then
     sudo docker run \
@@ -24,7 +28,6 @@ if [ "$yn" = "y" ]; then
         -e DISPLAY \
         -v /tmp/.X11-unix:/tmp/.X11-unix \
         -v /dev/dri:/dev/dri \
-        -h "$(hostname)-ROS" \
         lunabotics-2023-ros \
         sh -c "
             cd $PWD
@@ -42,7 +45,6 @@ else
         -e DISPLAY \
         -v /tmp/.X11-unix:/tmp/.X11-unix \
         -v /dev/dri:/dev/dri \
-        -h "$(hostname)-ROS" \
         lunabotics-2023-ros \
         sh -c "
             cd $PWD
