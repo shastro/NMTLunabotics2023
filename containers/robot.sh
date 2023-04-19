@@ -19,6 +19,8 @@ CONTAINER_NAME=lunabotics-2023-robot
 # Build the image.
 docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
 
+it=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
+
 params=(
     # Detach from the container, and create a fake virtual terminal.
     -dt
@@ -35,8 +37,8 @@ params=(
     --device-cgroup-rule "c 189:* rmw"
     
     # Environmental variables - change to match ip
-    -e ROS_MASTER_URI=http://129.138.170.202:11311
-    -e ROS_IP=129.138.170.202
+    -e ROS_MASTER_URI=http://$it:11311
+    -e ROS_IP=$it
 
     # Name the container.
     --name=$CONTAINER_NAME
