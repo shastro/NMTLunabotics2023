@@ -170,10 +170,16 @@ void loop()
 
   } // finish CAN message
 		
-  
-// Standard movement towards target counts
-  set_control(MOTOR_LEFT, left_dir);
-  set_control(MOTOR_RIGHT, right_dir);
+	  if (!estopped){
+	// Standard movement towards target counts
+	  set_control(MOTOR_LEFT, left_dir);
+	  set_control(MOTOR_RIGHT, right_dir);
+		
+	} else {
+	  set_control(MOTOR_LEFT, STOP);
+	  set_control(MOTOR_RIGHT, STOP);
+		
+	}
 
   // Send telemetry
   send_telemetry(DAVID_PITCH_TELEM_LEFT_FRAME_ID, left_dir, left_dir);
