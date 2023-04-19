@@ -20,6 +20,7 @@ CONTAINER_NAME=lunabotics-2023-robot
 docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
 
 it=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
+echo $it
 
 params=(
     # Detach from the container, and create a fake virtual terminal.
