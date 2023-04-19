@@ -25,8 +25,8 @@ enum DIRS {
 };
 
 // Pins
-#define HALL_PIN_L 5
-#define HALL_PIN_R 6
+#define HALL_PIN_L 0
+#define HALL_PIN_R 1
 
 // I2C Registers
 #define SOFTREG             0x07                    // Byte to read software
@@ -84,8 +84,8 @@ void setup()
     pinMode(PIN_TABLE[MOTOR_RIGHT][HALL_PIN], INPUT_PULLUP);
 
     // Interrupts
-    attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_LEFT][HALL_PIN]), left_hall_handler, RISING);
-    attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_RIGHT][HALL_PIN]), right_hall_handler, RISING);
+    attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_LEFT][HALL_PIN]), left_hall_handler, FALLING);
+    attachInterrupt(digitalPinToInterrupt(PIN_TABLE[MOTOR_RIGHT][HALL_PIN]), right_hall_handler, FALLING);
 
     Serial.begin(115200);
     while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
@@ -126,10 +126,6 @@ void loop()
         if (!estopped && !homing) {    
             if (canId == DAVID_PITCH_CTRL_HOME_FRAME_ID) {
                 homing = true;
-                Motors[MOTOR_LEFT].true_count = 1000000;
-                Motors[MOTOR_RIGHT].true_count = 1000000;
-                Motors[MOTOR_LEFT].prev_count = 1000001;
-                Motors[MOTOR_RIGHT].prev_count = 1000001;
                 Motors[MOTOR_LEFT].target_count = 0;
                 Motors[MOTOR_RIGHT].target_count = 0;
                 Motors[MOTOR_LEFT].homing = true;
