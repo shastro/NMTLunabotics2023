@@ -48,10 +48,6 @@ void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 int main(int argc, char **argv) {
-    if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info) ) {
-        ros::console::notifyLoggerLevelsChanged();
-    }
-
     try {
         can = SocketCAN(CAN_BUS);
 
