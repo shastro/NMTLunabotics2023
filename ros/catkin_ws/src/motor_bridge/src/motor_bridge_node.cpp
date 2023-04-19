@@ -200,6 +200,7 @@ void steppCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void callback(const motor_bridge::System::ConstPtr &msg) {
+    std::cout << "calling back" << std::endl;
     estopCallback(msg);
     pitchCallback(msg);
     excavCallback(msg);
