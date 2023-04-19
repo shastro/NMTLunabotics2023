@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <ros/ros.h>
+#include <ros/console.h>
 #include <unistd.h>
 
 #include <std_msgs/String.h>
@@ -18,8 +19,7 @@ enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
 void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
     int dir = msg->pitch.direction;
     motor m = (motor)msg->pitch.motor;
-    std::cout << "Pitch Message Received. dir: " << dir << " motor: " << m
-              << std::endl;
+    ROS_INFO_STREAM_NAMED("pitch_ctrl", "Pitch Message Received. dir: " << dir << " motor: " << m);
 
     uint8_t message[8];
     int can_id;
@@ -48,6 +48,10 @@ void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 int main(int argc, char **argv) {
+    if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info) ) {
+        ros::console::notifyLoggerLevelsChanged();
+    }
+
     try {
         can = SocketCAN(CAN_BUS);
 
@@ -59,7 +63,7 @@ int main(int argc, char **argv) {
         // Callback event loop
         ros::spin();
     } catch (std::string err) {
-        std::cerr << err << std::endl;
+        ROS_ERROR_NAMED("pitch_ctrl", "CAN failed. Error: CAN't. Node publicly executed with guillotine");
         return 1;
     }
 }
