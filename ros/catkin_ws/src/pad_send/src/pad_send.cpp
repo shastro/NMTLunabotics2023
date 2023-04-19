@@ -22,7 +22,20 @@ int main(int argc, char *argv[]) {
 
         std::cout << g << std::endl;
 
+        if (g.buttons.xbox && count > 50) {
+            s.estop = true;
+            going = false;
+        }
+
+        // Estop
+        if (g.buttons.A)
+            estopped = true;
+        if (g.buttons.B)
+            estopped = false;
+        s.estop = estopped;
+
         // Drive left stick
+        /*
         int left = g.left_stick.x + g.left_stick.y;
         int right = g.left_stick.y - g.left_stick.x;
         left = (left > max) ? max : left;
@@ -31,6 +44,11 @@ int main(int argc, char *argv[]) {
         right = (right < min) ? min : right;
         s.left.rpm = left;
         s.right.rpm = right;
+        */
+
+        // Drive both sticks
+        s.left.rpm = g.left_stick.y;
+        s.right.rpm = g.right_stick.y;
 
         // Pitch dpad up/down
         s.pitch.direction = g.dpad.up ? 1 : 0;
@@ -46,18 +64,6 @@ int main(int argc, char *argv[]) {
         // Digger triggers
         s.digger.rpm = g.right_trigger;
         s.digger.rpm = (g.left_trigger > 0) ? -g.left_trigger : s.digger.rpm;
-
-        // Estop
-        if (g.buttons.A)
-            estopped = true;
-        if (g.buttons.B)
-            estopped = false;
-        s.estop = estopped;
-
-        if (g.buttons.xbox && count > 50) {
-            s.estop = true;
-            going = false;
-        }
 
         pub.publish(s);
     }
