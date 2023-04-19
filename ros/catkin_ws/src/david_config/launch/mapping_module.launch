@@ -1,0 +1,2 @@
+<node pkg="tf2_ros" type="static_transform_publisher" name="base_link2camera" args="0.09525 0.0508 0 0 0 -1.57">
+<node pkg="tf2_ros" type="static_transform_publisher" name="base_link2tracking" args="0.0 0.0301625 -0.100125 0 -3.14159 -1.57">

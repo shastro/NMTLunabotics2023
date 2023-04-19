@@ -6,7 +6,7 @@ IFS=$'\n\t'
 
 DIR="$(realpath "$(dirname "$0")")"/..
 
-sudo docker build "$DIR/ros" -t lunabotics-2023-ros
+# sudo docker build "$DIR/ros" -t lunabotics-2023-ros
 sudo docker run \
      --rm \
      -it \
@@ -17,7 +17,7 @@ sudo docker run \
      -v /tmp/.X11-unix:/tmp/.X11-unix \
      -v /dev:/dev \
      -h "$(hostname)-ROS" \
-     lunabotics-2023-ros \
+     containers-ros \
      sh -c "
          cd $PWD
          export HOME="$HOME"
