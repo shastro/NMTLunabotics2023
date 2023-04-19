@@ -93,7 +93,6 @@ void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
     int dir = msg->pitch.direction;
     motor m = (motor)msg->pitch.motor;
     ROS_INFO_STREAM("Pitch Message Received. dir: " << dir << " motor: " << m);
-    std::cout << "Pitch Message Received. dir: " << dir << " motor: " << m << std::endl;
 
     uint8_t message[8];
     int can_id;
@@ -200,10 +199,10 @@ void steppCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void callback(const motor_bridge::System::ConstPtr &msg) {
-    std::cout << "calling back" << std::endl;
     estopCallback(msg);
     pitchCallback(msg);
     excavCallback(msg);
     locoCallback(msg);
     steppCallback(msg);
+    ROS_INFO("Called Back");
 }
