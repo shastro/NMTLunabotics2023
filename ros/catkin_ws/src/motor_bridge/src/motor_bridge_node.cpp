@@ -14,9 +14,11 @@
 SocketCAN can;
 
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
+enum dir { STOP = 0, FORWARD = 1, BACKWARD = 2 };
 
 //TODO better ros logging
 std::ostream& operator<<(std::ostream& os, const motor& m);
+std::ostream& operator<<(std::ostream& os, const dir& d);
 void estopCallback(const motor_bridge::System::ConstPtr &msg);
 void pitchCallback(const motor_bridge::System::ConstPtr &msg);
 void locoCallback(const motor_bridge::System::ConstPtr &msg);
@@ -37,19 +39,30 @@ int main(int argc, char **argv) {
         // Callback event loop
         ros::spin();
     } catch (std::string err) {
-        ROS_ERROR(err);
+        ROS_ERROR_STREAM("Something Happened" << err);
         return 1;
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const motor& m) {
+std::ostream& operator<<(std::ostream& s, const motor& m) {
     switch (m) {
         case BOTH:
-            return os << "BOTH";
+            return s << "BOTH";
         case LEFT:
-            return os << "LEFT";
+            return s << "LEFT";
         case RIGHT:
-            return os << "RIGHT";
+            return s << "RIGHT";
+    }
+}
+
+std::ostream& operator<<(std::ostream& s, const dir& d) {
+    switch (d) {
+        case STOP:
+            return s << "STOP";
+        case FORWARD:
+            return s << "FORWARD";
+        case BACKWARD:
+            return s << "BACKWARD";
     }
 }
 
@@ -135,7 +148,7 @@ void locoCallback(const motor_bridge::System::ConstPtr &msg) {
 void excavCallback(const motor_bridge::System::ConstPtr &msg) {
     int speed = msg->digger.rpm;
     ROS_INFO_STREAM("Drive Message Received."
-        << "speed: " << speed)
+        << "speed: " << speed);
 
     uint8_t message[8];
     int can_id;
@@ -191,5 +204,5 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
     pitchCallback(msg);
     excavCallback(msg);
     locoCallback(msg);
-    steppCallbac(msg);
+    steppCallback(msg);
 }
