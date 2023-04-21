@@ -5,6 +5,8 @@ set -x
 
 # robot.sh: runs the main robot container.
 
+xhost +local:root
+
 DIR=..
 IMAGE_NAME=lunabotics-2023-ros
 CONTAINER_NAME=lunabotics-2023-robot
