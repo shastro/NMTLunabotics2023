@@ -56,3 +56,5 @@ docker run "${params[@]}" $IMAGE_NAME roscore
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh /scripts/unfuck_realsense
 
 docker exec -e DISPLAY -d $CONTAINER_NAME /ros_entrypoint.sh rviz
+
+docker exec -e DISPLAY -it $CONTAINER_NAME /ros_entrypoint.sh /bin/bash
