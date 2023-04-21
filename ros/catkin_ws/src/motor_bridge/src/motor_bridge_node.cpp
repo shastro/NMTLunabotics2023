@@ -91,7 +91,7 @@ void estopCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
-    char dir = msg->pitch.direction;
+    int dir = msg->pitch.direction;
     motor m = (motor)msg->pitch.motor;
     ROS_INFO_STREAM("Pitch Message Received. dir: " << dir << " motor: " << m);
 
@@ -205,5 +205,4 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
     //excavCallback(msg);
     //locoCallback(msg);
     //steppCallback(msg);
-    ROS_INFO("Called Back");
 }
