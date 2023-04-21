@@ -1,22 +1,8 @@
 #include <iostream>
 #include <ncurses.h>
-/*
-#include <motor_bridge/Digger.h>
-#include <motor_bridge/Drive.h>
-#include <motor_bridge/Estop.h>
-#include <motor_bridge/Pitch.h>
-#include <motor_bridge/Stepp.h>
-<<<<<<< HEAD
-#include <motor_bridge/Estop.h>
-*/
 #include <motor_bridge/System.h>
 #include <ros/ros.h>
-//#include <std_msgs/String.h>
-=======
-#include <ros/ros.h>
 #include <sstream>
-#include <std_msgs/String.h>
->>>>>>> main
 #include <string>
 #include <unistd.h>
 #include <unordered_map>
@@ -33,7 +19,6 @@
         attroff(A_BOLD);                                                       \
     } while (0)
 
-<<<<<<< HEAD
 // Control maps
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
 //enum control { PITCH = 0, DRIVE = 1, DEPTH = 2, DIGGER = 3 };
@@ -70,7 +55,6 @@ std::ostream &operator<<(std::ostream &s, motor m) {
     }
     return s;
 }
-=======
 enum class motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
 enum class control { PITCH = 0, LOCO = 1, STEPP = 2 };
 enum class direction { STOP = 0, FORWARD = 1, BACKWARD = 2 };
@@ -146,7 +130,6 @@ struct target {
         return s;
     }
 };
->>>>>>> main
 
 std::ostream &operator<<(std::ostream &s, direction d) {
     switch (d) {
@@ -216,7 +199,6 @@ return s;
 }
 };
 
-<<<<<<< HEAD
 struct sys {
 pitch_target pitch;
 loco_target loco;
@@ -227,7 +209,6 @@ s << t.pitch << t.loco << t.stepp << t.digger << std::endl;
 return s;
 }
 };
-=======
 static struct {
     pitch_target pitch;
     loco_target loco;
@@ -237,7 +218,6 @@ static struct {
 
 static control sel_c;
 static motor sel_m = motor::BOTH;
->>>>>>> main
 
 static sys motorsys;
 */
@@ -281,16 +261,13 @@ static void digger_stop();
 //static void stop_selected();
 static void stop_all();
 static void estop();
-<<<<<<< HEAD
-static void estart();
-static void quit();
-=======
 static void send_targets();
 static void send_pitch();
 static void send_loco(motor m);
 static void send_stepp();
 static void send_digger();
->>>>>>> main
+static void estart();
+static void quit();
 
 // Can handlers
 static void send_targets();
@@ -402,7 +379,6 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-<<<<<<< HEAD
 static void drive_forward() {
     s.left.rpm = max;
     s.right.rpm = max;
@@ -506,7 +482,6 @@ static void estop() {
 
 static void estart() {
     s.estop = false;
-=======
         switch (n) {
         case 'p': // Select Pitch
             sel_c = control::PITCH;
@@ -679,7 +654,6 @@ static void send_stepp() {
     msg.rpm = motorsys.stepp.rpm.right;
     msg.direction = (int)motorsys.stepp.dir.right;
     stepp_pub.publish(msg);
->>>>>>> main
 }
 
 static void quit() {
@@ -724,7 +698,6 @@ static void quit() {
    */
 
 static void print_status() {
-<<<<<<< HEAD
     std::stringstream ss;
     ss << "Drive left: " << s.left.rpm
         << ", right: " << s.right.rpm << std::endl;
@@ -737,7 +710,6 @@ static void print_status() {
     ss << "Estop" << s.estop << std::endl;
     printw(ss.str().c_str());
     refresh();
-=======
     std::ostringstream status;
     status << "Pitch target: " << std::endl
            << motorsys.pitch.length << std::endl
@@ -750,7 +722,6 @@ static void print_status() {
            << "Selected control: " << sel_c << "  Selected motor: " << sel_m
            << std::endl;
     printw("%s", status.str().c_str());
->>>>>>> main
 }
 
 static void print_keybinds() {
