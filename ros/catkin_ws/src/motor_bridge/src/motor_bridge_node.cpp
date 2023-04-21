@@ -98,6 +98,7 @@ void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
     uint8_t message[8];
     int can_id = DAVID_PITCH_CTRL_BOTH_FRAME_ID;
     
+
     if (m == LEFT) {
         david_pitch_ctrl_left_t left = {
             .command = (uint8_t)dir,
