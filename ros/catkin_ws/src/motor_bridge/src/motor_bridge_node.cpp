@@ -148,17 +148,17 @@ void locoCallback(const motor_bridge::System::ConstPtr &msg) {
 
 void excavCallback(const motor_bridge::System::ConstPtr &msg) {
     int speed = msg->digger.rpm;
-    ROS_INFO_STREAM("Drive Message Received."
+    ROS_INFO_STREAM("Digger Message Received."
         << "speed: " << speed);
 
     uint8_t message[8];
     int can_id;
 
-    david_excav_ctrl_t left = {
+    david_excav_ctrl_t e = {
         .rpm = (uint64_t)speed
     };
-    david_excav_ctrl_pack(message, &left, sizeof(message));
-    can_id = DAVID_EXCAV_CTRL_FRAME_ID;
+    david_excav_ctrl_pack(message, &e, sizeof(message));
+    can_id = 0x500; //DAVID_EXCAV_CTRL_FRAME_ID;
 
     can.transmit(can_id, message);
 }
