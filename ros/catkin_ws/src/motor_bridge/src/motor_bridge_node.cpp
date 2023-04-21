@@ -18,6 +18,7 @@ enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
 enum dir { STOP = 0, FORWARD = 1, BACKWARD = 2 };
 
 //TODO better ros logging
+//TODO also stop using ros logging
 std::ostream& operator<<(std::ostream& os, const motor& m);
 std::ostream& operator<<(std::ostream& os, const dir& d);
 void estopCallback(const motor_bridge::System::ConstPtr &msg);
@@ -91,6 +92,8 @@ void estopCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
+    //TODO fix the weird shit
+    //TODO when you push the button quickly it keeps going and then crashes
     int dir = msg->pitch.direction;
     motor m = (motor)msg->pitch.motor;
     ROS_INFO_STREAM("Pitch Message Received. dir: " << dir << " motor: " << m);
