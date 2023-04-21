@@ -91,14 +91,13 @@ void estopCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
-    int dir = msg->pitch.direction;
+    char dir = msg->pitch.direction;
     motor m = (motor)msg->pitch.motor;
     ROS_INFO_STREAM("Pitch Message Received. dir: " << dir << " motor: " << m);
 
     uint8_t message[8];
     int can_id = DAVID_PITCH_CTRL_BOTH_FRAME_ID;
     
-    /*
     if (m == LEFT) {
         david_pitch_ctrl_left_t left = {
             .command = (uint8_t)dir,
@@ -118,20 +117,7 @@ void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
         david_pitch_ctrl_both_pack(message, &both, sizeof(message));
         can_id = DAVID_PITCH_CTRL_BOTH_FRAME_ID;
     }
-    can.transmit(can_id, message);*/
-
-    struct can_frame frame;
-    frame.can_id = can_id;
-    frame.can_dlc = 8;
-    frame.data[0] = (dir >> 24) & 0xFF;
-    frame.data[1] = (dir >> 16) & 0xFF;
-    frame.data[2] = (dir >> 8) & 0xFF;
-    frame.data[3] = dir & 0xFF;
-    frame.data[4] = 0;
-    frame.data[5] = 0;
-    frame.data[6] = 0;
-    frame.data[7] = 0;
-    can.transmit(frame);
+    can.transmit(can_id, message);
 }
 
 void locoCallback(const motor_bridge::System::ConstPtr &msg) {

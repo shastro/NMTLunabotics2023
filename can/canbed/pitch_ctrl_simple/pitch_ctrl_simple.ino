@@ -153,15 +153,17 @@ void loop()
 
         // Set lengths
         // If PITCH_CTRL_BOTH both if statements will fire.
+        david_pitch_ctrl_both_t msg;
+        david_pitch_ctrl_both_unpack(&msg, buf, 8);
         if (canId == DAVID_PITCH_CTRL_BOTH_FRAME_ID) {
-            left_dir = extract_value(buf, 0, 6);
+            left_dir = msg.command;
             right_dir = left_dir;
         }
         if (canId == DAVID_PITCH_CTRL_LEFT_FRAME_ID) {
-            left_dir = extract_value(buf, 0, 6);
+            left_dir = msg.command;
         }
         if (canId == DAVID_PITCH_CTRL_RIGHT_FRAME_ID) {
-            right_dir = extract_value(buf, 0, 6);
+            right_dir = msg.command;
         }
 
         // Print CAN message

@@ -12,27 +12,29 @@ echo "Add '129.138.xxx.xxx  jetson' to /etc/hosts for network support"
 
 ip=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 
+# Add this line for controller support
+#    --device=/dev/input/js0 \
+
 sudo docker run \
     --rm \
     -it \
     --net=host \
-# Uncomment for controller support
-#    --device=/dev/input/js0 \
+    --device=/dev/input/js0 \
     -v $DIR:$DIR \
     -e DISPLAY \
-    -e ROS_IP=$ip
-    -e ROS_IP=http://jetson:11311 \
+    -e ROS_IP=$ip \
+    -e ROS_MASTER_URI=http://jetson:11311 \
     -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
     -v /dev:/dev:rw \
     --device-cgroup-rule "c 81:* rmw" \
     --device-cgroup-rule "c 189:* rmw" \
     lunabotics-2023-ros \
     sh -c "
-    cd $PWD
-    export HOME="$HOME"
-    export PS1='\u@\h:\w\$ '
-    [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
-    bash
+        cd $PWD
+        export HOME="$HOME"
+        export PS1='\u@\h:\w\$ '
+        [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
+        bash
     "
 
 # ROS might create files owned by root here; it'll cause all kinds of
