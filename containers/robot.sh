@@ -5,16 +5,9 @@ set -x
 
 # robot.sh: runs the main robot container.
 
-DIR=../ros
+DIR=..
 IMAGE_NAME=lunabotics-2023-ros
 CONTAINER_NAME=lunabotics-2023-robot
-
-# Fix `can` symlink issue. This is smooth brain but it works
-# if [ -h ../ros/catkin_ws/src/motor_bridge/src/can ]; then
-    cp -r ../can/bus_spec ../ros/catkin_ws/src/motor_bridge/src/can_
-    rm -rf ../ros/catkin_ws/src/motor_bridge/src/can
-    mv ../ros/catkin_ws/src/motor_bridge/src/can_ ../ros/catkin_ws/src/motor_bridge/src/can
-# fi
 
 # Build the image.
 docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
@@ -64,5 +57,3 @@ docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun motor_bridge loco_ctrl
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun motor_bridge stepp_ctrl
 
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun motor_bridge excav_ctrl
-# # For now run keyboard control here.
-# docker exec -it $CONTAINER_NAME /ros_entrypoint.sh rosrun david_keyboard david_keyboard

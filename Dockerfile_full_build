@@ -18,19 +18,18 @@ RUN apt-get install -y \
     ros-noetic-grid-map-core \
     ros-noetic-grid-map-ros \
     ros-noetic-eigen-conversions \
-    ros-noetic-gazebo-ros 
-    
+    ros-noetic-gazebo-ros
 
-COPY scripts /scripts
-# COPY catkin_ws /catkin_ws
-COPY catkin_ws/.catkin_workspace /catkin_ws/.catkin_workspace
-# COPY catkin_ws/src/CMakeLists.txt /catkin_ws/src/CMakeLists.txt
-COPY catkin_ws/src/david_tui /catkin_ws/src/david_tui
-COPY catkin_ws/src/motor_bridge /catkin_ws/src/david_tui
+RUN apt-get install -y ros-noetic-robot-pose-ekf
 
-RUN cd /catkin_ws && \
-    rm -rf /catkin_ws/build /catkin_ws/devel && \
+COPY ros/scripts /ros/scripts
+COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
+COPY ros/catkin_ws/src /ros/catkin_ws/src
+COPY can /can
+
+RUN cd /ros/catkin_ws && \
+    rm -rf /ros/catkin_ws/build /ros/catkin_ws/devel && \
     /ros_entrypoint.sh catkin_make
 
 # Add /catkin_ws to the ROS environment.
-COPY ros_entrypoint.sh /ros_entrypoint.sh
+COPY ros/ros_entrypoint.sh /ros_entrypoint.sh
