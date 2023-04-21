@@ -23,12 +23,13 @@ params=(
     --network=host
 
     # Allow access to devices.
-    --volume=/dev:/dev
+    --volume=/dev:/dev:rw
 
     # X11 forwarding support
     --volume=/tmp:/tmp:rw
-    --volume=/dev/dri:/dev/dri:rw
 
+    --gpus=all
+    
     # Device rules for accessing Realsense cameras.
     --device-cgroup-rule "c 81:* rmw"
     --device-cgroup-rule "c 189:* rmw"
