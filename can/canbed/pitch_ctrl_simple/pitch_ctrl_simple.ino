@@ -114,7 +114,7 @@ void setup()
     pinMode(PIN_TABLE[MOTOR_RIGHT][P2], OUTPUT);
 
 
-    Serial.begin(115200);
+    Serial.begin(9600);
     while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
     {
         Serial.println("CAN BUS FAIL!");
@@ -155,6 +155,7 @@ void loop()
         // If PITCH_CTRL_BOTH both if statements will fire.
         david_pitch_ctrl_both_t msg;
         david_pitch_ctrl_both_unpack(&msg, buf, 8);
+        Serial.println((String)msg.command);
         if (canId == DAVID_PITCH_CTRL_BOTH_FRAME_ID) {
             left_dir = msg.command;
             right_dir = left_dir;
