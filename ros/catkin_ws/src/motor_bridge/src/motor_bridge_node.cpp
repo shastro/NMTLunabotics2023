@@ -158,7 +158,7 @@ void excavCallback(const motor_bridge::System::ConstPtr &msg) {
         .rpm = (uint64_t)speed
     };
     david_excav_ctrl_pack(message, &e, sizeof(message));
-    can_id = 0x500; //DAVID_EXCAV_CTRL_FRAME_ID;
+    can_id = DAVID_EXCAV_CTRL_FRAME_ID;
 
     can.transmit(can_id, message);
 }
@@ -204,6 +204,6 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
     estopCallback(msg);
     pitchCallback(msg);
     excavCallback(msg);
-    locoCallback(msg);
+    //locoCallback(msg);
     steppCallback(msg);
 }
