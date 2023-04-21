@@ -51,8 +51,12 @@ int main(int argc, char *argv[]) {
         s.right.rpm = g.right_stick.y;
 
         // Pitch dpad up/down
-        s.pitch.direction = g.dpad.up ? 1 : 0;
-        s.pitch.direction = g.dpad.down ? 2 : s.pitch.direction;
+        if (g.dpad.up)
+            s.pitch.direction = 1;
+        else if (g.dpad.down)
+            s.pitch.direction = 2;
+        else
+            s.pitch.direction = 0;
         s.pitch.motor = 0;
 
         // Extend bumpers
