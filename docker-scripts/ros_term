@@ -19,7 +19,6 @@ sudo docker run \
     --rm \
     -it \
     --net=host \
-    --device=/dev/input/js0 \
     -v $DIR:$DIR \
     -e DISPLAY \
     -e ROS_IP=$ip \

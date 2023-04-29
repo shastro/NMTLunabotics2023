@@ -24,10 +24,10 @@ include_directories(${catkin_INCLUDE_DIRS})
 # Nodes this package depends on
 
 # david_tui node
-add_executable(david_tui src/tui.cpp)
-add_dependencies(david_tui motor_bridge
-    ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(david_tui ${catkin_LIBRARIES} ncurses)
+#add_executable(david_tui src/tui.cpp)
+#add_dependencies(david_tui motor_bridge
+#    ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(david_tui ${catkin_LIBRARIES} ncurses)
 
 install(TARGETS motor_bridge
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
