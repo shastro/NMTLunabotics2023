@@ -18,7 +18,6 @@ enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
 enum dir { STOP = 0, FORWARD = 1, BACKWARD = 2 };
 
 //TODO better ros logging
-//TODO also stop using ros logging
 std::ostream& operator<<(std::ostream& os, const motor& m);
 std::ostream& operator<<(std::ostream& os, const dir& d);
 void estopCallback(const motor_bridge::System::ConstPtr &msg);
@@ -41,7 +40,7 @@ int main(int argc, char **argv) {
         // Callback event loop
         ros::spin();
     } catch (std::string err) {
-        ROS_ERROR_STREAM("Something Happened" << err);
+        std::cout << err << std::endl;
         return 1;
     }
 }
@@ -80,20 +79,21 @@ void estopCallback(const motor_bridge::System::ConstPtr &msg) {
         david_e_stop_pack(message, &estop, sizeof(message));
         can_id = DAVID_E_STOP_FRAME_ID;
 
-        can.transmit(can_id, message);
     } else {
         ROS_INFO("NOT ESTOP");
         david_e_start_t estart = {};
         david_e_start_pack(message, &estart, sizeof(message));
         can_id = DAVID_E_START_FRAME_ID;
 
+    }
+    try {
         can.transmit(can_id, message);
+    } catch (std::string err) {
+        ROS_WARN_STREAM("estop failed: " << err);
     }
 }
 
 void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
-    //TODO fix the weird shit
-    //TODO when you push the button quickly it keeps going and then crashes
     int dir = msg->pitch.direction;
     motor m = (motor)msg->pitch.motor;
     ROS_INFO_STREAM("Pitch Message Received. dir: " << dir << " motor: " << m);
@@ -121,7 +121,11 @@ void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
         david_pitch_ctrl_both_pack(message, &both, sizeof(message));
         can_id = DAVID_PITCH_CTRL_BOTH_FRAME_ID;
     }
-    can.transmit(can_id, message);
+    try {
+        can.transmit(can_id, message);
+    } catch (std::string err) {
+        ROS_WARN_STREAM("pitch failed: " << err);
+    }
 }
 
 void locoCallback(const motor_bridge::System::ConstPtr &msg) {
@@ -133,20 +137,27 @@ void locoCallback(const motor_bridge::System::ConstPtr &msg) {
 
     uint8_t message[8];
     int can_id;
-
     david_loco_ctrl_left_t left = {
         .velocity = (uint64_t)lspeed
     };
     david_loco_ctrl_left_pack(message, &left, sizeof(message));
     can_id = DAVID_LOCO_CTRL_LEFT_FRAME_ID;
-    can.transmit(can_id, message);
+    try {
+        can.transmit(can_id, message);
+    } catch (std::string err) {
+        ROS_WARN_STREAM("left motor failed: " << err);
+    }
 
     david_loco_ctrl_right_t right = {
         .velocity = (uint64_t)rspeed
     };
     david_loco_ctrl_right_pack(message, &right, sizeof(message));
     can_id = DAVID_LOCO_CTRL_RIGHT_FRAME_ID;
-    can.transmit(can_id, message);
+    try {
+        can.transmit(can_id, message);
+    } catch (std::string err) {
+        ROS_WARN_STREAM("right motor failed: " << err);
+    }
 }
 
 void excavCallback(const motor_bridge::System::ConstPtr &msg) {
@@ -163,7 +174,11 @@ void excavCallback(const motor_bridge::System::ConstPtr &msg) {
     david_excav_ctrl_pack(message, &e, sizeof(message));
     can_id = DAVID_EXCAV_CTRL_FRAME_ID;
 
-    can.transmit(can_id, message);
+    try {
+        can.transmit(can_id, message);
+    } catch (std::string err) {
+        ROS_WARN_STREAM("excav failed: " << err);
+    }
 }
 
 void steppCallback(const motor_bridge::System::ConstPtr &msg) {
@@ -200,13 +215,17 @@ void steppCallback(const motor_bridge::System::ConstPtr &msg) {
         can_id = DAVID_STEPPER_CTRL_BOTH_FRAME_ID;
     }
 
-    can.transmit(can_id, message);
+    try {
+        can.transmit(can_id, message);
+    } catch (std::string err) {
+        ROS_WARN_STREAM("stepp failed: " << err);
+    }
 }
 
 void callback(const motor_bridge::System::ConstPtr &msg) {
     estopCallback(msg);
     pitchCallback(msg);
-    //excavCallback(msg);
-    //locoCallback(msg);
+    excavCallback(msg);
+    locoCallback(msg);
     steppCallback(msg);
 }
