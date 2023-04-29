@@ -24,8 +24,8 @@ RUN apt-get install -y \
 
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
-COPY ros/catkin_ws/src /catkin_ws/src
-COPY can /cak
+COPY ros/catkin_ws/src /ros/catkin_ws/src
+COPY can /can
 
 RUN cd /ros/catkin_ws && \
     rm -rf /ros/catkin_ws/build /ros/catkin_ws/devel && \
