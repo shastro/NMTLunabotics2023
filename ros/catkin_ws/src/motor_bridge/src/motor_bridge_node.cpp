@@ -15,11 +15,21 @@
 static SocketCAN can;
 
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
-enum dir { STOP = 0, FORWARD = 1, BACKWARD = 2 };
+enum direction { STOP = 0, FORWARD = 1, BACKWARD = 2 };
+
+bool lastEstop;
+motor lastPitchM;
+direction lastPitchDir;
+int lastLSpeed;
+int lastRSpeed;
+int lastExcavSpeed;
+motor lastSteppM;
+direction lastSteppDir;
+int lastSteppRpm;
 
 //TODO better ros logging
 std::ostream& operator<<(std::ostream& os, const motor& m);
-std::ostream& operator<<(std::ostream& os, const dir& d);
+std::ostream& operator<<(std::ostream& os, const direction& d);
 void estopCallback(const motor_bridge::System::ConstPtr &msg);
 void pitchCallback(const motor_bridge::System::ConstPtr &msg);
 void locoCallback(const motor_bridge::System::ConstPtr &msg);
@@ -56,7 +66,7 @@ std::ostream& operator<<(std::ostream& s, const motor& m) {
     }
 }
 
-std::ostream& operator<<(std::ostream& s, const dir& d) {
+std::ostream& operator<<(std::ostream& s, const direction& d) {
     switch (d) {
         case STOP:
             return s << "STOP";
@@ -69,6 +79,8 @@ std::ostream& operator<<(std::ostream& s, const dir& d) {
 
 void estopCallback(const motor_bridge::System::ConstPtr &msg) {
     bool stop = msg->estop;
+    if (stop == lastEstop) { return; }
+    lastEstop = stop;
 
     uint8_t message[8];
     int can_id;
@@ -84,7 +96,6 @@ void estopCallback(const motor_bridge::System::ConstPtr &msg) {
         david_e_start_t estart = {};
         david_e_start_pack(message, &estart, sizeof(message));
         can_id = DAVID_E_START_FRAME_ID;
-
     }
     try {
         can.transmit(can_id, message);
@@ -94,8 +105,12 @@ void estopCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
-    int dir = msg->pitch.direction;
+    direction dir = (direction)msg->pitch.direction;
     motor m = (motor)msg->pitch.motor;
+    if (dir == lastPitchDir && m == lastPitchM) { return; }
+    lastPitchDir = dir;
+    lastPitchM = m;
+
     ROS_INFO_STREAM("Pitch Message Received. dir: " << dir << " motor: " << m);
 
     uint8_t message[8];
@@ -130,7 +145,11 @@ void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
 
 void locoCallback(const motor_bridge::System::ConstPtr &msg) {
     int lspeed = msg->left.rpm;
-    int rspeed = msg->left.rpm;
+    int rspeed = msg->right.rpm;
+    if (lspeed == lastLSpeed && rspeed == lastRSpeed) { return; }
+    lastLSpeed = lspeed;
+    lastRSpeed = rspeed;
+
     ROS_INFO_STREAM("Drive Message Received."
         << " left motor: " << lspeed
         << ", right motor: " << rspeed);
@@ -162,6 +181,9 @@ void locoCallback(const motor_bridge::System::ConstPtr &msg) {
 
 void excavCallback(const motor_bridge::System::ConstPtr &msg) {
     int speed = msg->digger.rpm;
+    if (speed == lastExcavSpeed) { return; }
+    lastExcavSpeed = speed;
+
     ROS_INFO_STREAM("Digger Message Received."
         << "speed: " << speed);
 
@@ -183,8 +205,13 @@ void excavCallback(const motor_bridge::System::ConstPtr &msg) {
 
 void steppCallback(const motor_bridge::System::ConstPtr &msg) {
     motor m = (motor)msg->extend.motor;
-    dir d = (dir)msg->extend.direction;
+    direction d = (direction)msg->extend.direction;
     int rpm = msg->extend.rpm;
+    if (m == lastSteppM && d == lastSteppDir && rpm == lastSteppRpm) { return; }
+    lastSteppM = m;
+    lastSteppDir = d;
+    lastSteppRpm = rpm;
+
     ROS_INFO_STREAM("Stepp Message Received. motor: " << m
         << " direction: " << d
         << " rmp: " << rpm);

@@ -52,6 +52,9 @@ void loop() {
         CAN.readMsgBuf(&len, buf);
         uint32_t canId = CAN.getCanId();
 
+        // unpack data
+        david_stepper_ctrl_both_t msg;
+        david_stepper_ctrl_both_unpack(&msg, buf, 8);
         // IF ESTOP stop other behaviors
         if (canId == DAVID_E_STOP_FRAME_ID) {
             estopped = true;
@@ -65,8 +68,8 @@ void loop() {
             (canId == DAVID_STEPPER_CTRL_RIGHT_FRAME_ID) ||
             (canId == DAVID_STEPPER_CTRL_BOTH_FRAME_ID))
             {
-                rpm = extract_value(buf, 0, 4);
-                move_dir = extract_value(buf, 4, 4);
+                rpm = msg.rpm;
+                move_dir = msg.direction;
         }
     }
 
