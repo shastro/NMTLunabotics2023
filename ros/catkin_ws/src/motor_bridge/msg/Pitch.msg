@@ -1,7 +1,8 @@
 # Pitch Control Message
 
+# Home (false - normal operation, true - home to direction)
+bool home
+
 # Pitch motion direction: (0 = stop, 1 = extend, 2 = retract)
 int32 direction
 
-# Which motor (0 = both, 1 = left, 2 = right)
-int32 motor

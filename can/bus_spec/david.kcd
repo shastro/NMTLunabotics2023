@@ -3,8 +3,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="http://kayak.2codeornot2code.org/1.0"
     xsi:noNamespaceSchemaLocation="Definition.xsd">
-  <Document name="DAVIID" version="2.0" author="NMT Lunabotics"
-            date="2023-03-22">
+<Document name="DAVIID" version="2.0" author="NMT Lunabotics"
+    date="2023-03-22">
     The NMT Lunabotics robot of 2022-'23.
   </Document>
 
@@ -15,138 +15,114 @@
   <Node id="4" name="Excavation Controller"/>
 
   <Bus name="Main">
-    <Message id="0x000" name="EStop">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-    </Message>
+      <Message id="0x000" name="EStop">
+          <!-- Priority 0 -->
+          <Producer>
+              <NodeRef id="0"/>
+          </Producer>
+          <Signal name="Stop" offset="0" length="8"/>
+              <!-- Estop -->
+              <!-- 0: Stop -->
+              <!-- 1: Go -->
+      </Message>
 
-    <Message id="0x001" name="EStart">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-    </Message>
+      <Message id="0x100" name="PitchCtrl">
+          <!--Priority 2 -->
+          <!--TODO change to position between 0 and 1024 -->
+          <Producer>
+              <NodeRef id="2"/>
+          </Producer>
+          <Signal name="Home" offset="0" length="8"/>
+              <!-- 0: Normal operation -->
+              <!-- 1: Home to direction -->
+          <Signal name="Direction" offset="8" length="8"/>
+              <!-- 0: stop -->
+              <!-- 1: forward -->
+              <!-- 2: retract -->
+      </Message>
 
-    <Message id="0x010" name="PitchCtrlHome">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-    </Message>
+      <Message id="0x101" name="PitchAdjust">
+          <!-- Priority 1 -->
+          <Producer>
+              <NodeRef id="2"/>
+          </Producer>
+          <Signal name="Motor" offset="0" length = "8" />
+              <!-- 0: both -->
+              <!-- 1: left -->
+              <!-- 2: right -->
+          <Signal name="Dir" offset="8" length="8" />
+              <!-- 0: stop -->
+              <!-- 1: forward -->
+              <!-- 2: retract -->
+          <Signal name="Amount" offset="16" length="16" />
+              <!-- Amount to adjust: 0 - 64 -->
+      </Message>
 
-    <Message id="0x020" name="SetTrigDelay">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-      <Signal name="Microseconds" offset="0" length="48"/>
-      <Signal name="MaxCount" offset="48" length="16" />
-    </Message>
+      <Message id="0x111" name="PitchTelem">
+          <!-- Priority 3 -->
+          <Producer>
+              <NodeRef id="2"/>
+          </Producer>
+          <Signal name="LeftCount" offset="0" length="16"/>
+          <Signal name="LeftDirection" offset="16" length="16"/>
+          <Signal name="RightCount" offset="32" length="16"/>
+          <Signal name="RightDirection" offset="48" length="16"/>
+      </Message>
 
-    <Message id="0x101" name="PitchCtrlLeft">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-      <!-- <Signal name="Count" offset="0" length="48"/> -->
-      <!-- <Signal name="Tolerance" offset="48" length="16"/> -->
-      <Signal name="Command" offset="0" length="8"/>
-      <!-- 0: stop -->
-      <!-- 1: forward -->
-      <!-- 2: retract -->
-    </Message>
-
-    <Message id="0x110" name="PitchCtrlRight">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-      <!-- <Signal name="Count" offset="0" length="48"/> -->
-      <!-- <Signal name="Tolerance" offset="48" length="16"/> -->
-      <Signal name="Command" offset="0" length="8"/>
-      <!-- 0: stop -->
-      <!-- 1: forward -->
-      <!-- 2: retract -->
-    </Message>
-
-    <Message id="0x111" name="PitchCtrlBoth">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-      <!-- <Signal name="Count" offset="0" length="48"/> -->
-      <!-- <Signal name="Tolerance" offset="48" length="16"/> -->
-      <Signal name="Command" offset="0" length="8"/>
-      <!-- 0: stop -->
-      <!-- 1: forward -->
-      <!-- 2: retract -->
-    </Message>
-
-    <Message id="0x200" name="PitchTelemLeft">
-      <Producer>
-        <NodeRef id="2"/>
-      </Producer>
-      <Signal name="Count" offset="0" length="48"/>
-      <Signal name="Direction" offset="48" length="16"/>
-    </Message>
-
-    <Message id="0x201" name="PitchTelemRight">
-      <Producer>
-        <NodeRef id="2"/>
-      </Producer>
-      <Signal name="Count" offset="0" length="48"/>
-      <Signal name="Direction" offset="48" length="16"/>
-    </Message>
-
-    <Message id="0x300" name="LocoCtrlLeft">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-      <Signal name="Velocity" offset="0" length="32"
+      <Message id="0x200" name="LocoCtrl">
+          <!-- Priority 1 -->
+          <Producer>
+              <NodeRef id="1"/>
+          </Producer>
+          <Signal name="LeftVel" offset="0" length="32" 
               slope="0.001" type="signed"/>
-    </Message>
+              <!-- value between -1024 and 1024 -->
+          <Signal name="rightVel" offset="32" length="32"
+              slope="0.001" type="signed"/>
+              <!-- value between -1024 and 1024 -->
+      </Message>
 
-    <Message id="0x301" name="LocoCtrlRight">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-      <Signal name="Velocity" offset="0" length="32"
-              slope="0.001" type="signed" />
-    </Message>
+      <Message id="0x201" name="ExcavCtrl">
+          <Producer>
+              <NodeRef id="4"/>
+          </Producer>
+          <Signal name="Dir" offset="0" length="8" />
+              <!-- 0: stop -->
+              <!-- 1: forward -->
+              <!-- 2: retract -->
+      </Message>
 
-    <Message id="0x311" name="LocoCtrlBoth">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-      <Signal name="Velocity" offset="0" length="32"
-              slope="0.001" type="signed" />
-    </Message>
+      <Message id="0x300" name="StepperCtrl">
+          <!-- Priority 1 -->
+          <!--TODO change to position between 0 and 1024 -->
+          <Producer>
+              <NodeRef id="3"/>
+          </Producer>
+          <Signal name="Home" offset="0" length="8"/>
+              <!-- 0: Normal operation -->
+              <!-- 1: Home to direction -->
+          <Signal name="Direction" offset="8" length="8"/>
+              <!-- 0: stop -->
+              <!-- 1: forward -->
+              <!-- 2: retract -->
+          <Signal name="RPM" offset="16" length="32"/>
+              <!-- RPM between 0 and 1024 -->
+      </Message>
 
-    <Message id="0x400" name="StepperCtrlLeft">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-      <Signal name="RPM" offset="0" length="32"/>
-      <Signal name="Direction" offset="32" length="32"/>
-    </Message>
-
-    <Message id="0x401" name="StepperCtrlRight">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-      <Signal name="RPM" offset="0" length="32"/>
-      <Signal name="Direction" offset="32" length="32"/>
-    </Message>
-
-    <Message id="0x411" name="StepperCtrlBoth">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-      <Signal name="RPM" offset="0" length="32"/>
-      <Signal name="Direction" offset="32" length="32"/>
-    </Message>
-
-    <Message id="0x500" name="ExcavCtrl">
-      <Producer>
-        <NodeRef id="0"/>
-      </Producer>
-      <Signal name="RPM" offset="0" length="32"
-              slope="0.001" type="signed" />
-    </Message>
+      <Message id="0x301" name="StepperCtrlAdjust">
+          <Producer>
+              <NodeRef id="3"/>
+          </Producer>
+          <Signal name="Motor" offset="0" length = "8" />
+              <!-- 0: both -->
+              <!-- 1: left -->
+              <!-- 2: right -->
+          <Signal name="Dir" offset="8" length="8" />
+              <!-- 0: stop -->
+              <!-- 1: forward -->
+              <!-- 2: retract -->
+          <Signal name="Amount" offset="16" length="16" />
+              <!-- Amount to adjust: 0 - 64 -->
+      </Message>
   </Bus>
 </NetworkDefinition>

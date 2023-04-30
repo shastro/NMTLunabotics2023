@@ -16,57 +16,33 @@ extern "C" {
 
 /* Frame ids. */
 #define DAVID_E_STOP_FRAME_ID (0x00u)
-#define DAVID_E_START_FRAME_ID (0x01u)
-#define DAVID_PITCH_CTRL_HOME_FRAME_ID (0x10u)
-#define DAVID_SET_TRIG_DELAY_FRAME_ID (0x20u)
-#define DAVID_PITCH_CTRL_LEFT_FRAME_ID (0x101u)
-#define DAVID_PITCH_CTRL_RIGHT_FRAME_ID (0x110u)
-#define DAVID_PITCH_CTRL_BOTH_FRAME_ID (0x111u)
-#define DAVID_PITCH_TELEM_LEFT_FRAME_ID (0x200u)
-#define DAVID_PITCH_TELEM_RIGHT_FRAME_ID (0x201u)
-#define DAVID_LOCO_CTRL_LEFT_FRAME_ID (0x300u)
-#define DAVID_LOCO_CTRL_RIGHT_FRAME_ID (0x301u)
-#define DAVID_LOCO_CTRL_BOTH_FRAME_ID (0x311u)
-#define DAVID_STEPPER_CTRL_LEFT_FRAME_ID (0x400u)
-#define DAVID_STEPPER_CTRL_RIGHT_FRAME_ID (0x401u)
-#define DAVID_STEPPER_CTRL_BOTH_FRAME_ID (0x411u)
-#define DAVID_EXCAV_CTRL_FRAME_ID (0x500u)
+#define DAVID_PITCH_CTRL_FRAME_ID (0x100u)
+#define DAVID_PITCH_ADJUST_FRAME_ID (0x101u)
+#define DAVID_PITCH_TELEM_FRAME_ID (0x111u)
+#define DAVID_LOCO_CTRL_FRAME_ID (0x200u)
+#define DAVID_EXCAV_CTRL_FRAME_ID (0x201u)
+#define DAVID_STEPPER_CTRL_FRAME_ID (0x300u)
+#define DAVID_STEPPER_CTRL_ADJUST_FRAME_ID (0x301u)
 
 /* Frame lengths in bytes. */
-#define DAVID_E_STOP_LENGTH (0u)
-#define DAVID_E_START_LENGTH (0u)
-#define DAVID_PITCH_CTRL_HOME_LENGTH (0u)
-#define DAVID_SET_TRIG_DELAY_LENGTH (8u)
-#define DAVID_PITCH_CTRL_LEFT_LENGTH (1u)
-#define DAVID_PITCH_CTRL_RIGHT_LENGTH (1u)
-#define DAVID_PITCH_CTRL_BOTH_LENGTH (1u)
-#define DAVID_PITCH_TELEM_LEFT_LENGTH (8u)
-#define DAVID_PITCH_TELEM_RIGHT_LENGTH (8u)
-#define DAVID_LOCO_CTRL_LEFT_LENGTH (4u)
-#define DAVID_LOCO_CTRL_RIGHT_LENGTH (4u)
-#define DAVID_LOCO_CTRL_BOTH_LENGTH (4u)
-#define DAVID_STEPPER_CTRL_LEFT_LENGTH (8u)
-#define DAVID_STEPPER_CTRL_RIGHT_LENGTH (8u)
-#define DAVID_STEPPER_CTRL_BOTH_LENGTH (8u)
-#define DAVID_EXCAV_CTRL_LENGTH (4u)
+#define DAVID_E_STOP_LENGTH (1u)
+#define DAVID_PITCH_CTRL_LENGTH (2u)
+#define DAVID_PITCH_ADJUST_LENGTH (6u)
+#define DAVID_PITCH_TELEM_LENGTH (8u)
+#define DAVID_LOCO_CTRL_LENGTH (8u)
+#define DAVID_EXCAV_CTRL_LENGTH (1u)
+#define DAVID_STEPPER_CTRL_LENGTH (8u)
+#define DAVID_STEPPER_CTRL_ADJUST_LENGTH (6u)
 
 /* Extended or standard frame types. */
 #define DAVID_E_STOP_IS_EXTENDED (0)
-#define DAVID_E_START_IS_EXTENDED (0)
-#define DAVID_PITCH_CTRL_HOME_IS_EXTENDED (0)
-#define DAVID_SET_TRIG_DELAY_IS_EXTENDED (0)
-#define DAVID_PITCH_CTRL_LEFT_IS_EXTENDED (0)
-#define DAVID_PITCH_CTRL_RIGHT_IS_EXTENDED (0)
-#define DAVID_PITCH_CTRL_BOTH_IS_EXTENDED (0)
-#define DAVID_PITCH_TELEM_LEFT_IS_EXTENDED (0)
-#define DAVID_PITCH_TELEM_RIGHT_IS_EXTENDED (0)
-#define DAVID_LOCO_CTRL_LEFT_IS_EXTENDED (0)
-#define DAVID_LOCO_CTRL_RIGHT_IS_EXTENDED (0)
-#define DAVID_LOCO_CTRL_BOTH_IS_EXTENDED (0)
-#define DAVID_STEPPER_CTRL_LEFT_IS_EXTENDED (0)
-#define DAVID_STEPPER_CTRL_RIGHT_IS_EXTENDED (0)
-#define DAVID_STEPPER_CTRL_BOTH_IS_EXTENDED (0)
+#define DAVID_PITCH_CTRL_IS_EXTENDED (0)
+#define DAVID_PITCH_ADJUST_IS_EXTENDED (0)
+#define DAVID_PITCH_TELEM_IS_EXTENDED (0)
+#define DAVID_LOCO_CTRL_IS_EXTENDED (0)
 #define DAVID_EXCAV_CTRL_IS_EXTENDED (0)
+#define DAVID_STEPPER_CTRL_IS_EXTENDED (0)
+#define DAVID_STEPPER_CTRL_ADJUST_IS_EXTENDED (0)
 
 /* Frame cycle times in milliseconds. */
 
@@ -81,243 +57,123 @@ extern "C" {
  */
 struct david_e_stop_t {
     /**
-     * Dummy signal in empty message.
+     * Range: -
+     * Scale: 1
+     * Offset: 0
      */
-    uint8_t dummy;
+    uint8_t stop;
 };
 
 /**
- * Signals in message EStart.
+ * Signals in message PitchCtrl.
  *
  * All signal values are as on the CAN bus.
  */
-struct david_e_start_t {
+struct david_pitch_ctrl_t {
     /**
-     * Dummy signal in empty message.
+     * Range: -
+     * Scale: 1
+     * Offset: 0
      */
-    uint8_t dummy;
+    uint8_t home;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t direction;
 };
 
 /**
- * Signals in message PitchCtrlHome.
+ * Signals in message PitchAdjust.
  *
  * All signal values are as on the CAN bus.
  */
-struct david_pitch_ctrl_home_t {
+struct david_pitch_adjust_t {
     /**
-     * Dummy signal in empty message.
+     * Range: -
+     * Scale: 1
+     * Offset: 0
      */
-    uint8_t dummy;
+    uint8_t left_dir;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint16_t left_amount;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t right_dir;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint16_t right_amount;
 };
 
 /**
- * Signals in message SetTrigDelay.
+ * Signals in message PitchTelem.
  *
  * All signal values are as on the CAN bus.
  */
-struct david_set_trig_delay_t {
+struct david_pitch_telem_t {
     /**
      * Range: -
      * Scale: 1
      * Offset: 0
      */
-    uint64_t microseconds;
+    uint16_t left_count;
 
     /**
      * Range: -
      * Scale: 1
      * Offset: 0
      */
-    uint16_t max_count;
+    uint16_t left_direction;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint16_t right_count;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint16_t right_direction;
 };
 
 /**
- * Signals in message PitchCtrlLeft.
+ * Signals in message LocoCtrl.
  *
  * All signal values are as on the CAN bus.
  */
-struct david_pitch_ctrl_left_t {
+struct david_loco_ctrl_t {
     /**
      * Range: -
      * Scale: 1
      * Offset: 0
      */
-    uint8_t command;
-};
-
-/**
- * Signals in message PitchCtrlRight.
- *
- * All signal values are as on the CAN bus.
- */
-struct david_pitch_ctrl_right_t {
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint8_t command;
-};
-
-/**
- * Signals in message PitchCtrlBoth.
- *
- * All signal values are as on the CAN bus.
- */
-struct david_pitch_ctrl_both_t {
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint8_t command;
-};
-
-/**
- * Signals in message PitchTelemLeft.
- *
- * All signal values are as on the CAN bus.
- */
-struct david_pitch_telem_left_t {
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint64_t count;
+    uint32_t left_vel;
 
     /**
      * Range: -
      * Scale: 1
      * Offset: 0
      */
-    uint16_t direction;
-};
-
-/**
- * Signals in message PitchTelemRight.
- *
- * All signal values are as on the CAN bus.
- */
-struct david_pitch_telem_right_t {
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint64_t count;
-
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint16_t direction;
-};
-
-/**
- * Signals in message LocoCtrlLeft.
- *
- * All signal values are as on the CAN bus.
- */
-struct david_loco_ctrl_left_t {
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint32_t velocity;
-};
-
-/**
- * Signals in message LocoCtrlRight.
- *
- * All signal values are as on the CAN bus.
- */
-struct david_loco_ctrl_right_t {
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint32_t velocity;
-};
-
-/**
- * Signals in message LocoCtrlBoth.
- *
- * All signal values are as on the CAN bus.
- */
-struct david_loco_ctrl_both_t {
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint32_t velocity;
-};
-
-/**
- * Signals in message StepperCtrlLeft.
- *
- * All signal values are as on the CAN bus.
- */
-struct david_stepper_ctrl_left_t {
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint32_t rpm;
-
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint32_t direction;
-};
-
-/**
- * Signals in message StepperCtrlRight.
- *
- * All signal values are as on the CAN bus.
- */
-struct david_stepper_ctrl_right_t {
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint32_t rpm;
-
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint32_t direction;
-};
-
-/**
- * Signals in message StepperCtrlBoth.
- *
- * All signal values are as on the CAN bus.
- */
-struct david_stepper_ctrl_both_t {
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint32_t rpm;
-
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint32_t direction;
+    uint32_t right_vel;
 };
 
 /**
@@ -331,7 +187,63 @@ struct david_excav_ctrl_t {
      * Scale: 1
      * Offset: 0
      */
+    uint8_t dir;
+};
+
+/**
+ * Signals in message StepperCtrl.
+ *
+ * All signal values are as on the CAN bus.
+ */
+struct david_stepper_ctrl_t {
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
     uint32_t rpm;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint32_t direction;
+};
+
+/**
+ * Signals in message StepperCtrlAdjust.
+ *
+ * All signal values are as on the CAN bus.
+ */
+struct david_stepper_ctrl_adjust_t {
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t left_dir;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint16_t left_amount;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t right_dir;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint16_t right_amount;
 };
 
 /**
@@ -363,7 +275,34 @@ int david_e_stop_unpack(
     size_t size);
 
 /**
- * Pack message EStart.
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t david_e_stop_stop_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_e_stop_stop_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_e_stop_stop_is_in_range(uint8_t value);
+
+/**
+ * Pack message PitchCtrl.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -371,13 +310,13 @@ int david_e_stop_unpack(
  *
  * @return Size of packed data, or negative error code.
  */
-int david_e_start_pack(
+int david_pitch_ctrl_pack(
     uint8_t *dst_p,
-    const struct david_e_start_t *src_p,
+    const struct david_pitch_ctrl_t *src_p,
     size_t size);
 
 /**
- * Unpack message EStart.
+ * Unpack message PitchCtrl.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -385,64 +324,8 @@ int david_e_start_pack(
  *
  * @return zero(0) or negative error code.
  */
-int david_e_start_unpack(
-    struct david_e_start_t *dst_p,
-    const uint8_t *src_p,
-    size_t size);
-
-/**
- * Pack message PitchCtrlHome.
- *
- * @param[out] dst_p Buffer to pack the message into.
- * @param[in] src_p Data to pack.
- * @param[in] size Size of dst_p.
- *
- * @return Size of packed data, or negative error code.
- */
-int david_pitch_ctrl_home_pack(
-    uint8_t *dst_p,
-    const struct david_pitch_ctrl_home_t *src_p,
-    size_t size);
-
-/**
- * Unpack message PitchCtrlHome.
- *
- * @param[out] dst_p Object to unpack the message into.
- * @param[in] src_p Message to unpack.
- * @param[in] size Size of src_p.
- *
- * @return zero(0) or negative error code.
- */
-int david_pitch_ctrl_home_unpack(
-    struct david_pitch_ctrl_home_t *dst_p,
-    const uint8_t *src_p,
-    size_t size);
-
-/**
- * Pack message SetTrigDelay.
- *
- * @param[out] dst_p Buffer to pack the message into.
- * @param[in] src_p Data to pack.
- * @param[in] size Size of dst_p.
- *
- * @return Size of packed data, or negative error code.
- */
-int david_set_trig_delay_pack(
-    uint8_t *dst_p,
-    const struct david_set_trig_delay_t *src_p,
-    size_t size);
-
-/**
- * Unpack message SetTrigDelay.
- *
- * @param[out] dst_p Object to unpack the message into.
- * @param[in] src_p Message to unpack.
- * @param[in] size Size of src_p.
- *
- * @return zero(0) or negative error code.
- */
-int david_set_trig_delay_unpack(
-    struct david_set_trig_delay_t *dst_p,
+int david_pitch_ctrl_unpack(
+    struct david_pitch_ctrl_t *dst_p,
     const uint8_t *src_p,
     size_t size);
 
@@ -453,7 +336,7 @@ int david_set_trig_delay_unpack(
  *
  * @return Encoded signal.
  */
-uint64_t david_set_trig_delay_microseconds_encode(double value);
+uint8_t david_pitch_ctrl_home_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -462,7 +345,7 @@ uint64_t david_set_trig_delay_microseconds_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_set_trig_delay_microseconds_decode(uint64_t value);
+double david_pitch_ctrl_home_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -471,7 +354,7 @@ double david_set_trig_delay_microseconds_decode(uint64_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_set_trig_delay_microseconds_is_in_range(uint64_t value);
+bool david_pitch_ctrl_home_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -480,7 +363,7 @@ bool david_set_trig_delay_microseconds_is_in_range(uint64_t value);
  *
  * @return Encoded signal.
  */
-uint16_t david_set_trig_delay_max_count_encode(double value);
+uint8_t david_pitch_ctrl_direction_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -489,7 +372,7 @@ uint16_t david_set_trig_delay_max_count_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_set_trig_delay_max_count_decode(uint16_t value);
+double david_pitch_ctrl_direction_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -498,10 +381,10 @@ double david_set_trig_delay_max_count_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_set_trig_delay_max_count_is_in_range(uint16_t value);
+bool david_pitch_ctrl_direction_is_in_range(uint8_t value);
 
 /**
- * Pack message PitchCtrlLeft.
+ * Pack message PitchAdjust.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -509,13 +392,13 @@ bool david_set_trig_delay_max_count_is_in_range(uint16_t value);
  *
  * @return Size of packed data, or negative error code.
  */
-int david_pitch_ctrl_left_pack(
+int david_pitch_adjust_pack(
     uint8_t *dst_p,
-    const struct david_pitch_ctrl_left_t *src_p,
+    const struct david_pitch_adjust_t *src_p,
     size_t size);
 
 /**
- * Unpack message PitchCtrlLeft.
+ * Unpack message PitchAdjust.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -523,8 +406,8 @@ int david_pitch_ctrl_left_pack(
  *
  * @return zero(0) or negative error code.
  */
-int david_pitch_ctrl_left_unpack(
-    struct david_pitch_ctrl_left_t *dst_p,
+int david_pitch_adjust_unpack(
+    struct david_pitch_adjust_t *dst_p,
     const uint8_t *src_p,
     size_t size);
 
@@ -535,7 +418,7 @@ int david_pitch_ctrl_left_unpack(
  *
  * @return Encoded signal.
  */
-uint8_t david_pitch_ctrl_left_command_encode(double value);
+uint8_t david_pitch_adjust_left_dir_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -544,7 +427,7 @@ uint8_t david_pitch_ctrl_left_command_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_pitch_ctrl_left_command_decode(uint8_t value);
+double david_pitch_adjust_left_dir_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -553,10 +436,91 @@ double david_pitch_ctrl_left_command_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_pitch_ctrl_left_command_is_in_range(uint8_t value);
+bool david_pitch_adjust_left_dir_is_in_range(uint8_t value);
 
 /**
- * Pack message PitchCtrlRight.
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint16_t david_pitch_adjust_left_amount_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_pitch_adjust_left_amount_decode(uint16_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_pitch_adjust_left_amount_is_in_range(uint16_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t david_pitch_adjust_right_dir_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_pitch_adjust_right_dir_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_pitch_adjust_right_dir_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint16_t david_pitch_adjust_right_amount_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_pitch_adjust_right_amount_decode(uint16_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_pitch_adjust_right_amount_is_in_range(uint16_t value);
+
+/**
+ * Pack message PitchTelem.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -564,13 +528,13 @@ bool david_pitch_ctrl_left_command_is_in_range(uint8_t value);
  *
  * @return Size of packed data, or negative error code.
  */
-int david_pitch_ctrl_right_pack(
+int david_pitch_telem_pack(
     uint8_t *dst_p,
-    const struct david_pitch_ctrl_right_t *src_p,
+    const struct david_pitch_telem_t *src_p,
     size_t size);
 
 /**
- * Unpack message PitchCtrlRight.
+ * Unpack message PitchTelem.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -578,8 +542,8 @@ int david_pitch_ctrl_right_pack(
  *
  * @return zero(0) or negative error code.
  */
-int david_pitch_ctrl_right_unpack(
-    struct david_pitch_ctrl_right_t *dst_p,
+int david_pitch_telem_unpack(
+    struct david_pitch_telem_t *dst_p,
     const uint8_t *src_p,
     size_t size);
 
@@ -590,7 +554,7 @@ int david_pitch_ctrl_right_unpack(
  *
  * @return Encoded signal.
  */
-uint8_t david_pitch_ctrl_right_command_encode(double value);
+uint16_t david_pitch_telem_left_count_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -599,7 +563,7 @@ uint8_t david_pitch_ctrl_right_command_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_pitch_ctrl_right_command_decode(uint8_t value);
+double david_pitch_telem_left_count_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -608,117 +572,7 @@ double david_pitch_ctrl_right_command_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_pitch_ctrl_right_command_is_in_range(uint8_t value);
-
-/**
- * Pack message PitchCtrlBoth.
- *
- * @param[out] dst_p Buffer to pack the message into.
- * @param[in] src_p Data to pack.
- * @param[in] size Size of dst_p.
- *
- * @return Size of packed data, or negative error code.
- */
-int david_pitch_ctrl_both_pack(
-    uint8_t *dst_p,
-    const struct david_pitch_ctrl_both_t *src_p,
-    size_t size);
-
-/**
- * Unpack message PitchCtrlBoth.
- *
- * @param[out] dst_p Object to unpack the message into.
- * @param[in] src_p Message to unpack.
- * @param[in] size Size of src_p.
- *
- * @return zero(0) or negative error code.
- */
-int david_pitch_ctrl_both_unpack(
-    struct david_pitch_ctrl_both_t *dst_p,
-    const uint8_t *src_p,
-    size_t size);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint8_t david_pitch_ctrl_both_command_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_pitch_ctrl_both_command_decode(uint8_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_pitch_ctrl_both_command_is_in_range(uint8_t value);
-
-/**
- * Pack message PitchTelemLeft.
- *
- * @param[out] dst_p Buffer to pack the message into.
- * @param[in] src_p Data to pack.
- * @param[in] size Size of dst_p.
- *
- * @return Size of packed data, or negative error code.
- */
-int david_pitch_telem_left_pack(
-    uint8_t *dst_p,
-    const struct david_pitch_telem_left_t *src_p,
-    size_t size);
-
-/**
- * Unpack message PitchTelemLeft.
- *
- * @param[out] dst_p Object to unpack the message into.
- * @param[in] src_p Message to unpack.
- * @param[in] size Size of src_p.
- *
- * @return zero(0) or negative error code.
- */
-int david_pitch_telem_left_unpack(
-    struct david_pitch_telem_left_t *dst_p,
-    const uint8_t *src_p,
-    size_t size);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint64_t david_pitch_telem_left_count_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_pitch_telem_left_count_decode(uint64_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_pitch_telem_left_count_is_in_range(uint64_t value);
+bool david_pitch_telem_left_count_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -748,41 +602,13 @@ double david_pitch_telem_left_direction_decode(uint16_t value);
 bool david_pitch_telem_left_direction_is_in_range(uint16_t value);
 
 /**
- * Pack message PitchTelemRight.
- *
- * @param[out] dst_p Buffer to pack the message into.
- * @param[in] src_p Data to pack.
- * @param[in] size Size of dst_p.
- *
- * @return Size of packed data, or negative error code.
- */
-int david_pitch_telem_right_pack(
-    uint8_t *dst_p,
-    const struct david_pitch_telem_right_t *src_p,
-    size_t size);
-
-/**
- * Unpack message PitchTelemRight.
- *
- * @param[out] dst_p Object to unpack the message into.
- * @param[in] src_p Message to unpack.
- * @param[in] size Size of src_p.
- *
- * @return zero(0) or negative error code.
- */
-int david_pitch_telem_right_unpack(
-    struct david_pitch_telem_right_t *dst_p,
-    const uint8_t *src_p,
-    size_t size);
-
-/**
  * Encode given signal by applying scaling and offset.
  *
  * @param[in] value Signal to encode.
  *
  * @return Encoded signal.
  */
-uint64_t david_pitch_telem_right_count_encode(double value);
+uint16_t david_pitch_telem_right_count_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -791,7 +617,7 @@ uint64_t david_pitch_telem_right_count_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_pitch_telem_right_count_decode(uint64_t value);
+double david_pitch_telem_right_count_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -800,7 +626,7 @@ double david_pitch_telem_right_count_decode(uint64_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_pitch_telem_right_count_is_in_range(uint64_t value);
+bool david_pitch_telem_right_count_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -830,7 +656,7 @@ double david_pitch_telem_right_direction_decode(uint16_t value);
 bool david_pitch_telem_right_direction_is_in_range(uint16_t value);
 
 /**
- * Pack message LocoCtrlLeft.
+ * Pack message LocoCtrl.
  *
  * @param[out] dst_p Buffer to pack the message into.
  * @param[in] src_p Data to pack.
@@ -838,13 +664,13 @@ bool david_pitch_telem_right_direction_is_in_range(uint16_t value);
  *
  * @return Size of packed data, or negative error code.
  */
-int david_loco_ctrl_left_pack(
+int david_loco_ctrl_pack(
     uint8_t *dst_p,
-    const struct david_loco_ctrl_left_t *src_p,
+    const struct david_loco_ctrl_t *src_p,
     size_t size);
 
 /**
- * Unpack message LocoCtrlLeft.
+ * Unpack message LocoCtrl.
  *
  * @param[out] dst_p Object to unpack the message into.
  * @param[in] src_p Message to unpack.
@@ -852,8 +678,8 @@ int david_loco_ctrl_left_pack(
  *
  * @return zero(0) or negative error code.
  */
-int david_loco_ctrl_left_unpack(
-    struct david_loco_ctrl_left_t *dst_p,
+int david_loco_ctrl_unpack(
+    struct david_loco_ctrl_t *dst_p,
     const uint8_t *src_p,
     size_t size);
 
@@ -864,7 +690,7 @@ int david_loco_ctrl_left_unpack(
  *
  * @return Encoded signal.
  */
-uint32_t david_loco_ctrl_left_velocity_encode(double value);
+uint32_t david_loco_ctrl_left_vel_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -873,7 +699,7 @@ uint32_t david_loco_ctrl_left_velocity_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_loco_ctrl_left_velocity_decode(uint32_t value);
+double david_loco_ctrl_left_vel_decode(uint32_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -882,35 +708,7 @@ double david_loco_ctrl_left_velocity_decode(uint32_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_loco_ctrl_left_velocity_is_in_range(uint32_t value);
-
-/**
- * Pack message LocoCtrlRight.
- *
- * @param[out] dst_p Buffer to pack the message into.
- * @param[in] src_p Data to pack.
- * @param[in] size Size of dst_p.
- *
- * @return Size of packed data, or negative error code.
- */
-int david_loco_ctrl_right_pack(
-    uint8_t *dst_p,
-    const struct david_loco_ctrl_right_t *src_p,
-    size_t size);
-
-/**
- * Unpack message LocoCtrlRight.
- *
- * @param[out] dst_p Object to unpack the message into.
- * @param[in] src_p Message to unpack.
- * @param[in] size Size of src_p.
- *
- * @return zero(0) or negative error code.
- */
-int david_loco_ctrl_right_unpack(
-    struct david_loco_ctrl_right_t *dst_p,
-    const uint8_t *src_p,
-    size_t size);
+bool david_loco_ctrl_left_vel_is_in_range(uint32_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -919,7 +717,7 @@ int david_loco_ctrl_right_unpack(
  *
  * @return Encoded signal.
  */
-uint32_t david_loco_ctrl_right_velocity_encode(double value);
+uint32_t david_loco_ctrl_right_vel_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -928,7 +726,7 @@ uint32_t david_loco_ctrl_right_velocity_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_loco_ctrl_right_velocity_decode(uint32_t value);
+double david_loco_ctrl_right_vel_decode(uint32_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -937,308 +735,7 @@ double david_loco_ctrl_right_velocity_decode(uint32_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_loco_ctrl_right_velocity_is_in_range(uint32_t value);
-
-/**
- * Pack message LocoCtrlBoth.
- *
- * @param[out] dst_p Buffer to pack the message into.
- * @param[in] src_p Data to pack.
- * @param[in] size Size of dst_p.
- *
- * @return Size of packed data, or negative error code.
- */
-int david_loco_ctrl_both_pack(
-    uint8_t *dst_p,
-    const struct david_loco_ctrl_both_t *src_p,
-    size_t size);
-
-/**
- * Unpack message LocoCtrlBoth.
- *
- * @param[out] dst_p Object to unpack the message into.
- * @param[in] src_p Message to unpack.
- * @param[in] size Size of src_p.
- *
- * @return zero(0) or negative error code.
- */
-int david_loco_ctrl_both_unpack(
-    struct david_loco_ctrl_both_t *dst_p,
-    const uint8_t *src_p,
-    size_t size);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint32_t david_loco_ctrl_both_velocity_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_loco_ctrl_both_velocity_decode(uint32_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_loco_ctrl_both_velocity_is_in_range(uint32_t value);
-
-/**
- * Pack message StepperCtrlLeft.
- *
- * @param[out] dst_p Buffer to pack the message into.
- * @param[in] src_p Data to pack.
- * @param[in] size Size of dst_p.
- *
- * @return Size of packed data, or negative error code.
- */
-int david_stepper_ctrl_left_pack(
-    uint8_t *dst_p,
-    const struct david_stepper_ctrl_left_t *src_p,
-    size_t size);
-
-/**
- * Unpack message StepperCtrlLeft.
- *
- * @param[out] dst_p Object to unpack the message into.
- * @param[in] src_p Message to unpack.
- * @param[in] size Size of src_p.
- *
- * @return zero(0) or negative error code.
- */
-int david_stepper_ctrl_left_unpack(
-    struct david_stepper_ctrl_left_t *dst_p,
-    const uint8_t *src_p,
-    size_t size);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint32_t david_stepper_ctrl_left_rpm_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_stepper_ctrl_left_rpm_decode(uint32_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_stepper_ctrl_left_rpm_is_in_range(uint32_t value);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint32_t david_stepper_ctrl_left_direction_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_stepper_ctrl_left_direction_decode(uint32_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_stepper_ctrl_left_direction_is_in_range(uint32_t value);
-
-/**
- * Pack message StepperCtrlRight.
- *
- * @param[out] dst_p Buffer to pack the message into.
- * @param[in] src_p Data to pack.
- * @param[in] size Size of dst_p.
- *
- * @return Size of packed data, or negative error code.
- */
-int david_stepper_ctrl_right_pack(
-    uint8_t *dst_p,
-    const struct david_stepper_ctrl_right_t *src_p,
-    size_t size);
-
-/**
- * Unpack message StepperCtrlRight.
- *
- * @param[out] dst_p Object to unpack the message into.
- * @param[in] src_p Message to unpack.
- * @param[in] size Size of src_p.
- *
- * @return zero(0) or negative error code.
- */
-int david_stepper_ctrl_right_unpack(
-    struct david_stepper_ctrl_right_t *dst_p,
-    const uint8_t *src_p,
-    size_t size);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint32_t david_stepper_ctrl_right_rpm_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_stepper_ctrl_right_rpm_decode(uint32_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_stepper_ctrl_right_rpm_is_in_range(uint32_t value);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint32_t david_stepper_ctrl_right_direction_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_stepper_ctrl_right_direction_decode(uint32_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_stepper_ctrl_right_direction_is_in_range(uint32_t value);
-
-/**
- * Pack message StepperCtrlBoth.
- *
- * @param[out] dst_p Buffer to pack the message into.
- * @param[in] src_p Data to pack.
- * @param[in] size Size of dst_p.
- *
- * @return Size of packed data, or negative error code.
- */
-int david_stepper_ctrl_both_pack(
-    uint8_t *dst_p,
-    const struct david_stepper_ctrl_both_t *src_p,
-    size_t size);
-
-/**
- * Unpack message StepperCtrlBoth.
- *
- * @param[out] dst_p Object to unpack the message into.
- * @param[in] src_p Message to unpack.
- * @param[in] size Size of src_p.
- *
- * @return zero(0) or negative error code.
- */
-int david_stepper_ctrl_both_unpack(
-    struct david_stepper_ctrl_both_t *dst_p,
-    const uint8_t *src_p,
-    size_t size);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint32_t david_stepper_ctrl_both_rpm_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_stepper_ctrl_both_rpm_decode(uint32_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_stepper_ctrl_both_rpm_is_in_range(uint32_t value);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint32_t david_stepper_ctrl_both_direction_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_stepper_ctrl_both_direction_decode(uint32_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_stepper_ctrl_both_direction_is_in_range(uint32_t value);
+bool david_loco_ctrl_right_vel_is_in_range(uint32_t value);
 
 /**
  * Pack message ExcavCtrl.
@@ -1275,7 +772,7 @@ int david_excav_ctrl_unpack(
  *
  * @return Encoded signal.
  */
-uint32_t david_excav_ctrl_rpm_encode(double value);
+uint8_t david_excav_ctrl_dir_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1284,7 +781,7 @@ uint32_t david_excav_ctrl_rpm_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_excav_ctrl_rpm_decode(uint32_t value);
+double david_excav_ctrl_dir_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1293,7 +790,225 @@ double david_excav_ctrl_rpm_decode(uint32_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_excav_ctrl_rpm_is_in_range(uint32_t value);
+bool david_excav_ctrl_dir_is_in_range(uint8_t value);
+
+/**
+ * Pack message StepperCtrl.
+ *
+ * @param[out] dst_p Buffer to pack the message into.
+ * @param[in] src_p Data to pack.
+ * @param[in] size Size of dst_p.
+ *
+ * @return Size of packed data, or negative error code.
+ */
+int david_stepper_ctrl_pack(
+    uint8_t *dst_p,
+    const struct david_stepper_ctrl_t *src_p,
+    size_t size);
+
+/**
+ * Unpack message StepperCtrl.
+ *
+ * @param[out] dst_p Object to unpack the message into.
+ * @param[in] src_p Message to unpack.
+ * @param[in] size Size of src_p.
+ *
+ * @return zero(0) or negative error code.
+ */
+int david_stepper_ctrl_unpack(
+    struct david_stepper_ctrl_t *dst_p,
+    const uint8_t *src_p,
+    size_t size);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint32_t david_stepper_ctrl_rpm_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_stepper_ctrl_rpm_decode(uint32_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_stepper_ctrl_rpm_is_in_range(uint32_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint32_t david_stepper_ctrl_direction_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_stepper_ctrl_direction_decode(uint32_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_stepper_ctrl_direction_is_in_range(uint32_t value);
+
+/**
+ * Pack message StepperCtrlAdjust.
+ *
+ * @param[out] dst_p Buffer to pack the message into.
+ * @param[in] src_p Data to pack.
+ * @param[in] size Size of dst_p.
+ *
+ * @return Size of packed data, or negative error code.
+ */
+int david_stepper_ctrl_adjust_pack(
+    uint8_t *dst_p,
+    const struct david_stepper_ctrl_adjust_t *src_p,
+    size_t size);
+
+/**
+ * Unpack message StepperCtrlAdjust.
+ *
+ * @param[out] dst_p Object to unpack the message into.
+ * @param[in] src_p Message to unpack.
+ * @param[in] size Size of src_p.
+ *
+ * @return zero(0) or negative error code.
+ */
+int david_stepper_ctrl_adjust_unpack(
+    struct david_stepper_ctrl_adjust_t *dst_p,
+    const uint8_t *src_p,
+    size_t size);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t david_stepper_ctrl_adjust_left_dir_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_stepper_ctrl_adjust_left_dir_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_stepper_ctrl_adjust_left_dir_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint16_t david_stepper_ctrl_adjust_left_amount_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_stepper_ctrl_adjust_left_amount_decode(uint16_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_stepper_ctrl_adjust_left_amount_is_in_range(uint16_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t david_stepper_ctrl_adjust_right_dir_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_stepper_ctrl_adjust_right_dir_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_stepper_ctrl_adjust_right_dir_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint16_t david_stepper_ctrl_adjust_right_amount_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_stepper_ctrl_adjust_right_amount_decode(uint16_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_stepper_ctrl_adjust_right_amount_is_in_range(uint16_t value);
 
 
 #ifdef __cplusplus
