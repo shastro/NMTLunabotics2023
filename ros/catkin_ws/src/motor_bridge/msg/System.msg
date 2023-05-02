@@ -1,10 +1,10 @@
-# System message, all in one neat package
+# System message - auto generated from kcd
 
-Motor left
-Motor right
-Motor digger
-Stepp extend
-Adjust stepp_adjust
-Pitch pitch
-Adjust pitch_adjust
-bool estop
+EStop e_stop
+PitchCtrl pitch_ctrl
+PitchAdjust pitch_adjust
+PitchTelem pitch_telem
+LocoCtrl loco_ctrl
+ExcavCtrl excav_ctrl
+StepperCtrl stepper_ctrl
+StepperCtrlAdjust stepper_ctrl_adjust
