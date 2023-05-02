@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
         can = SocketCAN(CAN_BUS);
 
         ros::init(argc, argv, "motor_bridge");
-        ROS_INFO("motor_bridge started");
+        std::cout << "motor_bridge started" << std::endl;
         ros::NodeHandle nh;
         ros::Subscriber sub =
             nh.subscribe("system", 1024, callback);
@@ -65,19 +65,23 @@ void estopCallback(const motor_bridge::System::ConstPtr &msg) {
     int can_id;
 
     if (stop) {
-        ROS_INFO("ESTOP YES");
+        std::cout << "ESTOP YES" << std::endl;
         david_e_stop_t estop = {};
         david_e_stop_pack(message, &estop, sizeof(message));
         can_id = DAVID_E_STOP_FRAME_ID;
 
     } else {
+        std::cout << "ESTOP NO" << std::endl;
+        david_e_start_t estart = {};
         david_e_start_pack(message, &estart, sizeof(message));
         can_id = DAVID_E_START_FRAME_ID;
     }
     try {
         can.transmit(can_id, message);
     } catch (std::string err) {
-        ROS_WARN_STREAM("estop failed: " << err);
+        std::cout << "\e[93m";
+        std::cout << "estop failed: " << err << std::endl;
+        std::cout << "\e[0m";
     }
 }
 
@@ -88,7 +92,7 @@ void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
     lastPitchDir = dir;
     lastPitchM = m;*/
 
-    ROS_INFO_STREAM("Pitch Message Received. dir: " << dir << " motor: " << m);
+    std::cout << "Pitch Message Received. dir: " << dir << " motor: " << m << std::endl;
 
     uint8_t message[8];
     int can_id = DAVID_PITCH_CTRL_BOTH_FRAME_ID;
@@ -116,7 +120,9 @@ void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
     try {
         can.transmit(can_id, message);
     } catch (std::string err) {
-        ROS_WARN_STREAM("pitch failed: " << err);
+        std::cout << "\e[93m";
+        std::cout << "pitch failed: " << err << std::endl << std::endl;
+        std::cout << "\e[0m";
     }
 }
 
@@ -127,9 +133,9 @@ void locoCallback(const motor_bridge::System::ConstPtr &msg) {
     lastLSpeed = lspeed;
     lastRSpeed = rspeed;*/
 
-    ROS_INFO_STREAM("Drive Message Received."
+    std::cout << "Drive Message Received."
         << " left motor: " << lspeed
-        << ", right motor: " << rspeed);
+        << ", right motor: " << rspeed << std::endl;
 
     uint8_t message[8];
     int can_id;
@@ -141,7 +147,9 @@ void locoCallback(const motor_bridge::System::ConstPtr &msg) {
     try {
         can.transmit(can_id, message);
     } catch (std::string err) {
-        ROS_WARN_STREAM("left motor failed: " << err);
+        std::cout << "\e[93m";
+        std::cout << "left motor failed: " << err << std::endl;
+        std::cout << "\e[0m";
     }
 
     david_loco_ctrl_right_t right = {
@@ -152,7 +160,9 @@ void locoCallback(const motor_bridge::System::ConstPtr &msg) {
     try {
         can.transmit(can_id, message);
     } catch (std::string err) {
-        ROS_WARN_STREAM("right motor failed: " << err);
+        std::cout << "\e[93m";
+        std::cout << "right motor failed: " << err << std::endl;
+        std::cout << "\e[0m";
     }
 }
 
@@ -161,8 +171,8 @@ void excavCallback(const motor_bridge::System::ConstPtr &msg) {
     /*if (speed == lastExcavSpeed) { return; }
     lastExcavSpeed = speed;*/
 
-    ROS_INFO_STREAM("Digger Message Received."
-        << "speed: " << speed);
+    std::cout << "Digger Message Received."
+        << "speed: " << speed << std::endl;
 
     uint8_t message[8];
     int can_id;
@@ -176,7 +186,9 @@ void excavCallback(const motor_bridge::System::ConstPtr &msg) {
     try {
         can.transmit(can_id, message);
     } catch (std::string err) {
-        ROS_WARN_STREAM("excav failed: " << err);
+        std::cout << "\e[93m";
+        std::cout << "excav failed: " << err << std::endl;
+        std::cout << "\e[0m";
     }
 }
 
@@ -189,9 +201,9 @@ void steppCallback(const motor_bridge::System::ConstPtr &msg) {
     lastSteppDir = d;
     lastSteppRpm = rpm;*/
 
-    ROS_INFO_STREAM("Stepp Message Received. motor: " << m
+    std::cout << "Stepp Message Received. motor: " << m
         << " direction: " << d
-        << " rmp: " << rpm);
+        << " rmp: " << rpm << std::endl;
 
     uint8_t message[8];
     int can_id;
@@ -222,7 +234,9 @@ void steppCallback(const motor_bridge::System::ConstPtr &msg) {
     try {
         can.transmit(can_id, message);
     } catch (std::string err) {
-        ROS_WARN_STREAM("stepp failed: " << err);
+        std::cout << "\e[93m";
+        std::cout << "stepp failed: " << err << std::endl;
+        std::cout << "\e[0m";
     }
 }
 
