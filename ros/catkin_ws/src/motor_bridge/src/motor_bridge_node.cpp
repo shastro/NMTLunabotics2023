@@ -17,15 +17,7 @@ static SocketCAN can;
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
 enum direction { STOP = 0, FORWARD = 1, BACKWARD = 2 };
 
-bool lastEstop;
-motor lastPitchM;
-direction lastPitchDir;
-int lastLSpeed;
-int lastRSpeed;
-int lastExcavSpeed;
-motor lastSteppM;
-direction lastSteppDir;
-int lastSteppRpm;
+motor_bridge::System lastMsg;
 
 //TODO better ros logging
 std::ostream& operator<<(std::ostream& os, const motor& m);
@@ -55,32 +47,19 @@ int main(int argc, char **argv) {
     }
 }
 
-std::ostream& operator<<(std::ostream& s, const motor& m) {
-    switch (m) {
-        case BOTH:
-            return s << "BOTH";
-        case LEFT:
-            return s << "LEFT";
-        case RIGHT:
-            return s << "RIGHT";
+void callback(const motor_bridge::System::ConstPtr &msg) {
+    if (lastMsg != *msg) {
+        estopCallback(msg);
+        pitchCallback(msg);
+        excavCallback(msg);
+        locoCallback(msg);
+        steppCallback(msg);
     }
-}
-
-std::ostream& operator<<(std::ostream& s, const direction& d) {
-    switch (d) {
-        case STOP:
-            return s << "STOP";
-        case FORWARD:
-            return s << "FORWARD";
-        case BACKWARD:
-            return s << "BACKWARD";
-    }
+    lastMsg = *msg;
 }
 
 void estopCallback(const motor_bridge::System::ConstPtr &msg) {
     bool stop = msg->estop;
-    /*if (stop == lastEstop) { return; }
-    lastEstop = stop;*/
 
     uint8_t message[8];
     int can_id;
@@ -92,8 +71,6 @@ void estopCallback(const motor_bridge::System::ConstPtr &msg) {
         can_id = DAVID_E_STOP_FRAME_ID;
 
     } else {
-        ROS_INFO("NOT ESTOP");
-        david_e_start_t estart = {};
         david_e_start_pack(message, &estart, sizeof(message));
         can_id = DAVID_E_START_FRAME_ID;
     }
@@ -249,10 +226,24 @@ void steppCallback(const motor_bridge::System::ConstPtr &msg) {
     }
 }
 
-void callback(const motor_bridge::System::ConstPtr &msg) {
-    estopCallback(msg);
-    pitchCallback(msg);
-    excavCallback(msg);
-    locoCallback(msg);
-    steppCallback(msg);
+std::ostream& operator<<(std::ostream& s, const motor& m) {
+    switch (m) {
+        case BOTH:
+            return s << "BOTH";
+        case LEFT:
+            return s << "LEFT";
+        case RIGHT:
+            return s << "RIGHT";
+    }
+}
+
+std::ostream& operator<<(std::ostream& s, const direction& d) {
+    switch (d) {
+        case STOP:
+            return s << "STOP";
+        case FORWARD:
+            return s << "FORWARD";
+        case BACKWARD:
+            return s << "BACKWARD";
+    }
 }
