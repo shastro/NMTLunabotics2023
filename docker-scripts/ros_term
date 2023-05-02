@@ -21,14 +21,14 @@ done
 
 ip=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 
+#    -e ROS_IP=$ip
+#    -e ROS_MASTER_URI=http://jetson:11311
 params=(
     --rm
     -it
     --net=host
     -v $DIR:$DIR
     -e DISPLAY
-    -e ROS_IP=$ip
-    -e ROS_MASTER_URI=http://jetson:11311
     -v /tmp/.X11-unix:/tmp/.X11-unix:rw
     -v /dev:/dev:rw
     --device-cgroup-rule "c 81:* rmw"

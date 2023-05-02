@@ -11,7 +11,7 @@
 #include "can_interface.hpp"
 #include <linux/can.h>
 
-#define CAN_BUS "can0"
+#define CAN_BUS "vcan0"
 static SocketCAN can;
 
 enum motor { BOTH = 0, LEFT = 1, RIGHT = 2 };
@@ -52,6 +52,7 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
     pitchCallback(msg);
     excavCallback(msg);
     locoCallback(msg);
+    steppCallback(msg);
     lastMsg = *msg;
 }
 
@@ -161,7 +162,7 @@ void locoCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void excavCallback(const motor_bridge::System::ConstPtr &msg) {
-    //if (lastMsg.digger == msg->digger) { return; }
+    if (lastMsg.digger == msg->digger) { return; }
     int speed = msg->digger.rpm;
 
     std::cout << "Digger Message Received."
