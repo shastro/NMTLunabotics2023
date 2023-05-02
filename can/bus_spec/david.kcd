@@ -54,7 +54,7 @@
               <!-- 0: stop -->
               <!-- 1: forward -->
               <!-- 2: retract -->
-          <Signal name="Amount" offset="16" length="16" />
+          <Signal name="Amount" offset="16" length="8" />
               <!-- Amount to adjust: 0 - 64 -->
       </Message>
 
@@ -86,7 +86,7 @@
           <Producer>
               <NodeRef id="4"/>
           </Producer>
-          <Signal name="Dir" offset="0" length="8" />
+          <Signal name="Direction" offset="0" length="8" />
               <!-- 0: stop -->
               <!-- 1: forward -->
               <!-- 2: retract -->
