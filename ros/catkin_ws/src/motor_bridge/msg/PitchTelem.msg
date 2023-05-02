@@ -1,6 +1,6 @@
 # PitchTelem ros message - auto generated from kcd
 
-int32 left_count
-int32 left_direction
-int32 right_count
-int32 right_direction
+int16 left_count
+int16 left_direction
+int16 right_count
+int16 right_direction

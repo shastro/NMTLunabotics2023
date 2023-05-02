@@ -1,4 +1,4 @@
 # PitchCtrl ros message - auto generated from kcd
 
-int32 home
-int32 direction
+int8 home
+int8 direction

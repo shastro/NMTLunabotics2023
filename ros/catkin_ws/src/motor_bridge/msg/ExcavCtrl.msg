@@ -1,3 +1,3 @@
 # ExcavCtrl ros message - auto generated from kcd
 
-int32 dir
+int8 direction

@@ -1,5 +1,5 @@
 # PitchAdjust ros message - auto generated from kcd
 
-int32 motor
-int32 dir
-int32 amount
+int8 motor
+int8 dir
+int8 amount
