@@ -161,7 +161,7 @@ void locoCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void excavCallback(const motor_bridge::System::ConstPtr &msg) {
-    if (lastMsg.digger == msg->digger) { return; }
+    //if (lastMsg.digger == msg->digger) { return; }
     int speed = msg->digger.rpm;
 
     std::cout << "Digger Message Received."
