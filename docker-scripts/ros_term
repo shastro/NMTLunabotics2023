@@ -11,40 +11,40 @@ sudo docker build "$DIR/ros" -t lunabotics-2023-ros
 echo "Add '129.138.xxx.xxx  jetson' to /etc/hosts for network support"
 
 # Function to find the joystick path.
-find_joystick () {
-    for idx in $(seq 32 | tac); do
-        file="/dev/input/js$idx"
-        if [ -e $file ]; then
-            echo $file
-            return
-        fi
-    done
-}
+param=""
+for ((c=32; c>=0; c--)); do
+    file="/dev/input/js$c"
+    if [ -e $file ]; then
+        param="--device=$file"
+    fi
+done
 
 ip=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 
-# Add this line for controller support
-#    --device=/dev/input/js0 \
+params=(
+    --rm
+    -it
+    --net=host
+    -v $DIR:$DIR
+    -e DISPLAY
+    -e ROS_IP=$ip
+    -e ROS_MASTER_URI=http://jetson:11311
+    -v /tmp/.X11-unix:/tmp/.X11-unix:rw
+    -v /dev:/dev:rw
+    --device-cgroup-rule "c 81:* rmw"
+    --device-cgroup-rule "c 189:* rmw"
+    $param
+)
 
 sudo docker run \
-    --rm \
-    -it \
-    --net=host \
-    -v $DIR:$DIR \
-    -e DISPLAY \
-    -e ROS_IP=$ip \
-    -e ROS_MASTER_URI=http://jetson:11311 \
-    -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-    -v /dev:/dev:rw \
-    --device-cgroup-rule "c 81:* rmw" \
-    --device-cgroup-rule "c 189:* rmw" \
+    "${params[@]}" \
     lunabotics-2023-ros \
     sh -c "
-        cd $PWD
-        export HOME="$HOME"
-        export PS1='\u@\h:\w\$ '
-        [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
-        bash
+    cd $PWD
+    export HOME="$HOME"
+    export PS1='\u@\h:\w\$ '
+    [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
+    bash
     "
 
 # ROS might create files owned by root here; it'll cause all kinds of

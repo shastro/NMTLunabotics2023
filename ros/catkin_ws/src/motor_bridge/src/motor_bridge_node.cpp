@@ -79,8 +79,8 @@ std::ostream& operator<<(std::ostream& s, const direction& d) {
 
 void estopCallback(const motor_bridge::System::ConstPtr &msg) {
     bool stop = msg->estop;
-    if (stop == lastEstop) { return; }
-    lastEstop = stop;
+    /*if (stop == lastEstop) { return; }
+    lastEstop = stop;*/
 
     uint8_t message[8];
     int can_id;
@@ -107,9 +107,9 @@ void estopCallback(const motor_bridge::System::ConstPtr &msg) {
 void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
     direction dir = (direction)msg->pitch.direction;
     motor m = (motor)msg->pitch.motor;
-    if (dir == lastPitchDir && m == lastPitchM) { return; }
+    /*if (dir == lastPitchDir && m == lastPitchM) { return; }
     lastPitchDir = dir;
-    lastPitchM = m;
+    lastPitchM = m;*/
 
     ROS_INFO_STREAM("Pitch Message Received. dir: " << dir << " motor: " << m);
 
@@ -146,9 +146,9 @@ void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
 void locoCallback(const motor_bridge::System::ConstPtr &msg) {
     int lspeed = msg->left.rpm;
     int rspeed = msg->right.rpm;
-    if (lspeed == lastLSpeed && rspeed == lastRSpeed) { return; }
+    /*if (lspeed == lastLSpeed && rspeed == lastRSpeed) { return; }
     lastLSpeed = lspeed;
-    lastRSpeed = rspeed;
+    lastRSpeed = rspeed;*/
 
     ROS_INFO_STREAM("Drive Message Received."
         << " left motor: " << lspeed
@@ -181,8 +181,8 @@ void locoCallback(const motor_bridge::System::ConstPtr &msg) {
 
 void excavCallback(const motor_bridge::System::ConstPtr &msg) {
     int speed = msg->digger.rpm;
-    if (speed == lastExcavSpeed) { return; }
-    lastExcavSpeed = speed;
+    /*if (speed == lastExcavSpeed) { return; }
+    lastExcavSpeed = speed;*/
 
     ROS_INFO_STREAM("Digger Message Received."
         << "speed: " << speed);
@@ -207,10 +207,10 @@ void steppCallback(const motor_bridge::System::ConstPtr &msg) {
     motor m = (motor)msg->extend.motor;
     direction d = (direction)msg->extend.direction;
     int rpm = msg->extend.rpm;
-    if (m == lastSteppM && d == lastSteppDir && rpm == lastSteppRpm) { return; }
+    /*if (m == lastSteppM && d == lastSteppDir && rpm == lastSteppRpm) { return; }
     lastSteppM = m;
     lastSteppDir = d;
-    lastSteppRpm = rpm;
+    lastSteppRpm = rpm;*/
 
     ROS_INFO_STREAM("Stepp Message Received. motor: " << m
         << " direction: " << d
