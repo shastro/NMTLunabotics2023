@@ -57,7 +57,7 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void estopCallback(const motor_bridge::System::ConstPtr &msg) {
-    if (lastMsg.estop == msg->estop) { return 0; }
+    if (lastMsg.estop == msg->estop) { return; }
     bool stop = msg->estop;
 
     uint8_t message[8];
@@ -85,7 +85,7 @@ void estopCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
-    if (lastMsg.pitch == msg->pitch) { return 0; }
+    if (lastMsg.pitch == msg->pitch) { return; }
     direction dir = (direction)msg->pitch.direction;
     motor m = (motor)msg->pitch.motor;
 
@@ -124,7 +124,7 @@ void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void locoCallback(const motor_bridge::System::ConstPtr &msg) {
-    if (lastMsg.loco == msg->loco) { return 0; }
+    if (lastMsg.loco == msg->loco) { return; }
     int lspeed = msg->left.rpm;
     int rspeed = msg->right.rpm;
 
@@ -162,7 +162,7 @@ void locoCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void excavCallback(const motor_bridge::System::ConstPtr &msg) {
-    if (lastMsg.digger == msg->digger) { return 0; }
+    if (lastMsg.digger == msg->digger) { return; }
     int speed = msg->digger.rpm;
 
     std::cout << "Digger Message Received."
@@ -187,7 +187,7 @@ void excavCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void steppCallback(const motor_bridge::System::ConstPtr &msg) {
-    if (lastMsg.extend == msg->extend) { return 0; }
+    if (lastMsg.extend == msg->extend) { return; }
     motor m = (motor)msg->extend.motor;
     direction d = (direction)msg->extend.direction;
     int rpm = msg->extend.rpm;
