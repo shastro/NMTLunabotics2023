@@ -97,24 +97,27 @@
       <Producer>
         <NodeRef id="0"/>
       </Producer>
-      <Signal name="Velocity" offset="0" length="32"
-              slope="0.001" type="signed"/>
+      <Signal name="Velocity" offset="0" length="32">
+        <Value slope="0.001" type="float"/>
+      </Signal>
     </Message>
 
     <Message id="0x301" name="LocoCtrlRight">
       <Producer>
         <NodeRef id="0"/>
       </Producer>
-      <Signal name="Velocity" offset="0" length="32"
-              slope="0.001" type="signed" />
+      <Signal name="Velocity" offset="0" length="32">
+        <Value slope="0.001" type="float"/>
+      </Signal>
     </Message>
 
     <Message id="0x311" name="LocoCtrlBoth">
       <Producer>
         <NodeRef id="0"/>
       </Producer>
-      <Signal name="Velocity" offset="0" length="32"
-              slope="0.001" type="signed" />
+      <Signal name="Velocity" offset="0" length="32">
+        <Value slope="0.001" type="float"/>
+      </Signal>
     </Message>
 
     <Message id="0x400" name="StepperCtrlLeft">
@@ -145,8 +148,9 @@
       <Producer>
         <NodeRef id="0"/>
       </Producer>
-      <Signal name="RPM" offset="0" length="32"
-              slope="0.001" type="signed" />
+      <Signal name="RPM" offset="0" length="32">
+        <Value slope="0.001" type="signed"/>
+      </Signal>
     </Message>
   </Bus>
 </NetworkDefinition>

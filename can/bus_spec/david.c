@@ -594,12 +594,12 @@ int david_loco_ctrl_left_unpack(
 
 uint32_t david_loco_ctrl_left_velocity_encode(double value)
 {
-    return (uint32_t)(value);
+    return (uint32_t)(value / 0.001);
 }
 
 double david_loco_ctrl_left_velocity_decode(uint32_t value)
 {
-    return ((double)value);
+    return ((double)value * 0.001);
 }
 
 bool david_loco_ctrl_left_velocity_is_in_range(uint32_t value)
@@ -647,12 +647,12 @@ int david_loco_ctrl_right_unpack(
 
 uint32_t david_loco_ctrl_right_velocity_encode(double value)
 {
-    return (uint32_t)(value);
+    return (uint32_t)(value / 0.001);
 }
 
 double david_loco_ctrl_right_velocity_decode(uint32_t value)
 {
-    return ((double)value);
+    return ((double)value * 0.001);
 }
 
 bool david_loco_ctrl_right_velocity_is_in_range(uint32_t value)
@@ -700,12 +700,12 @@ int david_loco_ctrl_both_unpack(
 
 uint32_t david_loco_ctrl_both_velocity_encode(double value)
 {
-    return (uint32_t)(value);
+    return (uint32_t)(value / 0.001);
 }
 
 double david_loco_ctrl_both_velocity_decode(uint32_t value)
 {
-    return ((double)value);
+    return ((double)value * 0.001);
 }
 
 bool david_loco_ctrl_both_velocity_is_in_range(uint32_t value)
@@ -954,16 +954,19 @@ int david_excav_ctrl_pack(
     const struct david_excav_ctrl_t *src_p,
     size_t size)
 {
+    uint32_t rpm;
+
     if (size < 4u) {
         return (-EINVAL);
     }
 
     memset(&dst_p[0], 0, 4);
 
-    dst_p[0] |= pack_left_shift_u32(src_p->rpm, 0u, 0xffu);
-    dst_p[1] |= pack_right_shift_u32(src_p->rpm, 8u, 0xffu);
-    dst_p[2] |= pack_right_shift_u32(src_p->rpm, 16u, 0xffu);
-    dst_p[3] |= pack_right_shift_u32(src_p->rpm, 24u, 0xffu);
+    rpm = (uint32_t)src_p->rpm;
+    dst_p[0] |= pack_left_shift_u32(rpm, 0u, 0xffu);
+    dst_p[1] |= pack_right_shift_u32(rpm, 8u, 0xffu);
+    dst_p[2] |= pack_right_shift_u32(rpm, 16u, 0xffu);
+    dst_p[3] |= pack_right_shift_u32(rpm, 24u, 0xffu);
 
     return (4);
 }
@@ -973,29 +976,32 @@ int david_excav_ctrl_unpack(
     const uint8_t *src_p,
     size_t size)
 {
+    uint32_t rpm;
+
     if (size < 4u) {
         return (-EINVAL);
     }
 
-    dst_p->rpm = unpack_right_shift_u32(src_p[0], 0u, 0xffu);
-    dst_p->rpm |= unpack_left_shift_u32(src_p[1], 8u, 0xffu);
-    dst_p->rpm |= unpack_left_shift_u32(src_p[2], 16u, 0xffu);
-    dst_p->rpm |= unpack_left_shift_u32(src_p[3], 24u, 0xffu);
+    rpm = unpack_right_shift_u32(src_p[0], 0u, 0xffu);
+    rpm |= unpack_left_shift_u32(src_p[1], 8u, 0xffu);
+    rpm |= unpack_left_shift_u32(src_p[2], 16u, 0xffu);
+    rpm |= unpack_left_shift_u32(src_p[3], 24u, 0xffu);
+    dst_p->rpm = (int32_t)rpm;
 
     return (0);
 }
 
-uint32_t david_excav_ctrl_rpm_encode(double value)
+int32_t david_excav_ctrl_rpm_encode(double value)
 {
-    return (uint32_t)(value);
+    return (int32_t)(value / 0.001);
 }
 
-double david_excav_ctrl_rpm_decode(uint32_t value)
+double david_excav_ctrl_rpm_decode(int32_t value)
 {
-    return ((double)value);
+    return ((double)value * 0.001);
 }
 
-bool david_excav_ctrl_rpm_is_in_range(uint32_t value)
+bool david_excav_ctrl_rpm_is_in_range(int32_t value)
 {
     (void)value;
 

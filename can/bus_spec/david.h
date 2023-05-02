@@ -223,7 +223,7 @@ struct david_pitch_telem_right_t {
 struct david_loco_ctrl_left_t {
     /**
      * Range: -
-     * Scale: 1
+     * Scale: 0.001
      * Offset: 0
      */
     uint32_t velocity;
@@ -237,7 +237,7 @@ struct david_loco_ctrl_left_t {
 struct david_loco_ctrl_right_t {
     /**
      * Range: -
-     * Scale: 1
+     * Scale: 0.001
      * Offset: 0
      */
     uint32_t velocity;
@@ -251,7 +251,7 @@ struct david_loco_ctrl_right_t {
 struct david_loco_ctrl_both_t {
     /**
      * Range: -
-     * Scale: 1
+     * Scale: 0.001
      * Offset: 0
      */
     uint32_t velocity;
@@ -328,10 +328,10 @@ struct david_stepper_ctrl_both_t {
 struct david_excav_ctrl_t {
     /**
      * Range: -
-     * Scale: 1
+     * Scale: 0.001
      * Offset: 0
      */
-    uint32_t rpm;
+    int32_t rpm;
 };
 
 /**
@@ -1275,7 +1275,7 @@ int david_excav_ctrl_unpack(
  *
  * @return Encoded signal.
  */
-uint32_t david_excav_ctrl_rpm_encode(double value);
+int32_t david_excav_ctrl_rpm_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1284,7 +1284,7 @@ uint32_t david_excav_ctrl_rpm_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_excav_ctrl_rpm_decode(uint32_t value);
+double david_excav_ctrl_rpm_decode(int32_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1293,7 +1293,7 @@ double david_excav_ctrl_rpm_decode(uint32_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_excav_ctrl_rpm_is_in_range(uint32_t value);
+bool david_excav_ctrl_rpm_is_in_range(int32_t value);
 
 
 #ifdef __cplusplus
