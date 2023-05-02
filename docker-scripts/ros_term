@@ -10,6 +10,17 @@ sudo docker build "$DIR/ros" -t lunabotics-2023-ros
 
 echo "Add '129.138.xxx.xxx  jetson' to /etc/hosts for network support"
 
+# Function to find the joystick path.
+find_joystick () {
+    for idx in $(seq 32 | tac); do
+        file="/dev/input/js$idx"
+        if [ -e $file ]; then
+            echo $file
+            return
+        fi
+    done
+}
+
 ip=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 
 # Add this line for controller support
