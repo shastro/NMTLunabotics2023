@@ -124,7 +124,7 @@ void pitchCallback(const motor_bridge::System::ConstPtr &msg) {
 }
 
 void locoCallback(const motor_bridge::System::ConstPtr &msg) {
-    if (lastMsg.loco == msg->loco) { return; }
+    if (lastMsg.left == msg->left) { return; }
     int lspeed = msg->left.rpm;
     int rspeed = msg->right.rpm;
 
@@ -146,6 +146,8 @@ void locoCallback(const motor_bridge::System::ConstPtr &msg) {
         std::cout << "left motor failed: " << err << std::endl;
         std::cout << "\e[0m";
     }
+
+    if (lastMsg.right == msg->right) { return; }
 
     david_loco_ctrl_right_t right = {
         .velocity = (uint64_t)rspeed
