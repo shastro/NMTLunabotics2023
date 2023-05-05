@@ -8,18 +8,28 @@ DIR="$(realpath "$(dirname "$0")")"/..
 
 sudo docker build "$DIR/ros" -t lunabotics-2023-ros
 
-echo "Add '129.138.xxx.xxx  jetson' to /etc/hosts for network support"
+# if -r, enable remote support
+param1=""
+while getopts 'r' OPTION; do
+    case "$OPTION" in
+        r)
+            echo "Add '129.138.xxx.xxx  jetson' to /etc/hosts for network support"
+            ip=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
+            param1="-e ROS_IP=$ip -e ROS_MASTER_URI=http://jetson:11311"
+            ;;
+    esac
+done
+
 
 # Function to find the joystick path.
-param=""
+param2=""
 for ((c=32; c>=0; c--)); do
     file="/dev/input/js$c"
     if [ -e $file ]; then
-        param="--device=$file"
+        param2="--device=$file"
     fi
 done
 
-ip=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 
 #    -e ROS_IP=$ip
 #    -e ROS_MASTER_URI=http://jetson:11311
@@ -33,7 +43,8 @@ params=(
     -v /dev:/dev:rw
     --device-cgroup-rule "c 81:* rmw"
     --device-cgroup-rule "c 189:* rmw"
-    $param
+    $param1
+    $param2
 )
 
 sudo docker run \
