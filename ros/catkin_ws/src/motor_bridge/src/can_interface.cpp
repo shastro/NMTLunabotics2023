@@ -62,19 +62,10 @@ void SocketCAN::transmit(const struct can_frame &cf) {
         throw string("Error transmitting CAN frame");
 }
 
-void SocketCAN::transmit(int can_id, int8_t data[8]) {
+void SocketCAN::transmit(int can_id, uint8_t data[8]) {
     struct can_frame frame;
     frame.can_id = can_id;
     frame.can_dlc = 8 * sizeof(data[0]);
     memcpy(frame.data, data, frame.can_dlc);
     transmit(frame);
-}
-
-
-void SocketCAN::transmit(int can_id, uint8_t* data, int len) {
-    uint8_t packet[8];
-    if ( len > 8 ) { throw string("len is greater than max (8)") }
-    for (int i = 0; i < len; i++)
-        packet[i] = *(data + i);
-    transmit(can_id, packet);
 }

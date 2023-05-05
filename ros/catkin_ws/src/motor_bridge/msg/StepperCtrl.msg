@@ -2,4 +2,4 @@
 
 int8 home
 int8 direction
-int32 r_p_m
+int32 rpm

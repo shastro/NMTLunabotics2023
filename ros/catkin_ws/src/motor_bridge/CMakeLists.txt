@@ -1,7 +1,5 @@
 # Adapted from CMakeLists.txt from david_motor of the old robot.
 
-# Needs simplification ~~Alex
-
 cmake_minimum_required(VERSION 3.0.2)
 project(motor_bridge)
 
@@ -19,10 +17,15 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   DIRECTORY msg
   FILES
-  Motor.msg
-  Pitch.msg
-  Stepp.msg
-  System.msg
+System.msg
+    EStop.msg
+    PitchCtrl.msg
+    PitchAdjust.msg
+    PitchTelem.msg
+    LocoCtrl.msg
+    ExcavCtrl.msg
+    StepperCtrl.msg
+    StepperCtrlAdjust.msg
 )
 
 generate_messages(DEPENDENCIES std_msgs)
@@ -35,12 +38,13 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(motor_bridge
   src/motor_bridge_node.cpp
   src/can/david.c
+  src/can/canshit.cpp
   src/can_interface.cpp
 )
 add_dependencies(motor_bridge
   ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(motor_bridge ${catkin_LIBRARIES})
 link_directories(${catkin_LIBRARY_DIRS})
-install(TARGETS 
+install(TARGETS
     motor_bridge
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

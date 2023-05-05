@@ -74,11 +74,13 @@
           <Producer>
               <NodeRef id="1"/>
           </Producer>
-          <Signal name="LeftVel" offset="0" length="32" 
-              slope="0.001" type="signed"/>
+          <Signal name="LeftVel" offset="0" length="16">
+              <Value type="signed"/>
+          </Signal>
               <!-- value between -1024 and 1024 -->
-          <Signal name="rightVel" offset="32" length="32"
-              slope="0.001" type="signed"/>
+          <Signal name="RightVel" offset="16" length="16">
+              <Value type="signed"/>
+          </Signal>
               <!-- value between -1024 and 1024 -->
       </Message>
 

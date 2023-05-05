@@ -12,8 +12,9 @@ echo "Add '129.138.xxx.xxx  jetson' to /etc/hosts for network support"
 
 ip=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 
-# Add this line for controller support
 #    --device=/dev/input/js0 \
+#    -e ROS_IP=$ip \
+#    -e ROS_MASTER_URI=http://jetson:11311 \
 
 sudo docker run \
     --rm \
@@ -21,8 +22,7 @@ sudo docker run \
     --net=host \
     -v $DIR:$DIR \
     -e DISPLAY \
-    -e ROS_IP=$ip \
-    -e ROS_MASTER_URI=http://jetson:11311 \
+    --device=/dev/input/js0 \
     -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
     -v /dev:/dev:rw \
     --device-cgroup-rule "c 81:* rmw" \
