@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fcntl.h>
 #include <motor_bridge/System.h>
 #include <ros/ros.h>
 #include "joystick/gamepad.hpp"
@@ -10,7 +11,25 @@ int main(int argc, char *argv[]) {
     int min = -max;
     int dead = 200;
     ros::Publisher pub = nh.advertise<motor_bridge::System>("/system", 5);
-    GamepadHandler g("/dev/input/js0", max, dead);
+    int fd, num_of_joysticks, joynum, max_joy_index = -1;
+    char name_of_joy[80];
+    char controller_input[80];
+    num_of_joysticks = 0;
+    for (joynum = 0; joynum < 16; joynum++)
+    {
+        sprintf(name_of_joy, "/dev/input/js%d", joynum);
+        fd = open(name_of_joy, O_RDONLY);
+        if (fd >= 0)
+        {
+            num_of_joysticks++;
+            if (joynum > max_joy_index)
+                max_joy_index = joynum;
+            close(fd);
+        }
+    }
+    sprintf(controller_input, "/dev/input/js%d", max_joy_index);
+    printf("%s", controller_input);
+    GamepadHandler g(controller_input, max, dead);
     motor_bridge::System s;
     bool going = true;
     bool estopped = false;
