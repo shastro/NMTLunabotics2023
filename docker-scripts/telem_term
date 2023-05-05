@@ -5,7 +5,40 @@ IFS=$'\n\t'
 # Generates a shell inside the ROS container, with ROS_MASTER_URI set
 # to the Jetson.
 
-JETSON_ADDRESS=129.138.173.40
+lookup_addr () {
+    # Looking up addresses is weirdly almost impossible in bash in a
+    # way that respects /etc/hosts and acts exactly as the standard
+    # system resolver would. Shell out to C to do the lookup instead.
+    C_FILE=$(mktemp --suffix=.c)
+    cat > $C_FILE <<EOF
+#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+
+int main(int argc, char **argv) {
+    struct addrinfo *result;
+    if (getaddrinfo(argv[1], NULL, NULL, &result)) {
+        fprintf(stderr, "lookup error on %s\n", argv[1]);
+        return 1;
+    }
+
+    struct sockaddr_in *addr = (struct sockaddr_in *)result->ai_addr;
+    const unsigned char *ip_data = (const unsigned char *)&addr->sin_addr.s_addr;
+
+    for (int i = 0; i < 4; i++)
+        printf("%s%d", i == 0 ? "" : ".", ip_data[i]);
+}
+EOF
+    BUILD_FILE=$(mktemp)
+    cc -o $BUILD_FILE $C_FILE
+    $BUILD_FILE "$@"
+
+    rm $BUILD_FILE $C_FILE
+}
+
+JETSON_ADDRESS=$(lookup_addr jetson)
 MY_ADDRESS=$(ip route get $JETSON_ADDRESS | sed 's/.* src //;s/ .*//;2,$d')
 
 DIR="$(realpath "$(dirname "$0")")"/..
