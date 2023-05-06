@@ -38,34 +38,37 @@ int main(int argc, char **argv) {
         printf("%s%d", i == 0 ? "" : ".", ip_data[i]);
 }
 EOF
-            BUILD_FILE=$(mktemp)
-            cc -o $BUILD_FILE $C_FILE
-            $BUILD_FILE "$@"
+                BUILD_FILE=$(mktemp)
+                cc -o $BUILD_FILE $C_FILE
+                $BUILD_FILE "$@"
 
-            rm $BUILD_FILE $C_FILE
+                rm $BUILD_FILE $C_FILE
             }
 
             JETSON_ADDRESS=$(lookup_addr jetson)
             MY_ADDRESS=$(ip route get $JETSON_ADDRESS | sed 's/.* src //;s/ .*//;2,$d')
 
             echo "Add '129.138.xxx.xxx  jetson' to /etc/hosts for network support"
-            param1="-e ROS_IP=$MY_ADDRESS -e ROS_MASTER_URI=http://jetson:11311"
+            param1=(
+                -e ROS_IP=$MY_ADDRESS
+                -e ROS_MASTER_URI=http://jetson:11311
+            )
         ;;
     esac
 done
 
-param2=""
+param2=()
 for ((c=32; c>=0; c--)); do
     file="/dev/input/js$c"
     if [ -e $file ]; then
-        param2="--device=$file"
+        param2=("--device=$file")
     fi
 done
 
 params=(
     --rm
     -it
-    --net=host
+    --network=host
     -v $DIR:$DIR
     -e DISPLAY
     -v /tmp/.X11-unix:/tmp/.X11-unix:rw
@@ -73,8 +76,8 @@ params=(
     --device-cgroup-rule "c 81:* rmw"
     --device-cgroup-rule "c 189:* rmw"
     --name=lunabotics-term
-    $param1
-    $param2
+    "${param1[@]}"
+    "${param2[@]}"
 )
 
 sudo docker build "$DIR/ros" -t lunabotics-2023-ros
@@ -82,11 +85,11 @@ sudo docker run \
     "${params[@]}" \
     lunabotics-2023-ros \
     sh -c "
-    cd $PWD
-    export HOME="$HOME"
-    export PS1='\u@\h:\w\$ '
-    [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
-    bash
+        cd $PWD
+        export HOME="$HOME"
+        export PS1='\u@\h:\w\$ '
+        [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
+        bash
     "
 
 # ROS might create files owned by root here; it'll cause all kinds of
