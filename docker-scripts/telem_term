@@ -2,15 +2,22 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Generates a shell inside the ROS container, with ROS_MASTER_URI set
-# to the Jetson.
+DIR="$(realpath "$(dirname "$0")")"/..
 
-lookup_addr () {
-    # Looking up addresses is weirdly almost impossible in bash in a
-    # way that respects /etc/hosts and acts exactly as the standard
-    # system resolver would. Shell out to C to do the lookup instead.
-    C_FILE=$(mktemp --suffix=.c)
-    cat > $C_FILE <<EOF
+# if -r, enable remote support
+param1=""
+while getopts 'r' OPTION; do
+    case "$OPTION" in
+        r)
+            # Generates a shell inside the ROS container, with ROS_MASTER_URI set
+            # to the Jetson.
+
+            lookup_addr () {
+                # Looking up addresses is weirdly almost impossible in bash in a
+                # way that respects /etc/hosts and acts exactly as the standard
+                # system resolver would. Shell out to C to do the lookup instead.
+                C_FILE=$(mktemp --suffix=.c)
+                cat > $C_FILE <<EOF
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,37 +38,55 @@ int main(int argc, char **argv) {
         printf("%s%d", i == 0 ? "" : ".", ip_data[i]);
 }
 EOF
-    BUILD_FILE=$(mktemp)
-    cc -o $BUILD_FILE $C_FILE
-    $BUILD_FILE "$@"
+            BUILD_FILE=$(mktemp)
+            cc -o $BUILD_FILE $C_FILE
+            $BUILD_FILE "$@"
 
-    rm $BUILD_FILE $C_FILE
-}
+            rm $BUILD_FILE $C_FILE
+            }
 
-JETSON_ADDRESS=$(lookup_addr jetson)
-MY_ADDRESS=$(ip route get $JETSON_ADDRESS | sed 's/.* src //;s/ .*//;2,$d')
+            JETSON_ADDRESS=$(lookup_addr jetson)
+            MY_ADDRESS=$(ip route get $JETSON_ADDRESS | sed 's/.* src //;s/ .*//;2,$d')
 
-DIR="$(realpath "$(dirname "$0")")"/..
+            echo "Add '129.138.xxx.xxx  jetson' to /etc/hosts for network support"
+            param1="-e ROS_IP=$MY_ADDRESS -e ROS_MASTER_URI=http://jetson:11311"
+        ;;
+    esac
+done
+
+param2=""
+for ((c=32; c>=0; c--)); do
+    file="/dev/input/js$c"
+    if [ -e $file ]; then
+        param2="--device=$file"
+    fi
+done
+
+params=(
+    --rm
+    -it
+    --net=host
+    -v $DIR:$DIR
+    -e DISPLAY
+    -v /tmp/.X11-unix:/tmp/.X11-unix:rw
+    -v /dev:/dev:rw
+    --device-cgroup-rule "c 81:* rmw"
+    --device-cgroup-rule "c 189:* rmw"
+    $param1
+    $param2
+)
 
 sudo docker build "$DIR/ros" -t lunabotics-2023-ros
 sudo docker run \
-     --rm \
-     -it \
-     -v $DIR:$DIR \
-     -e DISPLAY \
-     -e ROS_IP=$MY_ADDRESS \
-     -v /tmp/.X11-unix:/tmp/.X11-unix \
-     -v /dev/dri:/dev/dri \
-     --network=host \
-     lunabotics-2023-ros \
-     sh -c "
-         cd $PWD
-         export HOME="$HOME"
-         export PS1='\u@\h:\w\$ '
-         [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
-         export ROS_MASTER_URI='http://$JETSON_ADDRESS:11311'
-         bash
-     "
+    "${params[@]}" \
+    lunabotics-2023-ros \
+    sh -c "
+    cd $PWD
+    export HOME="$HOME"
+    export PS1='\u@\h:\w\$ '
+    [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
+    bash
+    "
 
 # ROS might create files owned by root here; it'll cause all kinds of
 # problems with git.

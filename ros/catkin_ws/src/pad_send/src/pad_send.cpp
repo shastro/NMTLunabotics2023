@@ -48,7 +48,6 @@ int main(int argc, char *argv[]) {
     bool lastB = false;
     bool home = false;
 
-    std::stringstream out;
 
     while (going) {
         g.update();
@@ -56,6 +55,8 @@ int main(int argc, char *argv[]) {
             count++;
             continue;
         }
+
+        std::stringstream out;
 
         // Control scheme
         out << controller_input << "\n";
