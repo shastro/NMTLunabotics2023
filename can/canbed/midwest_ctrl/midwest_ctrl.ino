@@ -6,6 +6,7 @@
 #include <mcp_can.h>
 
 #include "david.h"
+#include "pins_arduino.h"
 
 #define SPI_CS_PIN 17
 
@@ -30,21 +31,20 @@ class DigOutPin {
 
 // Motor controller object.
 class MotorController {
-    DigOutPin relay_left;
-    DigOutPin relay_right;
-    DigOutPin relay_common;
+    DigOutPin dir_clockwise;
+    DigOutPin dir_counter;
+    DigOutPin inhibit;
 
     void set_direction(bool clockwise) {
-        // Create a 5-volt difference between relay_left and _right,
-        // which will trigger the coil in the relay.
-        relay_left.write(clockwise);
-        relay_right.write(!clockwise);
+        dir_clockwise.write(clockwise);
+        dir_counter.write(!clockwise);
     }
 
   public:
-    MotorController(int relay_left, int relay_right, int relay_common)
-      : relay_left(relay_left), relay_right(relay_right),
-        relay_common(relay_common) {
+    // Build a motor controller with the given pins.
+    MotorController(int dir_clockwise, int dir_counter, int inhibit)
+        : dir_clockwise(dir_clockwise), dir_counter(dir_counter),
+          inhibit(inhibit) {
         setVel(0);
     }
 
@@ -52,28 +52,13 @@ class MotorController {
         // Currently we only support full forward, full backward, and
         // stopped velocity.
         if (abs(vel) < VEL_DEADZONE) {
-            // relay_common is also tied to MMP's pin 9
-            // "INHIBIT/ENABLE", so writing 0 to this also turns off
-            // the motor.
-
-            // Do you have any idea how fucking long it took to figure
-            // out how to turn off this motor? We tried turning off
-            // both inputs to the driver. We tried turning on both
-            // inputs to the driver. For hours we had this thing
-            // turning one direction or the other, but able to stop
-            // only about 75% of the time. The relevant data sheet
-            // section says "TTL level (+5V) inhibit/enable input.
-            // Pull to ground to inhibit drive (SW1-5 ON). Pull to
-            // ground to enable drive (SW1-5 OFF)." Ah, so it's not
-            // "stop," it's not "turn the fucking motor off," it's not
-            // "disable," it's fucking "INHIBIT."
-            relay_common.write(false);
+            inhibit.write(false);
         } else if (vel > 0) {
             set_direction(true);
-            relay_common.write(true);
+            inhibit.write(true);
         } else {
             set_direction(false);
-            relay_common.write(true);
+            inhibit.write(true);
         }
     }
 
@@ -112,24 +97,6 @@ void setup() {
 
     bool eStopped = false;
     while (true) {
-        // left.setVel(1);
-        // delay(1000);
-        // left.setVel(0);
-        // delay(1000);
-        // left.setVel(-1);
-        // delay(1000);
-        // left.setVel(0);
-        // delay(1000);
-
-        // right.setVel(1);
-        // delay(1000);
-        // right.setVel(0);
-        // delay(1000);
-        // right.setVel(-1);
-        // delay(1000);
-        // right.setVel(0);
-        // delay(1000);
-
         CANPacket packet = can_read(can);
         switch (packet.id) {
         case DAVID_E_STOP_FRAME_ID: {
