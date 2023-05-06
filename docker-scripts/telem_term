@@ -72,6 +72,7 @@ params=(
     -v /dev:/dev:rw
     --device-cgroup-rule "c 81:* rmw"
     --device-cgroup-rule "c 189:* rmw"
+    --name=lunabotics-term
     $param1
     $param2
 )
