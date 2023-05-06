@@ -65,8 +65,20 @@ with open(system_msg_path, 'w') as s:
                 # Write the signal definition to the file
                 name = camel_to_snake(sig['name'])
                 names.append(name)
-                size = sig['length']
-                m.write('int' + size + ' ' + name + '\n')
+                size = int(sig['length'])
+                if size == 1:
+                    var = "bool"
+                elif size > 1 and size <= 8:
+                    var = "int8"
+                elif size > 8 and size <= 16:
+                    var = "int16"
+                elif size > 16 and size <= 32:
+                    var = "int32"
+                else:
+                    var = "int64"
+                if hasattr(sig, 'value') and sig.value['slope'] is not None:
+                    var = "float"
+                m.write(var +  ' ' + name + '\n')
 
         msgs[msg_name] = names
 
