@@ -16,115 +16,133 @@
 
     <Bus name="Main">
         <Message id="0x000" name="EStop">
-            <!-- Priority 0 -->
             <Producer>
                 <NodeRef id="0"/>
             </Producer>
             <Signal name="Stop" offset="0" length="8"/>
-            <!-- Estop -->
-            <!-- 0: Stop -->
-            <!-- 1: Go -->
         </Message>
 
         <Message id="0x100" name="PitchCtrl">
-            <!--Priority 2 -->
-            <!--TODO change to position between 0 and 1024 -->
             <Producer>
                 <NodeRef id="2"/>
             </Producer>
-            <Signal name="Home" offset="0" length="8"/>
-            <!-- 0: Normal operation -->
-            <!-- 1: Home to direction -->
-            <Signal name="Direction" offset="8" length="8"/>
-            <!-- 0: stop -->
-            <!-- 1: forward -->
-            <!-- 2: retract -->
+            <Signal name="SetPoint" offset="0" length="9">
+                <!--Slope should be the max value in the units you want divided by the max value of the region (eg 153/2^9) -->
+                <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+            </Signal>
+            <Signal name="LeftOffset" offset="9" length="9">
+                <!--Slope should be the max value in the units you want divided by the max value of the region (eg 153/2^9) -->
+                <Value type="unsigned" unit="mm" slope="0.296875" intercept="-76.5" min="-76.5" max="76.5"/>
+            </Signal>
+            <Signal name="RightOffset" offset="18" length="9">
+                <!--Slope should be the max value in the units you want divided by the max value of the region (eg 153/2^9) -->
+                <Value type="unsigned" unit="mm" slope="0.296875" intercept="-76.5" min="-76.5" max="76.5"/>
+            </Signal>
         </Message>
-
-        <Message id="0x101" name="PitchAdjust">
-            <!-- Priority 1 -->
+        <Message id="0x110" name="PitchPositionTelem">
             <Producer>
                 <NodeRef id="2"/>
             </Producer>
-            <Signal name="Motor" offset="0" length = "8" />
-            <!-- 0: both -->
-            <!-- 1: left -->
-            <!-- 2: right -->
-            <Signal name="Dir" offset="8" length="8" />
-            <!-- 0: stop -->
-            <!-- 1: forward -->
-            <!-- 2: retract -->
-            <Signal name="Amount" offset="16" length="8" />
-            <!-- Amount to adjust: 0 - 64 -->
+            <Signal name="LeftPosition" offset="0" length="9">
+                <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+            </Signal>
+            <Signal name="RightPosition" offset="9" length="9">
+                <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+            </Signal>
         </Message>
 
-        <Message id="0x111" name="PitchTelem">
+        <Message id="0x111" name="PitchDriverTelem">
             <!-- Priority 3 -->
             <Producer>
                 <NodeRef id="2"/>
             </Producer>
-            <Signal name="LeftCount" offset="0" length="16"/>
-            <Signal name="LeftDirection" offset="16" length="16"/>
-            <Signal name="RightCount" offset="32" length="16"/>
-            <Signal name="RightDirection" offset="48" length="16"/>
+            <Signal name="LeftCurrent" offset="0" length="8">
+                <!--slope = 20/186-->
+                <Value type="unsigned" unit="Amp" slope="0.10752" intercept="0.0" min="0.0" max="20.0"/>
+            </Signal>
+            <Signal name="RightCurrent" offset="8" length="8">
+                <!--slope = 20/186-->
+                <Value type="unsigned" unit="Amp" slope="0.10752" intercept="0.0" min="0.0" max="20.0"/>
+            </Signal>
+            <Signal name="LeftTemperature" offset="16" length="8">
+                <!--slope = (125+40)/255-->
+                <Value type="unsigned" unit="Cel" slope="0.64453125" intercept="-40" min="-40" max="125"/>
+            </Signal>
+            <Signal name="RightTemperature" offset="24" length="8">
+                <!--slope = (125+40)/255-->
+                <Value type="unsigned" unit="Cel" slope="0.64453125" intercept="-40" min="-40" max="125"/>
+            </Signal>
         </Message>
 
         <Message id="0x200" name="LocoCtrl">
-            <!-- Priority 1 -->
             <Producer>
                 <NodeRef id="1"/>
             </Producer>
-            <Signal name="LeftVel" offset="0" length="16">
-                <Value type="signed"/>
+            <Signal name="LeftPower" offset="0" length="16">
+                <Value type="unsigned" slope="0.0030517578125" intercept="-100" min="-100" max="100"/>
             </Signal>
-            <!-- value between -1024 and 1024 -->
-            <Signal name="RightVel" offset="16" length="16">
-                <Value type="signed"/>
+            <Signal name="RightPower" offset="16" length="16">
+                <Value type="unsigned" slope="0.0030517578125" intercept="-100" min="-100" max="100"/>
             </Signal>
-            <!-- value between -1024 and 1024 -->
         </Message>
 
         <Message id="0x201" name="ExcavCtrl">
             <Producer>
                 <NodeRef id="4"/>
             </Producer>
-            <Signal name="Direction" offset="0" length="8" />
-            <!-- 0: stop -->
-            <!-- 1: forward -->
-            <!-- 2: retract -->
+            <Notes>
+                Negative power is reverse.
+                -100 is 100% power in reverse
+                100 is 100% power in reverse
+            </Notes>
+            <Signal name="Power" offset="2" length="16">
+                <Value type="unsigned" slope="0.0030517578125" intercept="-100" min="-100" max="100"/>
+            </Signal>
         </Message>
 
         <Message id="0x300" name="StepperCtrl">
-            <!-- Priority 1 -->
-            <!--TODO change to position between 0 and 1024 -->
             <Producer>
                 <NodeRef id="3"/>
             </Producer>
-            <Signal name="Home" offset="0" length="8"/>
-            <!-- 0: Normal operation -->
-            <!-- 1: Home to direction -->
-            <Signal name="Direction" offset="8" length="8"/>
-            <!-- 0: stop -->
-            <!-- 1: forward -->
-            <!-- 2: retract -->
-            <Signal name="RPM" offset="16" length="32"/>
-            <!-- RPM between 0 and 1024 -->
+            <Notes>
+                Home may not actually be something we want at this level.
+                Steppers should home/reset some internal measure of position
+                whenever they hit a limit switch.
+                We should home on startup
+            </Notes>
+            <Signal name="Home" offset="0" length="1">
+            <LabelSet> 
+                <Label name='False' value="0"/> 
+                <Label name='True' value="1"/> 
+            </LabelSet> 
+            </Signal>
+            <Signal name="SetPoint" offset="1" length="11">
+                <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+            </Signal>
         </Message>
-
-        <Message id="0x301" name="StepperCtrlAdjust">
-            <Producer>
-                <NodeRef id="3"/>
-            </Producer>
-            <Signal name="Motor" offset="0" length = "8" />
-            <!-- 0: both -->
-            <!-- 1: left -->
-            <!-- 2: right -->
-            <Signal name="Dir" offset="8" length="8" />
-            <!-- 0: stop -->
-            <!-- 1: forward -->
-            <!-- 2: retract -->
-            <Signal name="Amount" offset="16" length="16" />
-            <!-- Amount to adjust: 0 - 64 -->
+        <Message id="0x311" name="StepperTelem">
+        <Notes>
+            Min and Max stop refer to if we are currently at a limit switch
+            TODO: Get correct slope for steppers
+        </Notes>
+        <Signal name="AtMinStop" offset="0" length="1">
+        <LabelSet> 
+            <Label name='False' value="0"/> 
+            <Label name='True' value="1"/> 
+        </LabelSet> 
+        </Signal>
+        <Signal name="AtMaxStop" offset="1" length="1">
+        <LabelSet> 
+            <Label name='False' value="0"/> 
+            <Label name='True' value="1"/> 
+        </LabelSet> 
+        </Signal>
+        <Signal name="LeftPosition" offset="2" length="11">
+            <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+        </Signal>
+        <Signal name="RightPosition" offset="13" length="11">
+            <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+        </Signal>
         </Message>
     </Bus>
 </NetworkDefinition>
