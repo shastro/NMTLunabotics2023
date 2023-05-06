@@ -61,7 +61,11 @@ mkShell {
       #!/bin/sh
       # do nothing
     '')
-    python310
+
+    # untangle is used in bus_spec
+    (python310.withPackages (pkgs: [
+      pkgs.untangle
+    ]))
 
     # Make wrappers for the ROS programs.
     (symlinkJoin {
