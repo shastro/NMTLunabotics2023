@@ -111,38 +111,38 @@
                 We should home on startup
             </Notes>
             <Signal name="Home" offset="0" length="1">
-            <LabelSet> 
-                <Label name='False' value="0"/> 
-                <Label name='True' value="1"/> 
-            </LabelSet> 
+                <LabelSet>
+                    <Label name='False' value="0"/>
+                    <Label name='True' value="1"/>
+                </LabelSet>
             </Signal>
             <Signal name="SetPoint" offset="1" length="11">
                 <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
             </Signal>
         </Message>
         <Message id="0x311" name="StepperTelem">
-        <Notes>
-            Min and Max stop refer to if we are currently at a limit switch
-            TODO: Get correct slope for steppers
-        </Notes>
-        <Signal name="AtMinStop" offset="0" length="1">
-        <LabelSet> 
-            <Label name='False' value="0"/> 
-            <Label name='True' value="1"/> 
-        </LabelSet> 
-        </Signal>
-        <Signal name="AtMaxStop" offset="1" length="1">
-        <LabelSet> 
-            <Label name='False' value="0"/> 
-            <Label name='True' value="1"/> 
-        </LabelSet> 
-        </Signal>
-        <Signal name="LeftPosition" offset="2" length="11">
-            <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
-        </Signal>
-        <Signal name="RightPosition" offset="13" length="11">
-            <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
-        </Signal>
+            <Notes>
+                Min and Max stop refer to if we are currently at a limit switch
+                TODO: Get correct slope for steppers
+            </Notes>
+            <Signal name="AtMinStop" offset="0" length="1">
+                <LabelSet>
+                    <Label name='False' value="0"/>
+                    <Label name='True' value="1"/>
+                </LabelSet>
+            </Signal>
+            <Signal name="AtMaxStop" offset="1" length="1">
+                <LabelSet>
+                    <Label name='False' value="0"/>
+                    <Label name='True' value="1"/>
+                </LabelSet>
+            </Signal>
+            <Signal name="LeftPosition" offset="2" length="11">
+                <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+            </Signal>
+            <Signal name="RightPosition" offset="13" length="11">
+                <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+            </Signal>
         </Message>
     </Bus>
 </NetworkDefinition>
