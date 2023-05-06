@@ -22,7 +22,7 @@ add_executable(pad_send
     src/joystick/gamepad.cpp)
 add_dependencies(pad_send motor_bridge
     ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(pad_send ${catkin_LIBRARIES})
+target_link_libraries(pad_send ${catkin_LIBRARIES} ncurses)
 install(TARGETS
     pad_send
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
