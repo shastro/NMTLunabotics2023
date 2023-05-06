@@ -8,25 +8,43 @@ DIR="$(realpath "$(dirname "$0")")"/..
 
 sudo docker build "$DIR/ros" -t lunabotics-2023-ros
 
-echo "Add '129.138.xxx.xxx  jetson' to /etc/hosts for network support"
+# if -r, enable remote support
+param1=""
+while getopts 'r' OPTION; do
+    case "$OPTION" in
+        r)
+            echo "Add '129.138.xxx.xxx  jetson' to /etc/hosts for network support"
+            ip=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
+            param1="-e ROS_IP=$ip -e ROS_MASTER_URI=http://jetson:11311"
+            ;;
+    esac
+done
 
-ip=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
+param2=""
+for ((c=32; c>=0; c--)); do
+    file="/dev/input/js$c"
+    if [ -e $file ]; then
+        param2="--device=$file"
+    fi
+done
 
-#    --device=/dev/input/js0 \
-#    -e ROS_IP=$ip \
-#    -e ROS_MASTER_URI=http://jetson:11311 \
+params=(
+    --rm
+    -it
+    --net=host
+    -v $DIR:$DIR
+    -e DISPLAY
+    --device=/dev/input/js0
+    -v /tmp/.X11-unix:/tmp/.X11-unix:rw
+    -v /dev:/dev:rw
+    --device-cgroup-rule "c 81:* rmw"
+    --device-cgroup-rule "c 189:* rmw"
+    $param1
+    $param2
+)
 
 sudo docker run \
-    --rm \
-    -it \
-    --net=host \
-    -v $DIR:$DIR \
-    -e DISPLAY \
-    --device=/dev/input/js0 \
-    -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-    -v /dev:/dev:rw \
-    --device-cgroup-rule "c 81:* rmw" \
-    --device-cgroup-rule "c 189:* rmw" \
+    "${params[@]}" \
     lunabotics-2023-ros \
     sh -c "
         cd $PWD

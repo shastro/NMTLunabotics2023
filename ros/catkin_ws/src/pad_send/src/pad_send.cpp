@@ -11,84 +11,127 @@ int main(int argc, char *argv[]) {
     int min = -max;
     int dead = 200;
     ros::Publisher pub = nh.advertise<motor_bridge::System>("/system", 5);
-    int fd, num_of_joysticks, joynum, max_joy_index = -1;
+
+    // Get joystick last plugged in
     char name_of_joy[80];
     char controller_input[80];
-    num_of_joysticks = 0;
-    for (joynum = 0; joynum < 16; joynum++)
-    {
+    int joynum = 16;
+    bool found = false;
+    while (joynum >= 0 && !found) {
+        joynum--;
         sprintf(name_of_joy, "/dev/input/js%d", joynum);
-        fd = open(name_of_joy, O_RDONLY);
-        if (fd >= 0)
-        {
-            num_of_joysticks++;
-            if (joynum > max_joy_index)
-                max_joy_index = joynum;
-            close(fd);
+        int fd = open(name_of_joy, O_RDONLY);
+        if (fd >= 0) {
+            found = true;
         }
     }
-    sprintf(controller_input, "/dev/input/js%d", max_joy_index);
-    printf("%s", controller_input);
+    sprintf(controller_input, "/dev/input/js%d", joynum);
+    std:: cout << controller_input << std::endl;
     GamepadHandler g(controller_input, max, dead);
+
+    std::stringstream ctrls;
+    ctrls << "A - Estop, B - Un Estop, XBOX - quit\n";
+    ctrls << "Left stick - left tread, right stick - right tread\n";
+    ctrls << "Dpad: up/down - pitch up/down\n";
+    ctrls << "Dpad + X: up/down - home pitch up/down\n";
+    ctrls << "Bumpers: left - arm extend, right - arm retract\n";
+    ctrls << "Bumpers + X: left - arm extend full, right - arm retract full\n";
+    std::cout << ctrls.str();
+
+    // Get input and create message
     motor_bridge::System s;
     bool going = true;
     bool estopped = false;
     int count = 0;
     while (going) {
         g.update();
-        if (count < 100)
+        if (count < 50) {
             count++;
-
-        std::cout << g << std::endl;
-
-        if (g.buttons.xbox && count > 50) {
-            s.estop = true;
-            going = false;
+            continue;
         }
 
+        // Adjust mode
+        if (g.buttons.X) {
+            if (g.dpad.left) {
+                std::cout << "Adjust left pitch" << std::endl;
+            } else if (g.dpad.right) {
+                std::cout << "Adjust right pitch" << std::endl;
+            }
+
+            if (g.buttons.left_bumper) {
+                std::cout << "Adjust left stepper" << std::endl;
+            } else if (g.buttons.right_bumper) {
+                std::cout << "Adjust right stepper" << std::endl;
+            }
+        }
+                
+
+        //std::cout << g << std::endl;
+
         // Estop
+        /*
         if (g.buttons.A)
             estopped = true;
         if (g.buttons.B)
             estopped = false;
-        s.estop = estopped;
+        if (g.buttons.xbox) {
+            estopped = true;
+            going = false;
+        }
+        s.e_stop.stop = estopped;
 
-        // Drive left stick
-        /*
-        int left = g.left_stick.x + g.left_stick.y;
-        int right = g.left_stick.y - g.left_stick.x;
-        left = (left > max) ? max : left;
-        left = (left < min) ? min : left;
-        right = (right > max) ? max : right;
-        right = (right < min) ? min : right;
-        s.left.rpm = left;
-        s.right.rpm = right;
-        */
+        // Drive with both sticks
+        s.loco_ctrl.left_vel = g.left_stick.y;
+        s.loco_ctrl.right_vel = g.right_stick.y;
 
-        // Drive both sticks
-        s.left.rpm = g.left_stick.y;
-        s.right.rpm = g.right_stick.y;
-
-        // Pitch dpad up/down
-        if (g.dpad.up)
-            s.pitch.direction = 1;
-        else if (g.dpad.down)
-            s.pitch.direction = 2;
-        else
-            s.pitch.direction = 0;
-        s.pitch.motor = 0;
+        // Pitch control with dpad
+        if (g.dpad.up) {
+            s.pitch_ctrl.home = 0;
+            s.pitch_ctrl.direction = 1;
+        } else if (g.dpad.down) {
+            s.pitch_ctrl.home = 0;
+            s.pitch_ctrl.direction = 2;
+        } else if (g.dpad.up && g.buttons.X) {
+            s.pitch_ctrl.home = 1;
+            s.pitch_ctrl.direction = 1;
+        } else if (g.dpad.down && g.buttons.X) {
+            s.pitch_ctrl.home = 1;
+            s.pitch_ctrl.direction = 2;
+        } else {
+            s.pitch_ctrl.home = 0;
+            s.pitch_ctrl.direction = 0;
+        }
 
         // Extend bumpers
-        s.extend.direction = g.buttons.left_bumper ? 2 : 0;
-        s.extend.direction = g.buttons.right_bumper ? 1 : s.extend.direction;
-        s.extend.rpm = (s.extend.direction != 0) ? max : 0;
-        s.extend.motor = 0;
+        s.stepper_ctrl.rpm = 1024;
+        if (g.buttons.left_bumper) {
+            s.stepper_ctrl.home = 0;
+            s.stepper_ctrl.direction = 1;
+        } else if (g.buttons.right_bumper) {
+            s.stepper_ctrl.home = 0;
+            s.stepper_ctrl.direction = 2;
+        } else if (g.buttons.left_bumper && g.buttons.X) {
+            s.stepper_ctrl.home = 1;
+            s.stepper_ctrl.direction = 1;
+        } else if (g.buttons.right_bumper && g.buttons.X) {
+            s.stepper_ctrl.home = 1;
+            s.stepper_ctrl.direction = 2;
+        } else {
+            s.stepper_ctrl.home = 0;
+            s.stepper_ctrl.direction = 0;
+            s.stepper_ctrl.rpm = 0;
+        }
 
         // Digger triggers
-        s.digger.rpm = g.right_trigger;
-        s.digger.rpm = (g.left_trigger > 0) ? -g.left_trigger : s.digger.rpm;
-
+        if (g.left_trigger > 0) {
+            s.excav_ctrl.direction = 1;
+        } else if (g.right_trigger > 0) {
+            s.excav_ctrl.direction = 2;
+        } else {
+            s.excav_ctrl.direction = 0;
+        }
         pub.publish(s);
+        */
     }
     return 0;
 }
