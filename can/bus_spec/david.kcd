@@ -87,6 +87,15 @@
                 <Value type="unsigned" unit="Cel" slope="0.64453125"
                        intercept="-40" min="-40" max="125"/>
             </Signal>
+
+            <Signal name="Direction" offset="32" length="2">
+                <!--slope = (125+40)/255-->
+                <LabelSet> 
+                    <Label name='Stop' value="0"/> 
+                    <Label name='Extend' value="1"/> 
+                    <Label name='Retract' value="2"/> 
+                </LabelSet> 
+            </Signal>
         </Message>
 
         <Message id="0x200" name="LocoCtrl">
