@@ -1,4 +1,4 @@
-#include <david.h>
+#include "david.h"
 
 
 /*
@@ -7,7 +7,22 @@
  * Auto generated from KCD file
  */
 
-#include <david.h>
+// struct CANPacket {
+//     uint32_t len;
+//     uint32_t id;
+//     unsigned char buf[8];
+// };
+
+// template <typename T>
+// void david_excav_ctrl_run(const CANPacket &packet, T function) {
+//     if (packet.id == DAVID_EXCAV_CTRL_FRAME_ID) {
+//         struct david_excav_ctrl_t s;
+//         david_excav_ctrl_unpack(&s, packet.buf, packet.len);
+//         function(s);
+//     }
+// }
+
+
 void unpackEStop(int can_id, uint8_t* buff, int8* stop);
 void unpackPitchCtrl(int can_id, uint8_t* buff, int16* set_point, int16* left_offset, int16* right_offset);
 void unpackPitchPositionTelem(int can_id, uint8_t* buff, int16* left_position, int16* right_position);
