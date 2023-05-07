@@ -5,7 +5,7 @@ IFS=$'\n\t'
 DIR="$(realpath "$(dirname "$0")")"/..
 
 # if -r, enable remote support
-param1=""
+param1=()
 while getopts 'r' OPTION; do
     case "$OPTION" in
         r)
@@ -76,8 +76,8 @@ params=(
     --device-cgroup-rule "c 81:* rmw"
     --device-cgroup-rule "c 189:* rmw"
     --name=lunabotics-term
-    $param1
-    $param2
+    "${param1[@]}"
+    "${param2[@]}"
 )
 
 sudo docker build "$DIR" -t lunabotics-2023-ros
