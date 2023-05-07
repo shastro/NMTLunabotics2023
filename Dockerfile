@@ -23,6 +23,8 @@ RUN apt-get install -y \
     ros-noetic-tf2-tools
 
 COPY ros/scripts /ros/scripts
-COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
-COPY ros/catkin_ws/src /ros/catkin_ws/src
+COPY ros/catkin_ws /ros/catkin_ws
 COPY can /can
+
+# Add /catkin_ws to the ROS environment.
+COPY ros/ros_entrypoint.sh /ros_entrypoint.sh
