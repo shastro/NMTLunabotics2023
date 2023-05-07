@@ -166,22 +166,14 @@ struct david_loco_ctrl_t {
      * Scale: 0.0030517578125
      * Offset: -100
      */
-<<<<<<< HEAD
     uint16_t left_vel;
-=======
-    uint16_t left_power;
->>>>>>> dbd73ad6fb397231e4137d44b2839b593ef0b958
 
     /**
      * Range: 0..65536 (-100..100 -)
      * Scale: 0.0030517578125
      * Offset: -100
      */
-<<<<<<< HEAD
     uint16_t right_vel;
-=======
-    uint16_t right_power;
->>>>>>> dbd73ad6fb397231e4137d44b2839b593ef0b958
 };
 
 /**
@@ -201,11 +193,7 @@ struct david_excav_ctrl_t {
      * Scale: 0.0030517578125
      * Offset: -100
      */
-<<<<<<< HEAD
     uint16_t vel;
-=======
-    uint16_t power;
->>>>>>> dbd73ad6fb397231e4137d44b2839b593ef0b958
 };
 
 /**
@@ -693,11 +681,7 @@ int david_loco_ctrl_unpack(
  *
  * @return Encoded signal.
  */
-<<<<<<< HEAD
 uint16_t david_loco_ctrl_left_vel_encode(double value);
-=======
-uint16_t david_loco_ctrl_left_power_encode(double value);
->>>>>>> dbd73ad6fb397231e4137d44b2839b593ef0b958
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -706,11 +690,7 @@ uint16_t david_loco_ctrl_left_power_encode(double value);
  *
  * @return Decoded signal.
  */
-<<<<<<< HEAD
 double david_loco_ctrl_left_vel_decode(uint16_t value);
-=======
-double david_loco_ctrl_left_power_decode(uint16_t value);
->>>>>>> dbd73ad6fb397231e4137d44b2839b593ef0b958
 
 /**
  * Check that given signal is in allowed range.
@@ -719,11 +699,7 @@ double david_loco_ctrl_left_power_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-<<<<<<< HEAD
 bool david_loco_ctrl_left_vel_is_in_range(uint16_t value);
-=======
-bool david_loco_ctrl_left_power_is_in_range(uint16_t value);
->>>>>>> dbd73ad6fb397231e4137d44b2839b593ef0b958
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -732,11 +708,7 @@ bool david_loco_ctrl_left_power_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-<<<<<<< HEAD
 uint16_t david_loco_ctrl_right_vel_encode(double value);
-=======
-uint16_t david_loco_ctrl_right_power_encode(double value);
->>>>>>> dbd73ad6fb397231e4137d44b2839b593ef0b958
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -745,11 +717,7 @@ uint16_t david_loco_ctrl_right_power_encode(double value);
  *
  * @return Decoded signal.
  */
-<<<<<<< HEAD
 double david_loco_ctrl_right_vel_decode(uint16_t value);
-=======
-double david_loco_ctrl_right_power_decode(uint16_t value);
->>>>>>> dbd73ad6fb397231e4137d44b2839b593ef0b958
 
 /**
  * Check that given signal is in allowed range.
@@ -758,11 +726,7 @@ double david_loco_ctrl_right_power_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-<<<<<<< HEAD
 bool david_loco_ctrl_right_vel_is_in_range(uint16_t value);
-=======
-bool david_loco_ctrl_right_power_is_in_range(uint16_t value);
->>>>>>> dbd73ad6fb397231e4137d44b2839b593ef0b958
 
 /**
  * Pack message ExcavCtrl.
@@ -799,11 +763,7 @@ int david_excav_ctrl_unpack(
  *
  * @return Encoded signal.
  */
-<<<<<<< HEAD
 uint16_t david_excav_ctrl_vel_encode(double value);
-=======
-uint16_t david_excav_ctrl_power_encode(double value);
->>>>>>> dbd73ad6fb397231e4137d44b2839b593ef0b958
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -812,11 +772,7 @@ uint16_t david_excav_ctrl_power_encode(double value);
  *
  * @return Decoded signal.
  */
-<<<<<<< HEAD
 double david_excav_ctrl_vel_decode(uint16_t value);
-=======
-double david_excav_ctrl_power_decode(uint16_t value);
->>>>>>> dbd73ad6fb397231e4137d44b2839b593ef0b958
 
 /**
  * Check that given signal is in allowed range.
@@ -825,11 +781,7 @@ double david_excav_ctrl_power_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-<<<<<<< HEAD
 bool david_excav_ctrl_vel_is_in_range(uint16_t value);
-=======
-bool david_excav_ctrl_power_is_in_range(uint16_t value);
->>>>>>> dbd73ad6fb397231e4137d44b2839b593ef0b958
 
 /**
  * Pack message StepperCtrl.
