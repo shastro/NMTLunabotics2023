@@ -4,11 +4,13 @@
 int main(int argc, char **argv) {
     GamepadHandler g("/dev/input/js0", 1024, 100);
     bool going = true;
-    while(going) {
+    float pitch_max = 100;
+    float pitch_min = 0;
+    float pitch_point = 50.;
+    float delta = 0.001 * pitch_max;
+    while(true) {
         g.update();
-        std::cout << g << std::endl << std::endl;
-        if (g.buttons.Y)
-            going = false;
+        std::cout << "Here"  << std::endl;
     }
     return 0;
 }

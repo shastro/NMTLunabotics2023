@@ -49,14 +49,12 @@ void Joystick::openPath(std::string devicePath, bool blocking) {
     throw string("Error opening joystick device");
 }
 
-JoystickEvent Joystick::sample() {
-  JoystickEvent event;
-  int bytes = read(_fd, &event, sizeof(event));
+bool Joystick::sample(JoystickEvent* event) {
+  int bytes = read(_fd, event, sizeof(*event));
 
-  if (bytes != sizeof(event))
-    throw string("Error reading joystick event");
-
-  return event;
+  if (bytes != sizeof(*event))
+      return false;
+  return true;
 }
 
 Joystick::Joystick(Joystick &&other) {

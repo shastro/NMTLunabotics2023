@@ -108,6 +108,7 @@ class GamepadHandler{
         Buttons buttons;
 
         GamepadHandler(std::string pad_path, int sig_max, int dead);
+        GamepadHandler(std::string pad_path, int sig_max, int dead, bool blocking);
         ~GamepadHandler();
 
         void update();

@@ -3,10 +3,13 @@
 #include <cmath>
 #include <string>
 
-GamepadHandler::GamepadHandler(std::string pad_path, int sig_max, int dead) {
+GamepadHandler::GamepadHandler(std::string pad_path, int sig_max, int dead) :
+    GamepadHandler(pad_path, sig_max, dead, false) {}
+
+GamepadHandler::GamepadHandler(std::string pad_path, int sig_max, int dead, bool blocking) {
     std::cout << "Connecting to joystick..." << std::endl;
     try {
-        j = new Joystick(pad_path, true);
+        j = new Joystick(pad_path, blocking);
         std::cout << "awww yeahhhhh we good ... for now" << std::endl;
     } catch (std::string err) {
         std::cerr << "Connection timeout. Try plugging it in, dumbass" << std::endl;
@@ -197,13 +200,15 @@ void GamepadHandler::getButtons(JoystickEvent& event) {
 }
 
 void GamepadHandler::update() {
-    JoystickEvent e = this->j->sample();
-    this->getLeftStick(e);
-    this->getRightStick(e);
-    this->getLeftTrigger(e);
-    this->getRightTrigger(e);
-    this->getDpad(e);
-    this->getButtons(e);
+    JoystickEvent e;
+    if (this->j->sample(&e)) {
+        this->getLeftStick(e);
+        this->getRightStick(e);
+        this->getLeftTrigger(e);
+        this->getRightTrigger(e);
+        this->getDpad(e);
+        this->getButtons(e);
+    }
 }
 
 int GamepadHandler::scale(int val, int old_min, int old_max, int new_min, int new_max) {

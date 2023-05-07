@@ -6,7 +6,6 @@
  */
 
 #include <iostream>
-#include <ros/ros.h>
 #include <motor_bridge/EStop.h>
 #include <motor_bridge/PitchCtrl.h>
 #include <motor_bridge/PitchPositionTelem.h>

@@ -13,10 +13,11 @@ int map(int val, int omin, int omax, int nmin, int nmax) {
 int main(int argc, char *argv[]) {
     ros::init(argc, argv, "pad_send");
     ros::NodeHandle nh;
-    int max = 1024;
+    int max = 100;
     int min = -max;
-    int dead = 200;
+    int dead = 20;
     ros::Publisher pub = nh.advertise<motor_bridge::System>("/system", 5);
+    ros::Rate loop_rate(1);
 
     // Setup ncurses
     initscr();
@@ -46,11 +47,10 @@ int main(int argc, char *argv[]) {
     motor_bridge::System s;
     double pitch_set = (PITCH_CTRL_SET_POINT_MAX -
             PITCH_CTRL_SET_POINT_MIN) / 2;
-    double pitch_delta = 0.001 * pitch_set;
+    double pitch_delta = 0.000001 * PITCH_CTRL_SET_POINT_MAX;
     double stepper_set = (STEPPER_CTRL_SET_POINT_MAX -
             STEPPER_CTRL_SET_POINT_MIN) / 2;
-    double stepper_delta = 0.001 * stepper_set;
-    bool going = true;
+    double stepper_delta = 0.000001 * PITCH_CTRL_SET_POINT_MAX;
     bool estopped = false;
     bool adjust = false;
     int count = 0;
@@ -59,17 +59,21 @@ int main(int argc, char *argv[]) {
     bool lastA = false;
     bool lastB = false;
 
-    while (going) {
+    while (true) {
         g.update();
+        erase();
+        move(0, 0);
         if (count < 10) {
             count++;
             continue;
         }
 
+        s.header.stamp = ros::Time::now();
+        s.header.frame_id = "Pad Send";
+
         std::stringstream out;
 
         // Control scheme
-        out << controller_input << "\n";
         out << "Y - Toggle Estop, A - Adjust mode, XBOX - quit\n";
         out << "Left stick - left tread, right stick - right tread\n";
         out << "Dpad: up/down - pitch\n";
@@ -85,7 +89,8 @@ int main(int argc, char *argv[]) {
 
         if (g.buttons.xbox) {
             estopped = true;
-            going = false;
+            pub.publish(s);
+            return 0;
         }
         s.e_stop.stop = estopped;
         if (estopped)
@@ -96,7 +101,7 @@ int main(int argc, char *argv[]) {
             adjust = !adjust;
         }
 
-        if (!adjust) {
+        if (!adjust && !estopped) {
             // Pitch control with dpad
             if (g.dpad.up) {
                 pitch_set += pitch_delta;
@@ -142,20 +147,10 @@ int main(int argc, char *argv[]) {
 
             // Digger triggers
             if (g.left_trigger > 0) {
-                s.excav_ctrl.vel = map(
-                        g.left_trigger,
-                        0,
-                        max,
-                        EXCAV_CTRL_VEL_MIN,
-                        EXCAV_CTRL_VEL_MAX);
+                s.excav_ctrl.vel = -g.left_trigger;
                 out << "Dig Forward\n";
             } else if (g.right_trigger > 0) {
-                s.excav_ctrl.vel = map(
-                        -g.right_trigger,
-                        -max,
-                        0,
-                        EXCAV_CTRL_VEL_MIN,
-                        EXCAV_CTRL_VEL_MAX);
+                s.excav_ctrl.vel = g.right_trigger;
                 out << "Dig Backward\n";
             } else {
                 s.excav_ctrl.vel = 0;
@@ -172,8 +167,6 @@ int main(int argc, char *argv[]) {
         lastB = g.buttons.B;
 
         // Print
-        clear();
-        move(0, 0);
         printw(out.str().c_str());
         refresh();
 

@@ -1,5 +1,6 @@
 # System message - auto generated from kcd
 
+Header header
 EStop e_stop
 PitchCtrl pitch_ctrl
 PitchPositionTelem pitch_position_telem

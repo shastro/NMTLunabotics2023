@@ -57,7 +57,7 @@ EOF
     esac
 done
 
-param2=()
+param3=()
 for ((c=32; c>=0; c--)); do
     file="/dev/input/js$c"
     if [ -e $file ]; then

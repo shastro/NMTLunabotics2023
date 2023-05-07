@@ -17,17 +17,17 @@ tree = untangle.parse(kcd)
 # Can file names
 can_c = "canshit.cpp"
 can_h = "canshit.hpp"
+ards_c = "unpackers.cpp"
+ards_h = "unpackers.hpp"
 lim = "limits.hpp"
 
-h_template = """
+template = """
 /*
  * {0}
  * Can message generation helpers
  * Auto generated from KCD file
  */
 
-#include <iostream>
-#include <ros/ros.h>
 """
 
 c_template = """
@@ -36,12 +36,10 @@ c_template = """
  * Can message generation helpers
  * Auto generated from KCD file
  */
-#include "{1}"
-#include "david.h"
 
 """
 
-msgs = {}
+msgs = []
 
 def camel_to_snake(s):
     if s.isupper():
@@ -54,6 +52,7 @@ def camel_to_snake(s):
 system_msg_path = os.path.join(msg_dir, 'System.msg')
 with open(system_msg_path, 'w') as s, open(lim, 'w') as l:
     s.write("# System message - auto generated from kcd\n\n")
+    s.write("Header header\n")
     l.write("// Input limits - auto generated from kcd\n\n")
     # Iterate over each message in the KCD file
     for msg in tree.NetworkDefinition.Bus.Message:
@@ -62,6 +61,7 @@ with open(system_msg_path, 'w') as s, open(lim, 'w') as l:
         msg_path = os.path.join(msg_dir, '' + msg_name + '.msg')
 
         names = []
+        types = []
         with open(msg_path, 'w') as m:
             m.write("# " + msg_name +
                     " ros message - auto generated from kcd\n\n")
@@ -82,6 +82,7 @@ with open(system_msg_path, 'w') as s, open(lim, 'w') as l:
                     var = "int32"
                 else:
                     var = "int64"
+                types.append(var)
                 if hasattr(sig, 'Value'):
                     if sig.Value['slope'] is not None:
                         var = "float64"
@@ -95,48 +96,76 @@ with open(system_msg_path, 'w') as s, open(lim, 'w') as l:
                                 + sig.Value['max'] + ";\n")
                 m.write(var +  ' ' + name + '\n')
 
-        msgs[msg_name] = names
+        msgs.append([msg_name, names, types])
 
         # Add new message to combined message
         s.write(msg_name + " " + camel_to_snake(msg_name) + '\n')
 
-with open(can_c, 'w') as c, open(can_h, 'w') as h:
+with (open(can_c, 'w') as c,
+        open(can_h, 'w') as h,
+        open(ards_c, 'w') as ac,
+        open(ards_h, 'w') as ah):
     # Add stuff to c and h that always needs to be there
-    h.write(h_template.format(can_h))
-    c.write(c_template.format(can_c, can_h))
+    h.write(template.format(can_h))
+    h.write("#include <iostream>\n")
+    ah.write("#include <david.h>\n\n")
+    c.write(template.format(can_c))
+    c.write("#include <" + can_h + ">\n")
+    c.write("#include <ros/ros.h>\n\n")
 
-    for msg in msgs.keys():
-        h.write("#include <motor_bridge/" + msg + ".h>\n")
+    ah.write(template.format(ards_h))
+    ah.write("#include <david.h>\n")
+    ac.write(template.format(ards_c))
+    ac.write("#include <" + ards_h + ">\n\n")
+
+    for msg in msgs:
+        h.write("#include <motor_bridge/" + msg[0] + ".h>\n")
 
     h.write('\n')
-    for msg, names in msgs.items():
+    for msg in msgs:
         # Add functions to can_h and can_c
         func = ("int pack_msg(const motor_bridge::"
-                + msg + "& msg, uint8_t* buff)")
+                + msg[0] + "& msg, uint8_t* buff)")
         h.write(func + ";\n")
         c.write(func + " {\n")
-        c.write("    david_" + camel_to_snake(msg) + "_t t = {\n")
-        for name in names:
+        c.write("    david_" + camel_to_snake(msg[0]) + "_t t = {\n")
+        for name in msg[1]:
             c.write("        ." + name + " = msg." + name + ",\n")
 
         c.write("    };\n\n")
-        c.write("    david_" + camel_to_snake(msg) + "_pack(buff, &t, 8);\n")
+        c.write("    david_" + camel_to_snake(msg[0]) + "_pack(buff, &t, 8);\n")
         c.write("    return DAVID_" +
-                camel_to_snake(msg).upper() + "_FRAME_ID;\n")
+                camel_to_snake(msg[0]).upper() + "_FRAME_ID;\n")
         c.write("}\n\n")
+
+        # Unpack functions
+        func = "void unpack" + msg[0] + "(int can_id, uint8_t* buff"
+        for name, var in zip(msg[1], msg[2]):
+            func += ", " + var + "* " + name
+        func += ")"
+        ah.write(func + ";\n")
+        ac.write(func + "{\n")
+        ac.write("    if (can_id == DAVID_" + msg[0] + "_FRAME_ID) {\n")
+        ac.write("        david_" + camel_to_snake(msg[0]) + "_t t;\n")
+        ac.write("        david_" + camel_to_snake(msg[0]) + "_unpack(&t, buff, 8);\n")
+        for name in msg[1]:
+            ac.write("        *" + name + " = t." + name + ";\n")
+        ac.write("   }\n}\n\n")
+
     
     h.write('\n')
-    for msg, names in msgs.items():
-        func = "std::ostream& operator<<(std::ostream& s, const motor_bridge::" + msg + "& msg)"
+    for msg in msgs:
+        func = "std::ostream& operator<<(std::ostream& s, const motor_bridge::" + msg[0] + "& msg)"
         h.write(func + ";\n")
         c.write(func + " {\n")
-        c.write("    s << \"" + msg  + "\" << \" - \";\n")
-        for name in names:
-            c.write("    s << \"" + name + ": \" << msg." + name + " << \", \";\n")
+        c.write("    s << \"" + msg[0]  + " - \";\n")
+        for name in msg[1]:
+            c.write("    s << \"" + name + ": \" << (int)msg." + name + " << \", \";\n")
         c.write("    s << std::endl;\n")
         c.write("    return s;\n")
         c.write("}\n\n")
 
+# Add messsage files to cmake
 tgt = "add_message_files("
 lno = 0;
 i1 = 0;
@@ -157,9 +186,9 @@ while cline != ")":
 i2 = lno
 
 new_msgs = []
-new_msgs.append('System.msg\n')
-for key in msgs.keys():
-    new_msgs.append('    ' + key + '.msg\n')
+new_msgs.append('    System.msg\n')
+for msg in msgs:
+    new_msgs.append('    ' + msg[0] + '.msg\n')
 
 data[i1:i2] = new_msgs
 
