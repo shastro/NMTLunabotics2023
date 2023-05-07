@@ -200,9 +200,9 @@ struct david_excav_ctrl_t {
  * Signals in message StepperCtrl.
  *
  * 
-                Home may not actually be something we want at this level.
-                Steppers should home/reset some internal measure of position
-                whenever they hit a limit switch.
+                Home may not actually be something we want at this
+                level. Steppers should home/reset some internal
+                measure of position whenever they hit a limit switch.
                 We should home on startup
             
  *
@@ -228,8 +228,8 @@ struct david_stepper_ctrl_t {
  * Signals in message StepperTelem.
  *
  * 
-                Min and Max stop refer to if we are currently at a limit switch
-                TODO: Get correct slope for steppers
+                Min and Max stop refer to if we are currently at a
+                limit switch. TODO: Get correct slope for steppers
             
  *
  * All signal values are as on the CAN bus.
