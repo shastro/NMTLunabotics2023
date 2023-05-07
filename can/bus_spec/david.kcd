@@ -27,16 +27,25 @@
                 <NodeRef id="2"/>
             </Producer>
             <Signal name="SetPoint" offset="0" length="9">
-                <!--Slope should be the max value in the units you want divided by the max value of the region (eg 153/2^9) -->
-                <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+                <!--Slope should be the max value in the units you
+                     want divided by the max value of the region (eg
+                     153/2^9) -->
+                <Value type="unsigned" unit="mm" slope="0.296875"
+                       intercept="0.0" min="0.0" max="153"/>
             </Signal>
             <Signal name="LeftOffset" offset="9" length="9">
-                <!--Slope should be the max value in the units you want divided by the max value of the region (eg 153/2^9) -->
-                <Value type="unsigned" unit="mm" slope="0.296875" intercept="-76.5" min="-76.5" max="76.5"/>
+                <!--Slope should be the max value in the units you
+                     want divided by the max value of the region (eg
+                     153/2^9) -->
+                <Value type="unsigned" unit="mm" slope="0.296875"
+                       intercept="-76.5" min="-76.5" max="76.5"/>
             </Signal>
             <Signal name="RightOffset" offset="18" length="9">
-                <!--Slope should be the max value in the units you want divided by the max value of the region (eg 153/2^9) -->
-                <Value type="unsigned" unit="mm" slope="0.296875" intercept="-76.5" min="-76.5" max="76.5"/>
+                <!--Slope should be the max value in the units you
+                     want divided by the max value of the region (eg
+                     153/2^9) -->
+                <Value type="unsigned" unit="mm" slope="0.296875"
+                       intercept="-76.5" min="-76.5" max="76.5"/>
             </Signal>
         </Message>
         <Message id="0x110" name="PitchPositionTelem">
@@ -44,10 +53,12 @@
                 <NodeRef id="2"/>
             </Producer>
             <Signal name="LeftPosition" offset="0" length="9">
-                <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+                <Value type="unsigned" unit="mm" slope="0.296875"
+                       intercept="0.0" min="0.0" max="153"/>
             </Signal>
             <Signal name="RightPosition" offset="9" length="9">
-                <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+                <Value type="unsigned" unit="mm" slope="0.296875"
+                       intercept="0.0" min="0.0" max="153"/>
             </Signal>
         </Message>
 
@@ -58,19 +69,23 @@
             </Producer>
             <Signal name="LeftCurrent" offset="0" length="8">
                 <!--slope = 20/186-->
-                <Value type="unsigned" unit="Amp" slope="0.10752" intercept="0.0" min="0.0" max="20.0"/>
+                <Value type="unsigned" unit="Amp" slope="0.10752"
+                       intercept="0.0" min="0.0" max="20.0"/>
             </Signal>
             <Signal name="RightCurrent" offset="8" length="8">
                 <!--slope = 20/186-->
-                <Value type="unsigned" unit="Amp" slope="0.10752" intercept="0.0" min="0.0" max="20.0"/>
+                <Value type="unsigned" unit="Amp" slope="0.10752"
+                       intercept="0.0" min="0.0" max="20.0"/>
             </Signal>
             <Signal name="LeftTemperature" offset="16" length="8">
                 <!--slope = (125+40)/255-->
-                <Value type="unsigned" unit="Cel" slope="0.64453125" intercept="-40" min="-40" max="125"/>
+                <Value type="unsigned" unit="Cel" slope="0.64453125"
+                       intercept="-40" min="-40" max="125"/>
             </Signal>
             <Signal name="RightTemperature" offset="24" length="8">
                 <!--slope = (125+40)/255-->
-                <Value type="unsigned" unit="Cel" slope="0.64453125" intercept="-40" min="-40" max="125"/>
+                <Value type="unsigned" unit="Cel" slope="0.64453125"
+                       intercept="-40" min="-40" max="125"/>
             </Signal>
         </Message>
 
@@ -105,9 +120,9 @@
                 <NodeRef id="3"/>
             </Producer>
             <Notes>
-                Home may not actually be something we want at this level.
-                Steppers should home/reset some internal measure of position
-                whenever they hit a limit switch.
+                Home may not actually be something we want at this
+                level. Steppers should home/reset some internal
+                measure of position whenever they hit a limit switch.
                 We should home on startup
             </Notes>
             <Signal name="Home" offset="0" length="1">
@@ -117,13 +132,14 @@
                 </LabelSet>
             </Signal>
             <Signal name="SetPoint" offset="1" length="11">
-                <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+                <Value type="unsigned" unit="mm" slope="0.296875"
+                       intercept="0.0" min="0.0" max="153"/>
             </Signal>
         </Message>
         <Message id="0x311" name="StepperTelem">
             <Notes>
-                Min and Max stop refer to if we are currently at a limit switch
-                TODO: Get correct slope for steppers
+                Min and Max stop refer to if we are currently at a
+                limit switch. TODO: Get correct slope for steppers
             </Notes>
             <Signal name="AtMinStop" offset="0" length="1">
                 <LabelSet>
@@ -138,10 +154,12 @@
                 </LabelSet>
             </Signal>
             <Signal name="LeftPosition" offset="2" length="11">
-                <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+                <Value type="unsigned" unit="mm" slope="0.296875"
+                       intercept="0.0" min="0.0" max="153"/>
             </Signal>
             <Signal name="RightPosition" offset="13" length="11">
-                <Value type="unsigned" unit="mm" slope="0.296875" intercept="0.0" min="0.0" max="153"/>
+                <Value type="unsigned" unit="mm" slope="0.296875"
+                       intercept="0.0" min="0.0" max="153"/>
             </Signal>
         </Message>
     </Bus>

@@ -360,10 +360,17 @@ int david_loco_ctrl_pack(
 
     memset(&dst_p[0], 0, 4);
 
+<<<<<<< HEAD
     dst_p[0] |= pack_left_shift_u16(src_p->left_vel, 0u, 0xffu);
     dst_p[1] |= pack_right_shift_u16(src_p->left_vel, 8u, 0xffu);
     dst_p[2] |= pack_left_shift_u16(src_p->right_vel, 0u, 0xffu);
     dst_p[3] |= pack_right_shift_u16(src_p->right_vel, 8u, 0xffu);
+=======
+    dst_p[0] |= pack_left_shift_u16(src_p->left_power, 0u, 0xffu);
+    dst_p[1] |= pack_right_shift_u16(src_p->left_power, 8u, 0xffu);
+    dst_p[2] |= pack_left_shift_u16(src_p->right_power, 0u, 0xffu);
+    dst_p[3] |= pack_right_shift_u16(src_p->right_power, 8u, 0xffu);
+>>>>>>> dbd73ad6fb397231e4137d44b2839b593ef0b958
 
     return (4);
 }
