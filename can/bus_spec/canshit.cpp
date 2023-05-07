@@ -18,35 +18,35 @@ int pack_msg(const motor_bridge::EStop& msg, uint8_t* buff) {
 
 int pack_msg(const motor_bridge::PitchCtrl& msg, uint8_t* buff) {
     david_pitch_ctrl_t t = {
-        .home = msg.home,
-        .direction = msg.direction,
+        .set_point = msg.set_point,
+        .left_offset = msg.left_offset,
+        .right_offset = msg.right_offset,
     };
 
     david_pitch_ctrl_pack(buff, &t, 8);
     return DAVID_PITCH_CTRL_FRAME_ID;
 }
 
-int pack_msg(const motor_bridge::PitchAdjust& msg, uint8_t* buff) {
-    david_pitch_adjust_t t = {
-        .motor = msg.motor,
-        .dir = msg.dir,
-        .amount = msg.amount,
+int pack_msg(const motor_bridge::PitchPositionTelem& msg, uint8_t* buff) {
+    david_pitch_position_telem_t t = {
+        .left_position = msg.left_position,
+        .right_position = msg.right_position,
     };
 
-    david_pitch_adjust_pack(buff, &t, 8);
-    return DAVID_PITCH_ADJUST_FRAME_ID;
+    david_pitch_position_telem_pack(buff, &t, 8);
+    return DAVID_PITCH_POSITION_TELEM_FRAME_ID;
 }
 
-int pack_msg(const motor_bridge::PitchTelem& msg, uint8_t* buff) {
-    david_pitch_telem_t t = {
-        .left_count = msg.left_count,
-        .left_direction = msg.left_direction,
-        .right_count = msg.right_count,
-        .right_direction = msg.right_direction,
+int pack_msg(const motor_bridge::PitchDriverTelem& msg, uint8_t* buff) {
+    david_pitch_driver_telem_t t = {
+        .left_current = msg.left_current,
+        .right_current = msg.right_current,
+        .left_temperature = msg.left_temperature,
+        .right_temperature = msg.right_temperature,
     };
 
-    david_pitch_telem_pack(buff, &t, 8);
-    return DAVID_PITCH_TELEM_FRAME_ID;
+    david_pitch_driver_telem_pack(buff, &t, 8);
+    return DAVID_PITCH_DRIVER_TELEM_FRAME_ID;
 }
 
 int pack_msg(const motor_bridge::LocoCtrl& msg, uint8_t* buff) {
@@ -61,7 +61,7 @@ int pack_msg(const motor_bridge::LocoCtrl& msg, uint8_t* buff) {
 
 int pack_msg(const motor_bridge::ExcavCtrl& msg, uint8_t* buff) {
     david_excav_ctrl_t t = {
-        .direction = msg.direction,
+        .vel = msg.vel,
     };
 
     david_excav_ctrl_pack(buff, &t, 8);
@@ -71,23 +71,23 @@ int pack_msg(const motor_bridge::ExcavCtrl& msg, uint8_t* buff) {
 int pack_msg(const motor_bridge::StepperCtrl& msg, uint8_t* buff) {
     david_stepper_ctrl_t t = {
         .home = msg.home,
-        .direction = msg.direction,
-        .rpm = msg.rpm,
+        .set_point = msg.set_point,
     };
 
     david_stepper_ctrl_pack(buff, &t, 8);
     return DAVID_STEPPER_CTRL_FRAME_ID;
 }
 
-int pack_msg(const motor_bridge::StepperCtrlAdjust& msg, uint8_t* buff) {
-    david_stepper_ctrl_adjust_t t = {
-        .motor = msg.motor,
-        .dir = msg.dir,
-        .amount = msg.amount,
+int pack_msg(const motor_bridge::StepperTelem& msg, uint8_t* buff) {
+    david_stepper_telem_t t = {
+        .at_min_stop = msg.at_min_stop,
+        .at_max_stop = msg.at_max_stop,
+        .left_position = msg.left_position,
+        .right_position = msg.right_position,
     };
 
-    david_stepper_ctrl_adjust_pack(buff, &t, 8);
-    return DAVID_STEPPER_CTRL_ADJUST_FRAME_ID;
+    david_stepper_telem_pack(buff, &t, 8);
+    return DAVID_STEPPER_TELEM_FRAME_ID;
 }
 
 std::ostream& operator<<(std::ostream& s, const motor_bridge::EStop& msg) {
@@ -99,27 +99,27 @@ std::ostream& operator<<(std::ostream& s, const motor_bridge::EStop& msg) {
 
 std::ostream& operator<<(std::ostream& s, const motor_bridge::PitchCtrl& msg) {
     s << "PitchCtrl" << " - ";
-    s << "home: " << msg.home << ", ";
-    s << "direction: " << msg.direction << ", ";
+    s << "set_point: " << msg.set_point << ", ";
+    s << "left_offset: " << msg.left_offset << ", ";
+    s << "right_offset: " << msg.right_offset << ", ";
     s << std::endl;
     return s;
 }
 
-std::ostream& operator<<(std::ostream& s, const motor_bridge::PitchAdjust& msg) {
-    s << "PitchAdjust" << " - ";
-    s << "motor: " << msg.motor << ", ";
-    s << "dir: " << msg.dir << ", ";
-    s << "amount: " << msg.amount << ", ";
+std::ostream& operator<<(std::ostream& s, const motor_bridge::PitchPositionTelem& msg) {
+    s << "PitchPositionTelem" << " - ";
+    s << "left_position: " << msg.left_position << ", ";
+    s << "right_position: " << msg.right_position << ", ";
     s << std::endl;
     return s;
 }
 
-std::ostream& operator<<(std::ostream& s, const motor_bridge::PitchTelem& msg) {
-    s << "PitchTelem" << " - ";
-    s << "left_count: " << msg.left_count << ", ";
-    s << "left_direction: " << msg.left_direction << ", ";
-    s << "right_count: " << msg.right_count << ", ";
-    s << "right_direction: " << msg.right_direction << ", ";
+std::ostream& operator<<(std::ostream& s, const motor_bridge::PitchDriverTelem& msg) {
+    s << "PitchDriverTelem" << " - ";
+    s << "left_current: " << msg.left_current << ", ";
+    s << "right_current: " << msg.right_current << ", ";
+    s << "left_temperature: " << msg.left_temperature << ", ";
+    s << "right_temperature: " << msg.right_temperature << ", ";
     s << std::endl;
     return s;
 }
@@ -134,7 +134,7 @@ std::ostream& operator<<(std::ostream& s, const motor_bridge::LocoCtrl& msg) {
 
 std::ostream& operator<<(std::ostream& s, const motor_bridge::ExcavCtrl& msg) {
     s << "ExcavCtrl" << " - ";
-    s << "direction: " << msg.direction << ", ";
+    s << "vel: " << msg.vel << ", ";
     s << std::endl;
     return s;
 }
@@ -142,17 +142,17 @@ std::ostream& operator<<(std::ostream& s, const motor_bridge::ExcavCtrl& msg) {
 std::ostream& operator<<(std::ostream& s, const motor_bridge::StepperCtrl& msg) {
     s << "StepperCtrl" << " - ";
     s << "home: " << msg.home << ", ";
-    s << "direction: " << msg.direction << ", ";
-    s << "rpm: " << msg.rpm << ", ";
+    s << "set_point: " << msg.set_point << ", ";
     s << std::endl;
     return s;
 }
 
-std::ostream& operator<<(std::ostream& s, const motor_bridge::StepperCtrlAdjust& msg) {
-    s << "StepperCtrlAdjust" << " - ";
-    s << "motor: " << msg.motor << ", ";
-    s << "dir: " << msg.dir << ", ";
-    s << "amount: " << msg.amount << ", ";
+std::ostream& operator<<(std::ostream& s, const motor_bridge::StepperTelem& msg) {
+    s << "StepperTelem" << " - ";
+    s << "at_min_stop: " << msg.at_min_stop << ", ";
+    s << "at_max_stop: " << msg.at_max_stop << ", ";
+    s << "left_position: " << msg.left_position << ", ";
+    s << "right_position: " << msg.right_position << ", ";
     s << std::endl;
     return s;
 }

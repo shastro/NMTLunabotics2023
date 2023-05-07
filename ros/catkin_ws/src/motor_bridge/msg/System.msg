@@ -2,9 +2,9 @@
 
 EStop e_stop
 PitchCtrl pitch_ctrl
-PitchAdjust pitch_adjust
-PitchTelem pitch_telem
+PitchPositionTelem pitch_position_telem
+PitchDriverTelem pitch_driver_telem
 LocoCtrl loco_ctrl
 ExcavCtrl excav_ctrl
 StepperCtrl stepper_ctrl
-StepperCtrlAdjust stepper_ctrl_adjust
+StepperTelem stepper_telem

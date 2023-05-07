@@ -4,6 +4,11 @@
 #include <motor_bridge/System.h>
 #include <ros/ros.h>
 #include "joystick/gamepad.hpp"
+#include "can/limits.hpp"
+
+int map(int val, int omin, int omax, int nmin, int nmax) {
+    return (val - omin) / (omax - omin) * (nmax - nmin) + nmin;
+}
 
 int main(int argc, char *argv[]) {
     ros::init(argc, argv, "pad_send");
@@ -39,15 +44,20 @@ int main(int argc, char *argv[]) {
 
     // Message loop
     motor_bridge::System s;
+    double pitch_set = (PITCH_CTRL_SET_POINT_MAX -
+            PITCH_CTRL_SET_POINT_MIN) / 2;
+    double pitch_delta = 0.001 * pitch_set;
+    double stepper_set = (STEPPER_CTRL_SET_POINT_MAX -
+            STEPPER_CTRL_SET_POINT_MIN) / 2;
+    double stepper_delta = 0.001 * stepper_set;
     bool going = true;
     bool estopped = false;
+    bool adjust = false;
     int count = 0;
     bool lastX = false;
     bool lastY = false;
     bool lastA = false;
     bool lastB = false;
-    bool home = false;
-
 
     while (going) {
         g.update();
@@ -60,15 +70,16 @@ int main(int argc, char *argv[]) {
 
         // Control scheme
         out << controller_input << "\n";
-        out << "A - Toggle Estop, X - toggle home, XBOX - quit\n";
+        out << "Y - Toggle Estop, A - Adjust mode, XBOX - quit\n";
         out << "Left stick - left tread, right stick - right tread\n";
         out << "Dpad: up/down - pitch\n";
         out << "Bumpers: left - arm extend, right - arm retract\n";
+        out << "B: Arm home\n";
 
         //std::cout << g << std::endl;
 
         // Estop
-        if (g.buttons.A && ! lastA) {
+        if (g.buttons.Y && ! lastY) {
             estopped = !estopped;
         }
 
@@ -80,56 +91,78 @@ int main(int argc, char *argv[]) {
         if (estopped)
             out << "Estopped\n";
 
-        // Home mode
-        if (g.buttons.X && !lastX) {
-            home = !home;
-        }
-        if (home)
-            out << "Homing\n";
-
-        // Drive with both sticks
-        s.loco_ctrl.left_vel = g.left_stick.y;
-        s.loco_ctrl.right_vel = g.right_stick.y;
-        if (s.loco_ctrl.left_vel != 0 && s.loco_ctrl.right_vel != 0) {
-            out << "Driving - L: " << s.loco_ctrl.left_vel
-                << ", R: " << s.loco_ctrl.right_vel << "\n";
+        // Adjust mode
+        if (g.buttons.A && !lastA) {
+            adjust = !adjust;
         }
 
-        // Pitch control with dpad
-        s.pitch_ctrl.home = (int)home;
-        if (g.dpad.up) {
-            s.pitch_ctrl.direction = 1;
-            out << "Pitch Up\n";
-        } else if (g.dpad.down) {
-            s.pitch_ctrl.direction = 2;
-            out << "Pitch Down\n";
+        if (!adjust) {
+            // Pitch control with dpad
+            if (g.dpad.up) {
+                pitch_set += pitch_delta;
+                if (pitch_set > PITCH_CTRL_SET_POINT_MAX)
+                    pitch_set = PITCH_CTRL_SET_POINT_MAX;
+                out << "Pitch Up\n";
+            } else if (g.dpad.down) {
+                pitch_set -= pitch_delta;
+                if (pitch_set < PITCH_CTRL_SET_POINT_MIN)
+                    pitch_set = PITCH_CTRL_SET_POINT_MIN;
+                out << "Pitch Down\n";
+            }
+            s.pitch_ctrl.set_point = pitch_set;
+
+            // Drive with both sticks
+            s.loco_ctrl.left_vel = g.left_stick.y;
+            s.loco_ctrl.right_vel = g.right_stick.y;
+            if (s.loco_ctrl.left_vel != 0 || s.loco_ctrl.right_vel != 0) {
+                out << "Driving - L: " << s.loco_ctrl.left_vel
+                    << ", R: " << s.loco_ctrl.right_vel << "\n";
+            }
+
+            // Extend bumpers
+            if (g.buttons.B) {
+                out << "Arm Homing\n";
+                stepper_set = STEPPER_CTRL_SET_POINT_MIN;
+                s.stepper_ctrl.home = true;
+            } else {
+                s.stepper_ctrl.home = false;
+                if (g.buttons.right_bumper) {
+                    stepper_set += stepper_delta;
+                    if (stepper_set > STEPPER_CTRL_SET_POINT_MAX)
+                        stepper_set = STEPPER_CTRL_SET_POINT_MAX;
+                    out << "Arm Extend\n";
+                } else if (g.buttons.left_bumper) {
+                    stepper_set -= stepper_delta;
+                    if (stepper_set < STEPPER_CTRL_SET_POINT_MIN)
+                        stepper_set = STEPPER_CTRL_SET_POINT_MIN;
+                    out << "Arm Retract\n";
+                }
+            }
+            s.stepper_ctrl.set_point = stepper_set;
+
+            // Digger triggers
+            if (g.left_trigger > 0) {
+                s.excav_ctrl.vel = map(
+                        g.left_trigger,
+                        0,
+                        max,
+                        EXCAV_CTRL_VEL_MIN,
+                        EXCAV_CTRL_VEL_MAX);
+                out << "Dig Forward\n";
+            } else if (g.right_trigger > 0) {
+                s.excav_ctrl.vel = map(
+                        -g.right_trigger,
+                        -max,
+                        0,
+                        EXCAV_CTRL_VEL_MIN,
+                        EXCAV_CTRL_VEL_MAX);
+                out << "Dig Backward\n";
+            } else {
+                s.excav_ctrl.vel = 0;
+            }
         } else {
-            s.pitch_ctrl.direction = 0;
-        }
+            out << "Adjust Not Implemented\n";
 
-        // Extend bumpers
-        s.stepper_ctrl.rpm = 1024;
-        s.stepper_ctrl.home = (int)home;
-        if (g.buttons.left_bumper) {
-            s.stepper_ctrl.direction = 1;
-            out << "Arm Extend\n";
-        } else if (g.buttons.right_bumper) {
-            s.stepper_ctrl.direction = 2;
-            out << "Arm Retract\n";
-        } else {
-            s.stepper_ctrl.direction = 0;
-            s.stepper_ctrl.rpm = 0;
-        }
-
-        // Digger triggers
-        if (g.left_trigger > 0) {
-            s.excav_ctrl.direction = 1;
-            out << "Dig Forward\n";
-        } else if (g.right_trigger > 0) {
-            s.excav_ctrl.direction = 2;
-            out << "Dig Backward\n";
-        } else {
-            s.excav_ctrl.direction = 0;
         }
 
         // Update last state

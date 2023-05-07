@@ -7,12 +7,17 @@ kcd = "david.kcd"
 msg_dir = "../../ros/catkin_ws/src/motor_bridge/msg"
 cmake = "../../ros/catkin_ws/src/motor_bridge/CMakeLists.txt"
 
+# Remove all current messages
+for m in os.listdir(msg_dir):
+    os.remove(os.path.join(msg_dir + "/" + m))
+
 # Load the KCD file and msg dir
 tree = untangle.parse(kcd)
 
 # Can file names
 can_c = "canshit.cpp"
 can_h = "canshit.hpp"
+lim = "limits.hpp"
 
 h_template = """
 /*
@@ -47,8 +52,9 @@ def camel_to_snake(s):
 # Create Messages
 # Combined system message
 system_msg_path = os.path.join(msg_dir, 'System.msg')
-with open(system_msg_path, 'w') as s:
+with open(system_msg_path, 'w') as s, open(lim, 'w') as l:
     s.write("# System message - auto generated from kcd\n\n")
+    l.write("// Input limits - auto generated from kcd\n\n")
     # Iterate over each message in the KCD file
     for msg in tree.NetworkDefinition.Bus.Message:
         # Create a new ROS message file
@@ -76,8 +82,17 @@ with open(system_msg_path, 'w') as s:
                     var = "int32"
                 else:
                     var = "int64"
-                if hasattr(sig, 'value') and sig.value['slope'] is not None:
-                    var = "float"
+                if hasattr(sig, 'Value'):
+                    if sig.Value['slope'] is not None:
+                        var = "float64"
+                    if sig.Value['min'] is not None:
+                        l.write("double " + camel_to_snake(msg_name).upper()
+                                + "_" + name.upper() + "_MIN =  "
+                                + sig.Value['min'] + ";\n")
+                    if sig.Value['max'] is not None:
+                        l.write("double " + camel_to_snake(msg_name).upper()
+                                + "_" + name.upper() + "_MAX = "
+                                + sig.Value['max'] + ";\n")
                 m.write(var +  ' ' + name + '\n')
 
         msgs[msg_name] = names

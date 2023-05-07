@@ -1,4 +1,4 @@
 # LocoCtrl ros message - auto generated from kcd
 
-int16 left_vel
-int16 right_vel
+float64 left_vel
+float64 right_vel

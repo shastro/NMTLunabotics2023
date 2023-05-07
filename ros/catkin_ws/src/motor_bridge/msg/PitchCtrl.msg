@@ -1,4 +1,5 @@
 # PitchCtrl ros message - auto generated from kcd
 
-int8 home
-int8 direction
+float64 set_point
+float64 left_offset
+float64 right_offset

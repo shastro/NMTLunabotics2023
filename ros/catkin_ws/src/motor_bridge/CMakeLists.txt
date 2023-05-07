@@ -20,12 +20,12 @@ add_message_files(
 System.msg
     EStop.msg
     PitchCtrl.msg
-    PitchAdjust.msg
-    PitchTelem.msg
+    PitchPositionTelem.msg
+    PitchDriverTelem.msg
     LocoCtrl.msg
     ExcavCtrl.msg
     StepperCtrl.msg
-    StepperCtrlAdjust.msg
+    StepperTelem.msg
 )
 
 generate_messages(DEPENDENCIES std_msgs)
@@ -43,7 +43,7 @@ add_executable(motor_bridge
 )
 add_dependencies(motor_bridge
   ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(motor_bridge ${catkin_LIBRARIES})
+target_link_libraries(motor_bridge ${catkin_LIBRARIES} ncurses)
 link_directories(${catkin_LIBRARY_DIRS})
 install(TARGETS
     motor_bridge
