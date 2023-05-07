@@ -47,8 +47,6 @@ class MotorController {
 };
 
 void setup() {
-    Serial.begin(115200);
-
     MotorController excav(11, 4, 5, 6);
     MCP_CAN can = setup_can();
 

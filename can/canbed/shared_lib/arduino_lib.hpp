@@ -40,6 +40,7 @@ struct CANPacket {
 
 // Set up a CAN connection.
 inline MCP_CAN setup_can() {
+    Serial.begin(115200);
     MCP_CAN can(SPI_CS_PIN);
     while (can.begin(CAN_500KBPS) != CAN_OK) {
         Serial.println("CAN bus fail!");
