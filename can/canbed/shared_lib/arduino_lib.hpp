@@ -78,11 +78,12 @@ class OutPin {
 // Input pins.
 class InPin {
     int num;
-
+    float threshold;
   public:
-    InPin(int num) : num(num) { pinMode(num, INPUT); }
+    InPin(int num, float threshold = 0.8f) : num(num), threshold(threshold) { pinMode(num, INPUT); }
     bool read() { return digitalRead(num) == HIGH; }
-    double read_analog() { return analogRead(num) / 1023.0; }
+    float read_analog() { return (analogRead(num) / 1023.0); }
+    bool read_threshold() { return read_analog() > threshold; }
 };
 
 // Relay controller.

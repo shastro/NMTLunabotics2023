@@ -14,8 +14,8 @@ struct Stepper {
     pulse(pulse_pin), direction(dir_pin) {}
 
     void doStep(unsigned int step) {
-        const bool pulse_sequence[] = {1, 1, 0, 0};
-        const bool dir_sequence[] = {0, 1, 1, 0};
+        const int pulse_sequence[] = {HIGH, HIGH, LOW, LOW};
+        const int dir_sequence[] = {LOW, HIGH, HIGH, LOW};
         pulse.write(pulse_sequence[step % 4]);
         direction.write(dir_sequence[step % 4]);
     }        
@@ -24,8 +24,8 @@ struct Stepper {
 struct StepperController {
     Stepper right;
     Stepper left;
-    InPin home_int;
-    InPin forward_int;
+    InPin home_limit;
+    InPin extent_limit;
     enum States {
         MOVE = 0, // Move to point
         HOME = 1,
@@ -41,9 +41,9 @@ struct StepperController {
     int dir;
 
     StepperController(int pulse_l, int dir_l, int pulse_r, int dir_r, int home, int forward) :
-    left(pulse_l, dir_l), right(pulse_r, dir_r), home_int(home), forward_int(forward) {
+    left(pulse_l, dir_l), right(pulse_r, dir_r), home_limit(home), extent_limit(forward) {
         state = HOME;
-        step = 0;
+        step = 100000;
         point = 0;
         dir = STOP;
     }
@@ -60,57 +60,56 @@ struct StepperController {
     }
 
     const int ticks_per_loop = 100;
-    const int step_delay_micros = 100;
-    const int limit_volt_threshold = 1000;
+    const int read_limit_frequency = 5;
     void loop() {
         int ticks = ticks_per_loop;
+        bool at_home = false;
+        bool at_extent = false;
         while (ticks-- > 0) {
+            if (ticks % read_limit_frequency == 0) {
+                at_home = home_limit.read_threshold();
+                at_extent = extent_limit.read_threshold();
+            }
+
             switch (state) {
             case HOME: {
-                // TODO(lcf): poll limit-switches
-                // or alternatively setup interrupts.
-                if (!home_int.read()) {
-                    doStep(step--);
+                dir = BACKWARD;
+                if (at_home) {
+                    /* step = point = 0; */
+                    /* state = MOVE; */
                 } else {
-                    step = point = 0;
-                    state = MOVE;
+                    doStep(step--);
                 }
             } break;
             case MOVE: {
                 dir = sign((int)point - (int)step);
-                if (dir == BACKWARD && home_int.read()) {
-                    // TODO: convey that we are at limits in telemetry
-                } else if (dir == FORWARD && forward_int.read()) {
-                
-                } else {
-                    doStep(step += dir);            
+                if (dir == BACKWARD && at_home) {
+                    point = step; dir = STOP;
                 }
+                if (dir == FORWARD && at_extent) {
+                    point = step; dir = STOP;
+                }
+                doStep(step += dir);            
             } break;
             }
-            delayMicroseconds(step_delay_micros);
         } // end while(ticks)
         
         // TODO telemetry
     }
 };
 
-const int stepsPerTick = 600;  // change this to fit the number of steps per revolution
-const int stepDelayMicros = 10;
-
 void setup() {
-    enum {
-        RPUL = 10,
-        RDIR = 6, 
-        LPUL = 4,
-        LDIR = 11,
-        HOME_INT = 2,
-        FORWARD_INT = 3,
-    };
-    StepperController control(RPUL, RDIR, LPUL, LDIR, HOME_INT, FORWARD_INT);
+    #define RPUL 10
+    #define RDIR 6
+    #define LPUL 4
+    #define LDIR 11
+    #define HOME_LIMIT A0
+    #define EXTENT_LIMIT A1
+    StepperController control(RPUL, RDIR, LPUL, LDIR, HOME_LIMIT, EXTENT_LIMIT);
 
     MCP_CAN can = setup_can();
 
-    bool eStopped = true;
+    bool eStopped = false;
     for (;;) {
         CANPacket packet = can_read(can);
         switch (packet.id) {
@@ -129,6 +128,10 @@ void setup() {
             }
         }
 
+        /* int ticks = control.ticks_per_loop; */
+        /* while (ticks-- > 0) { */
+            /* control.doStep(control.step++); */
+        /* } */
         control.loop();
     }
 }
