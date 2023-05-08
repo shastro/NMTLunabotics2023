@@ -8,6 +8,8 @@
 #include <Wire.h>
 #include <mcp_can.h>
 
+#define sign(i) (((i) > 0) - ((i) < 0))
+
 // Pin CAN runs on.
 #define SPI_CS_PIN 17
 
