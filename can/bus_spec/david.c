@@ -650,3 +650,48 @@ bool david_stepper_telem_set_point_is_in_range(uint16_t value)
 {
     return (value <= 1684u);
 }
+
+int david_mast_ctrl_pack(
+    uint8_t *dst_p,
+    const struct david_mast_ctrl_t *src_p,
+    size_t size)
+{
+    if (size < 1u) {
+        return (-EINVAL);
+    }
+
+    memset(&dst_p[0], 0, 1);
+
+    dst_p[0] |= pack_left_shift_u8(src_p->direction, 0u, 0x03u);
+
+    return (1);
+}
+
+int david_mast_ctrl_unpack(
+    struct david_mast_ctrl_t *dst_p,
+    const uint8_t *src_p,
+    size_t size)
+{
+    if (size < 1u) {
+        return (-EINVAL);
+    }
+
+    dst_p->direction = unpack_right_shift_u8(src_p[0], 0u, 0x03u);
+
+    return (0);
+}
+
+uint8_t david_mast_ctrl_direction_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double david_mast_ctrl_direction_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool david_mast_ctrl_direction_is_in_range(uint8_t value)
+{
+    return (value <= 3u);
+}
