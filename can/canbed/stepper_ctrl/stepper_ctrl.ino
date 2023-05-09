@@ -125,14 +125,7 @@ struct StepperController {
 };
 
 void setup() {
-    MCP_CAN can(SPI_CS_PIN);
-    Serial.begin(9600);
-    while (CAN_OK != can.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
-    {
-        Serial.println("CAN BUS FAIL!");
-        delay(100);
-    }
-    Serial.println("CAN BUS OK!");
+    MCP_CAN can = setup_can();
     
     /* #define RPUL 5 */ // For camera mast
     /* #define RDIR 4 */
@@ -150,20 +143,7 @@ void setup() {
         // TODO: investigate if a non-blocking can_read would allow us to reduce
         // ticks_per_loop to reduce command latency.
         // So don't have `while (can.checkReceive)`, just do the call and then continue
-        // if !CAN_MSGAVAIL.
-        /* CANPacket packet = can_read(can); */
-        CANPacket packet = {0xFFFFFFFF, 0};
-        for (int i = 0; i < 64; i++) {
-            if (can.checkReceive() == CAN_MSGAVAIL) {
-                unsigned char len = 0;
-                if (can.readMsgBuf(&len, packet.buf) == CAN_OK) {
-                    packet.len = len;
-                    packet.id = can.getCanId();
-                    break;
-                }
-            }
-        }
-        
+        CANPacket packet = can_read(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
                 eStopped = frame.stop;

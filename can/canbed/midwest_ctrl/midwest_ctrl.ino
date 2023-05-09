@@ -7,6 +7,7 @@
 
 #include "david.h"
 #include "pins_arduino.h"
+#include "arduino_lib.hpp"
 
 #define SPI_CS_PIN 17
 
@@ -65,27 +66,6 @@ class MotorController {
     // TODO: implement telemetry.
 };
 
-// Set up a CAN connection.
-MCP_CAN setup_can() {
-    MCP_CAN can(SPI_CS_PIN);
-    while (can.begin(CAN_500KBPS) != CAN_OK) {
-        Serial.println("CAN bus fail!");
-        delay(100);
-    }
-    Serial.println("CAN bus ok!");
-    return can;
-}
-
-// Read a CAN packet. Blocks until one is available.
-CANPacket can_read(MCP_CAN &can) {
-    while (can.checkReceive() != CAN_MSGAVAIL)
-        ;
-    CANPacket packet;
-    can.readMsgBuf((unsigned char *)&packet.len, packet.buf);
-    packet.id = can.getCanId();
-
-    return packet;
-}
 
 void setup() {
     Serial.begin(115200);
@@ -96,7 +76,6 @@ void setup() {
     MCP_CAN can = setup_can();
 
     bool eStopped = false;
-    while (true) {
         CANPacket packet = can_read(can);
         switch (packet.id) {
         case DAVID_E_STOP_FRAME_ID: {

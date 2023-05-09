@@ -54,12 +54,20 @@ inline MCP_CAN setup_can() {
 
 // Read a CAN packet. Blocks until one is available.
 inline CANPacket can_read(MCP_CAN &can) {
-    while (can.checkReceive() != CAN_MSGAVAIL);
-    CANPacket packet;
-    can.readMsgBuf((unsigned char *)&packet.len, packet.buf);
-    packet.id = can.getCanId();
+    if (can.checkReceive() == CAN_MSGAVAIL) {
+        CANPacket packet;
+        packet.len = 0;
+        packet.id = 0xFFFFFFFFFFF;
+        can.readMsgBuf((unsigned char *)&packet.len, packet.buf);
+        packet.id = can.getCanId();
+        return packet;
+    } else {
+        CANPacket packet;
+        packet.len = 8;
+        packet.id = 0xFFFFFFFFFFF;
+        return packet;
+    }
 
-    return packet;
 }
 
 inline void can_send(MCP_CAN &can, CANPacket packet) {
