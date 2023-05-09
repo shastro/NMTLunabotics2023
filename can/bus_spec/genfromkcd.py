@@ -74,17 +74,17 @@ with open(system_msg_path, 'w') as s, open(lim, 'w') as l:
                 if size == 1:
                     var = "bool"
                 elif size > 1 and size <= 8:
-                    var = "int8"
+                    var = "uint8"
                 elif size > 8 and size <= 16:
-                    var = "int16"
+                    var = "uint16"
                 elif size > 16 and size <= 32:
-                    var = "int32"
+                    var = "unt32"
                 else:
-                    var = "int64"
+                    var = "uint64"
                 types.append(var)
                 if hasattr(sig, 'Value'):
                     if sig.Value['slope'] is not None:
-                        var = "float64"
+                        var = "float32"
                     if sig.Value['min'] is not None:
                         l.write("double " + camel_to_snake(msg_name).upper()
                                 + "_" + name.upper() + "_MIN =  "
@@ -127,10 +127,14 @@ with (open(can_c, 'w') as c,
         c.write(func + " {\n")
         c.write("    david_" + camel_to_snake(msg[0]) + "_t t = {\n")
         for name in msg[1]:
-            c.write("        ." + name + " = msg." + name + ",\n")
+            line = "        ." + name + " = "
+            line += "david_" + camel_to_snake(msg[0])
+            line += "_" + name + "_encode(msg." + name + "),\n"
+            c.write(line)
 
         c.write("    };\n\n")
-        c.write("    david_" + camel_to_snake(msg[0]) + "_pack(buff, &t, 8);\n")
+        c.write("    david_" + camel_to_snake(msg[0]) +
+                "_pack(buff, &t, sizeof(t));\n")
         c.write("    return DAVID_" +
                 camel_to_snake(msg[0]).upper() + "_FRAME_ID;\n")
         c.write("}\n\n")

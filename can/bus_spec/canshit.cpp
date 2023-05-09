@@ -10,86 +10,95 @@
 
 int pack_msg(const motor_bridge::EStop& msg, uint8_t* buff) {
     david_e_stop_t t = {
-        .stop = msg.stop,
+        .stop = david_e_stop_stop_encode(msg.stop),
     };
 
-    david_e_stop_pack(buff, &t, 8);
+    david_e_stop_pack(buff, &t, sizeof(t));
     return DAVID_E_STOP_FRAME_ID;
 }
 
 int pack_msg(const motor_bridge::PitchCtrl& msg, uint8_t* buff) {
     david_pitch_ctrl_t t = {
-        .set_point = msg.set_point,
-        .left_offset = msg.left_offset,
-        .right_offset = msg.right_offset,
+        .set_point = david_pitch_ctrl_set_point_encode(msg.set_point),
+        .left_offset = david_pitch_ctrl_left_offset_encode(msg.left_offset),
+        .right_offset = david_pitch_ctrl_right_offset_encode(msg.right_offset),
     };
 
-    david_pitch_ctrl_pack(buff, &t, 8);
+    david_pitch_ctrl_pack(buff, &t, sizeof(t));
     return DAVID_PITCH_CTRL_FRAME_ID;
 }
 
 int pack_msg(const motor_bridge::PitchPositionTelem& msg, uint8_t* buff) {
     david_pitch_position_telem_t t = {
-        .left_position = msg.left_position,
-        .right_position = msg.right_position,
+        .left_position = david_pitch_position_telem_left_position_encode(msg.left_position),
+        .right_position = david_pitch_position_telem_right_position_encode(msg.right_position),
     };
 
-    david_pitch_position_telem_pack(buff, &t, 8);
+    david_pitch_position_telem_pack(buff, &t, sizeof(t));
     return DAVID_PITCH_POSITION_TELEM_FRAME_ID;
 }
 
 int pack_msg(const motor_bridge::PitchDriverTelem& msg, uint8_t* buff) {
     david_pitch_driver_telem_t t = {
-        .left_current = msg.left_current,
-        .right_current = msg.right_current,
-        .left_temperature = msg.left_temperature,
-        .right_temperature = msg.right_temperature,
-        .direction = msg.direction,
+        .left_current = david_pitch_driver_telem_left_current_encode(msg.left_current),
+        .right_current = david_pitch_driver_telem_right_current_encode(msg.right_current),
+        .left_temperature = david_pitch_driver_telem_left_temperature_encode(msg.left_temperature),
+        .right_temperature = david_pitch_driver_telem_right_temperature_encode(msg.right_temperature),
+        .direction = david_pitch_driver_telem_direction_encode(msg.direction),
     };
 
-    david_pitch_driver_telem_pack(buff, &t, 8);
+    david_pitch_driver_telem_pack(buff, &t, sizeof(t));
     return DAVID_PITCH_DRIVER_TELEM_FRAME_ID;
 }
 
 int pack_msg(const motor_bridge::LocoCtrl& msg, uint8_t* buff) {
     david_loco_ctrl_t t = {
-        .left_vel = msg.left_vel,
-        .right_vel = msg.right_vel,
+        .left_vel = david_loco_ctrl_left_vel_encode(msg.left_vel),
+        .right_vel = david_loco_ctrl_right_vel_encode(msg.right_vel),
     };
 
-    david_loco_ctrl_pack(buff, &t, 8);
+    david_loco_ctrl_pack(buff, &t, sizeof(t));
     return DAVID_LOCO_CTRL_FRAME_ID;
 }
 
 int pack_msg(const motor_bridge::ExcavCtrl& msg, uint8_t* buff) {
     david_excav_ctrl_t t = {
-        .vel = msg.vel,
+        .vel = david_excav_ctrl_vel_encode(msg.vel),
     };
 
-    david_excav_ctrl_pack(buff, &t, 8);
+    david_excav_ctrl_pack(buff, &t, sizeof(t));
     return DAVID_EXCAV_CTRL_FRAME_ID;
 }
 
 int pack_msg(const motor_bridge::StepperCtrl& msg, uint8_t* buff) {
     david_stepper_ctrl_t t = {
-        .home = msg.home,
-        .set_point = msg.set_point,
+        .home = david_stepper_ctrl_home_encode(msg.home),
+        .set_point = david_stepper_ctrl_set_point_encode(msg.set_point),
     };
 
-    david_stepper_ctrl_pack(buff, &t, 8);
+    david_stepper_ctrl_pack(buff, &t, sizeof(t));
     return DAVID_STEPPER_CTRL_FRAME_ID;
 }
 
 int pack_msg(const motor_bridge::StepperTelem& msg, uint8_t* buff) {
     david_stepper_telem_t t = {
-        .at_min_stop = msg.at_min_stop,
-        .at_max_stop = msg.at_max_stop,
-        .position = msg.position,
-        .set_point = msg.set_point,
+        .at_min_stop = david_stepper_telem_at_min_stop_encode(msg.at_min_stop),
+        .at_max_stop = david_stepper_telem_at_max_stop_encode(msg.at_max_stop),
+        .position = david_stepper_telem_position_encode(msg.position),
+        .set_point = david_stepper_telem_set_point_encode(msg.set_point),
     };
 
-    david_stepper_telem_pack(buff, &t, 8);
+    david_stepper_telem_pack(buff, &t, sizeof(t));
     return DAVID_STEPPER_TELEM_FRAME_ID;
+}
+
+int pack_msg(const motor_bridge::MastCtrl& msg, uint8_t* buff) {
+    david_mast_ctrl_t t = {
+        .direction = david_mast_ctrl_direction_encode(msg.direction),
+    };
+
+    david_mast_ctrl_pack(buff, &t, sizeof(t));
+    return DAVID_MAST_CTRL_FRAME_ID;
 }
 
 std::string printable(const motor_bridge::EStop& msg) {
@@ -156,6 +165,13 @@ std::string printable(const motor_bridge::StepperTelem& msg) {
     s << "at_max_stop: " << (int)msg.at_max_stop << ", ";
     s << "position: " << (int)msg.position << ", ";
     s << "set_point: " << (int)msg.set_point << ", ";
+    s << std::endl;
+    return s.str();
+}
+
+std::string printable(const motor_bridge::MastCtrl& msg) {
+    std::stringstream s;    s << "MastCtrl - ";
+    s << "direction: " << (int)msg.direction << ", ";
     s << std::endl;
     return s.str();
 }

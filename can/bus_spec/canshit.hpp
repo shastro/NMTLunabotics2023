@@ -16,6 +16,7 @@
 #include <motor_bridge/ExcavCtrl.h>
 #include <motor_bridge/StepperCtrl.h>
 #include <motor_bridge/StepperTelem.h>
+#include <motor_bridge/MastCtrl.h>
 
 int pack_msg(const motor_bridge::EStop& msg, uint8_t* buff);
 int pack_msg(const motor_bridge::PitchCtrl& msg, uint8_t* buff);
@@ -25,6 +26,7 @@ int pack_msg(const motor_bridge::LocoCtrl& msg, uint8_t* buff);
 int pack_msg(const motor_bridge::ExcavCtrl& msg, uint8_t* buff);
 int pack_msg(const motor_bridge::StepperCtrl& msg, uint8_t* buff);
 int pack_msg(const motor_bridge::StepperTelem& msg, uint8_t* buff);
+int pack_msg(const motor_bridge::MastCtrl& msg, uint8_t* buff);
 
 std::string printable(const motor_bridge::EStop& msg);
 std::string printable(const motor_bridge::PitchCtrl& msg);
@@ -34,3 +36,4 @@ std::string printable(const motor_bridge::LocoCtrl& msg);
 std::string printable(const motor_bridge::ExcavCtrl& msg);
 std::string printable(const motor_bridge::StepperCtrl& msg);
 std::string printable(const motor_bridge::StepperTelem& msg);
+std::string printable(const motor_bridge::MastCtrl& msg);

@@ -6,18 +6,20 @@
 #include "joystick/gamepad.hpp"
 #include "can/limits.hpp"
 
-int map(int val, int omin, int omax, int nmin, int nmax) {
-    return (val - omin) / (omax - omin) * (nmax - nmin) + nmin;
-}
+// The Adjustables
+int max = 98;   // Max value for sticks/triggers
+int min = -max; // Min val ... well yeah
+int dead = 20;  // Can't be too touchy. < dead = 0
+int rate = 100; //in hertz
+double pitch_delta = 8; // in mm/s
+double stepper_delta = 20; // in mm/s
 
 int main(int argc, char *argv[]) {
+    // Set up ros
     ros::init(argc, argv, "pad_send");
     ros::NodeHandle nh;
-    int max = 100;
-    int min = -max;
-    int dead = 20;
     ros::Publisher pub = nh.advertise<motor_bridge::System>("/system", 5);
-    //ros::Rate rate(50);
+    ros::Rate nyquil(rate);
 
     // Setup ncurses
     initscr();
@@ -45,20 +47,21 @@ int main(int argc, char *argv[]) {
 
     // Message loop
     motor_bridge::System s;
+
     double pitch_set = (PITCH_CTRL_SET_POINT_MAX -
             PITCH_CTRL_SET_POINT_MIN) / 2;
-    double pitch_delta = 0.000001 * PITCH_CTRL_SET_POINT_MAX;
-    double stepper_set = (STEPPER_CTRL_SET_POINT_MAX -
-            STEPPER_CTRL_SET_POINT_MIN) / 2;
-    double stepper_delta = 0.000001 * PITCH_CTRL_SET_POINT_MAX;
+    double stepper_set = 0;
+
     bool estopped = false;
     bool adjust = false;
     bool homing = false;
-    int count = 0;
+
     bool lastX = false;
     bool lastY = false;
     bool lastA = false;
     bool lastB = false;
+
+    int count = 0;
 
     while (true) {
         g.update();
@@ -108,12 +111,12 @@ int main(int argc, char *argv[]) {
         if (!adjust && !estopped) {
             // Pitch control with dpad
             if (g.dpad.up) {
-                pitch_set += pitch_delta;
+                pitch_set += pitch_delta / rate;
                 if (pitch_set > PITCH_CTRL_SET_POINT_MAX)
                     pitch_set = PITCH_CTRL_SET_POINT_MAX;
                 out << "Pitch Up\n";
             } else if (g.dpad.down) {
-                pitch_set -= pitch_delta;
+                pitch_set -= pitch_delta / rate;
                 if (pitch_set < PITCH_CTRL_SET_POINT_MIN)
                     pitch_set = PITCH_CTRL_SET_POINT_MIN;
                 out << "Pitch Down\n";
@@ -136,12 +139,12 @@ int main(int argc, char *argv[]) {
             } else {
                 s.stepper_ctrl.home = false;
                 if (g.buttons.right_bumper) {
-                    stepper_set += stepper_delta;
+                    stepper_set += stepper_delta / rate;
                     if (stepper_set > STEPPER_CTRL_SET_POINT_MAX)
                         stepper_set = STEPPER_CTRL_SET_POINT_MAX;
                     out << "Arm Extend\n";
                 } else if (g.buttons.left_bumper) {
-                    stepper_set -= stepper_delta;
+                    stepper_set -= stepper_delta / rate;
                     if (stepper_set < STEPPER_CTRL_SET_POINT_MIN)
                         stepper_set = STEPPER_CTRL_SET_POINT_MIN;
                     out << "Arm Retract\n";
@@ -175,7 +178,7 @@ int main(int argc, char *argv[]) {
         refresh();
 
         pub.publish(s);
-        //rate.sleep();
+        nyquil.sleep();
     }
     endwin();
     return 0;
