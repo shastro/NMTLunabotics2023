@@ -69,9 +69,6 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        s.header.stamp = ros::Time::now();
-        s.header.frame_id = "Pad Send";
-
         std::stringstream out;
 
         // Control scheme
