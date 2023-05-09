@@ -558,10 +558,10 @@ int david_stepper_telem_pack(
 
     dst_p[0] |= pack_left_shift_u8(src_p->at_min_stop, 0u, 0x01u);
     dst_p[0] |= pack_left_shift_u8(src_p->at_max_stop, 1u, 0x02u);
-    dst_p[0] |= pack_left_shift_u16(src_p->left_position, 2u, 0xfcu);
-    dst_p[1] |= pack_right_shift_u16(src_p->left_position, 6u, 0x1fu);
-    dst_p[1] |= pack_left_shift_u16(src_p->right_position, 5u, 0xe0u);
-    dst_p[2] |= pack_right_shift_u16(src_p->right_position, 3u, 0xffu);
+    dst_p[0] |= pack_left_shift_u16(src_p->position, 2u, 0xfcu);
+    dst_p[1] |= pack_right_shift_u16(src_p->position, 6u, 0x1fu);
+    dst_p[1] |= pack_left_shift_u16(src_p->set_point, 5u, 0xe0u);
+    dst_p[2] |= pack_right_shift_u16(src_p->set_point, 3u, 0xffu);
 
     return (3);
 }
@@ -577,10 +577,10 @@ int david_stepper_telem_unpack(
 
     dst_p->at_min_stop = unpack_right_shift_u8(src_p[0], 0u, 0x01u);
     dst_p->at_max_stop = unpack_right_shift_u8(src_p[0], 1u, 0x02u);
-    dst_p->left_position = unpack_right_shift_u16(src_p[0], 2u, 0xfcu);
-    dst_p->left_position |= unpack_left_shift_u16(src_p[1], 6u, 0x1fu);
-    dst_p->right_position = unpack_right_shift_u16(src_p[1], 5u, 0xe0u);
-    dst_p->right_position |= unpack_left_shift_u16(src_p[2], 3u, 0xffu);
+    dst_p->position = unpack_right_shift_u16(src_p[0], 2u, 0xfcu);
+    dst_p->position |= unpack_left_shift_u16(src_p[1], 6u, 0x1fu);
+    dst_p->set_point = unpack_right_shift_u16(src_p[1], 5u, 0xe0u);
+    dst_p->set_point |= unpack_left_shift_u16(src_p[2], 3u, 0xffu);
 
     return (0);
 }
@@ -615,32 +615,32 @@ bool david_stepper_telem_at_max_stop_is_in_range(uint8_t value)
     return (value <= 1u);
 }
 
-uint16_t david_stepper_telem_left_position_encode(double value)
+uint16_t david_stepper_telem_position_encode(double value)
 {
     return (uint16_t)(value / 0.296875);
 }
 
-double david_stepper_telem_left_position_decode(uint16_t value)
+double david_stepper_telem_position_decode(uint16_t value)
 {
     return ((double)value * 0.296875);
 }
 
-bool david_stepper_telem_left_position_is_in_range(uint16_t value)
+bool david_stepper_telem_position_is_in_range(uint16_t value)
 {
     return (value <= 515u);
 }
 
-uint16_t david_stepper_telem_right_position_encode(double value)
+uint16_t david_stepper_telem_set_point_encode(double value)
 {
     return (uint16_t)(value / 0.296875);
 }
 
-double david_stepper_telem_right_position_decode(uint16_t value)
+double david_stepper_telem_set_point_decode(uint16_t value)
 {
     return ((double)value * 0.296875);
 }
 
-bool david_stepper_telem_right_position_is_in_range(uint16_t value)
+bool david_stepper_telem_set_point_is_in_range(uint16_t value)
 {
     return (value <= 515u);
 }

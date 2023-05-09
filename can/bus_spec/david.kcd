@@ -162,11 +162,11 @@
                     <Label name='True' value="1"/>
                 </LabelSet>
             </Signal>
-            <Signal name="LeftPosition" offset="2" length="11">
+            <Signal name="Position" offset="2" length="11">
                 <Value type="unsigned" unit="mm" slope="0.296875"
                        intercept="0.0" min="0.0" max="153"/>
             </Signal>
-            <Signal name="RightPosition" offset="13" length="11">
+            <Signal name="SetPoint" offset="13" length="11">
                 <Value type="unsigned" unit="mm" slope="0.296875"
                        intercept="0.0" min="0.0" max="153"/>
             </Signal>
