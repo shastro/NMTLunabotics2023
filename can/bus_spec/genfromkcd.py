@@ -147,14 +147,14 @@ with (open(can_c, 'w') as c,
     
     h.write('\n')
     for msg in msgs:
-        func = "std::ostream& operator<<(std::ostream& s, const motor_bridge::" + msg[0] + "& msg)"
+        func = "std::string printable(motor_bridge::" + msg[0] + "& msg)"
         h.write(func + ";\n")
         c.write(func + " {\n")
         c.write("    s << \"" + msg[0]  + " - \";\n")
         for name in msg[1]:
             c.write("    s << \"" + name + ": \" << (int)msg." + name + " << \", \";\n")
         c.write("    s << std::endl;\n")
-        c.write("    return s;\n")
+        c.write("    return s.str();\n")
         c.write("}\n\n")
 
 # Add messsage files to cmake

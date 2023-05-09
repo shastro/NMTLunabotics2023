@@ -44,6 +44,7 @@ int pack_msg(const motor_bridge::PitchDriverTelem& msg, uint8_t* buff) {
         .right_current = msg.right_current,
         .left_temperature = msg.left_temperature,
         .right_temperature = msg.right_temperature,
+        .direction = msg.direction,
     };
 
     david_pitch_driver_telem_pack(buff, &t, 8);
@@ -91,70 +92,71 @@ int pack_msg(const motor_bridge::StepperTelem& msg, uint8_t* buff) {
     return DAVID_STEPPER_TELEM_FRAME_ID;
 }
 
-std::ostream& operator<<(std::ostream& s, const motor_bridge::EStop& msg) {
+std::string printable(motor_bridge::EStop& msg) {
     s << "EStop - ";
     s << "stop: " << (int)msg.stop << ", ";
     s << std::endl;
-    return s;
+    return s.str();
 }
 
-std::ostream& operator<<(std::ostream& s, const motor_bridge::PitchCtrl& msg) {
+std::string printable(motor_bridge::PitchCtrl& msg) {
     s << "PitchCtrl - ";
     s << "set_point: " << (int)msg.set_point << ", ";
     s << "left_offset: " << (int)msg.left_offset << ", ";
     s << "right_offset: " << (int)msg.right_offset << ", ";
     s << std::endl;
-    return s;
+    return s.str();
 }
 
-std::ostream& operator<<(std::ostream& s, const motor_bridge::PitchPositionTelem& msg) {
+std::string printable(motor_bridge::PitchPositionTelem& msg) {
     s << "PitchPositionTelem - ";
     s << "left_position: " << (int)msg.left_position << ", ";
     s << "right_position: " << (int)msg.right_position << ", ";
     s << std::endl;
-    return s;
+    return s.str();
 }
 
-std::ostream& operator<<(std::ostream& s, const motor_bridge::PitchDriverTelem& msg) {
+std::string printable(motor_bridge::PitchDriverTelem& msg) {
     s << "PitchDriverTelem - ";
     s << "left_current: " << (int)msg.left_current << ", ";
     s << "right_current: " << (int)msg.right_current << ", ";
     s << "left_temperature: " << (int)msg.left_temperature << ", ";
     s << "right_temperature: " << (int)msg.right_temperature << ", ";
+    s << "direction: " << (int)msg.direction << ", ";
     s << std::endl;
-    return s;
+    return s.str();
 }
 
-std::ostream& operator<<(std::ostream& s, const motor_bridge::LocoCtrl& msg) {
+std::string printable(motor_bridge::LocoCtrl& msg) {
     s << "LocoCtrl - ";
     s << "left_vel: " << (int)msg.left_vel << ", ";
     s << "right_vel: " << (int)msg.right_vel << ", ";
     s << std::endl;
-    return s;
+    return s.str();
 }
 
-std::ostream& operator<<(std::ostream& s, const motor_bridge::ExcavCtrl& msg) {
+std::string printable(motor_bridge::ExcavCtrl& msg) {
     s << "ExcavCtrl - ";
     s << "vel: " << (int)msg.vel << ", ";
     s << std::endl;
-    return s;
+    return s.str();
 }
 
-std::ostream& operator<<(std::ostream& s, const motor_bridge::StepperCtrl& msg) {
+std::string printable(motor_bridge::StepperCtrl& msg) {
     s << "StepperCtrl - ";
     s << "home: " << (int)msg.home << ", ";
     s << "set_point: " << (int)msg.set_point << ", ";
     s << std::endl;
-    return s;
+    return s.str();
 }
 
-std::ostream& operator<<(std::ostream& s, const motor_bridge::StepperTelem& msg) {
+std::string printable(motor_bridge::StepperTelem& msg) {
     s << "StepperTelem - ";
     s << "at_min_stop: " << (int)msg.at_min_stop << ", ";
     s << "at_max_stop: " << (int)msg.at_max_stop << ", ";
     s << "left_position: " << (int)msg.left_position << ", ";
     s << "right_position: " << (int)msg.right_position << ", ";
     s << std::endl;
-    return s;
+    return s.str();
 }
 
