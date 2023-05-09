@@ -1,4 +1,4 @@
-all: david.c david.h canshit.cpp
+all: david.c david.h canshit.cpp canshit.hpp unpackers.hpp limits.hpp
 
 david.c david.h: david.kcd
 	cantools generate_c_source $^
