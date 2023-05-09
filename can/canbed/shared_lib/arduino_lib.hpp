@@ -35,15 +35,15 @@
                  once = false)
 
 struct CANPacket {
-    uint32_t len;
     uint32_t id;
+    uint32_t len;
     unsigned char buf[8];
 };
 
 // Set up a CAN connection.
 inline MCP_CAN setup_can() {
-    Serial.begin(115200);
     MCP_CAN can(SPI_CS_PIN);
+    Serial.begin(9600);
     while (can.begin(CAN_500KBPS) != CAN_OK) {
         Serial.println("CAN bus fail!");
         delay(100);
@@ -54,13 +54,16 @@ inline MCP_CAN setup_can() {
 
 // Read a CAN packet. Blocks until one is available.
 inline CANPacket can_read(MCP_CAN &can) {
-    while (can.checkReceive() != CAN_MSGAVAIL)
-        ;
+    while (can.checkReceive() != CAN_MSGAVAIL);
     CANPacket packet;
     can.readMsgBuf((unsigned char *)&packet.len, packet.buf);
     packet.id = can.getCanId();
 
     return packet;
+}
+
+inline void can_send(MCP_CAN &can, CANPacket packet) {
+    can.sendMsgBuf(packet.id, CAN_STDID, 8, packet.buf);
 }
 
 // Output pins.
@@ -83,16 +86,15 @@ class InPin {
     InPin(int num, float threshold = 0.8f) : num(num), threshold(threshold) { pinMode(num, INPUT); }
     bool read() { return digitalRead(num) == HIGH; }
     float read_analog() { return (analogRead(num) / 1023.0); }
-    bool read_threshold() { return read_analog() > threshold; }
+    bool read_threshold() { return read_analog() >= threshold; }
 };
 
 // Relay controller.
-class Relay {
+struct Relay {
     OutPin left;
     OutPin right;
     OutPin common;
 
-  public:
     Relay(int left, int right, int common)
         : left(left), right(right), common(common) {}
 

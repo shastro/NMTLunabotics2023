@@ -36,22 +36,31 @@ class MotorController {
         if (vel < 0)
             vel *= 1.5;
 
-        enable.write(abs(vel) > VEL_DEADZONE);
-        if (vel > 0)
-            relay.output_right().write_pwm(abs(vel));
-        else
-            relay.output_left().write_pwm(abs(vel));
+        if (abs(vel) < VEL_DEADZONE) {
+            enable.write(false);
+            /* relay.common.analogWrite(0.0f); */
+            relay.common.write_pwm(0.0f);
+        } else {
+            enable.write(true);
+            ((vel > 0)? relay.output_right() : relay.output_left()).write_pwm(abs(vel));
+        }
+        
     }
 
     // TODO: implement telemetry.
 };
 
 void setup() {
-    MotorController excav(11, 4, 5, 6);
     MCP_CAN can = setup_can();
 
-    bool eStopped = true;
-    while (true) {
+    #define INHIBIT 11
+    #define RELAY_LEFT 4
+    #define RELAY_RIGHT 5
+    #define RELAY_COMMON 6
+    MotorController excav(INHIBIT, RELAY_LEFT, RELAY_RIGHT, RELAY_COMMON);
+
+    bool eStopped = false;
+    for (;;) {
         CANPacket packet = can_read(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
@@ -66,7 +75,7 @@ void setup() {
 
         switch (packet.id) {
             FRAME_CASE(DAVID_EXCAV_CTRL, david_excav_ctrl) {
-                excav.setVel(david_excav_ctrl_vel_decode(frame.vel) / 100);
+                excav.setVel(david_excav_ctrl_vel_decode(frame.vel) / 1000.0f);
             }
         }
     }
