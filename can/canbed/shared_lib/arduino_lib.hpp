@@ -123,4 +123,44 @@ struct Relay {
     }
 };
 
+
+// Motor controller object.
+class MidwestMotorController {
+    OutPin enable;
+    Relay relay;
+
+  public:
+    MidwestMotorController(int inhibit, int relay_left, int relay_right,
+                    int relay_common)
+        : enable(inhibit), relay(relay_left, relay_right, relay_common) {
+        setVel(0);
+    }
+
+    // The dead-zone of velocity in meters per second; within this region
+    // the motors are turned off.
+    const double vel_deadzone = 0.01;
+    void setVel(double vel) {
+        // Experimentally determined that the motors' maximum velocity
+        // is somewhere around 0.45-0.5 duty cycle. It's unclear why,
+        // but as a result for better control we can just multiply by
+        // 0.5;
+        vel *= 0.5;
+
+        // The motors are slightly more responsive when going forwards
+        // than when going backwards.
+        if (vel < 0)
+            vel *= 1.5;
+
+        enable.write(!(abs(vel) > vel_deadzone));
+        // ((vel > 0)? relay.output_right() : relay.output_left()).write_pwm(abs(vel));
+        if (vel > 0)
+            relay.output_right().write_pwm(abs(vel));
+        else
+            relay.output_left().write_pwm(abs(vel));
+
+    }
+
+};
+
+
 #endif // ARDUINO_LIB_H
