@@ -142,7 +142,7 @@
             </Signal>
             <Signal name="SetPoint" offset="1" length="11">
                 <Value type="unsigned" unit="mm" slope="0.296875"
-                       intercept="0.0" min="0.0" max="153"/>
+                       intercept="0.0" min="0.0" max="500"/>
             </Signal>
         </Message>
         <Message id="0x311" name="StepperTelem">
@@ -164,11 +164,11 @@
             </Signal>
             <Signal name="Position" offset="2" length="11">
                 <Value type="unsigned" unit="mm" slope="0.296875"
-                       intercept="0.0" min="0.0" max="153"/>
+                       intercept="0.0" min="0.0" max="500"/>
             </Signal>
             <Signal name="SetPoint" offset="13" length="11">
                 <Value type="unsigned" unit="mm" slope="0.296875"
-                       intercept="0.0" min="0.0" max="153"/>
+                       intercept="0.0" min="0.0" max="500"/>
             </Signal>
         </Message>
     </Bus>
