@@ -63,16 +63,16 @@ struct StepperController {
         }
     }
 
-    const int ticks_per_loop = 100; 
-    const int read_limit_frequency = 20;
-    const int step_delay_micros = 1;
-    const int homing_time_ticks = 10;
+    const int ticks_per_loop = 2000; 
+    const int read_limit_frequency = 200;
+    const int step_delay_micros = 0;
+    const int homing_time_ticks = 10; 
     void loop() {
         int ticks = ticks_per_loop;
         bool at_min = false;
         bool at_max = false;
-        while (ticks-- > 0) {
-            if (ticks % read_limit_frequency == 0) {
+        while (ticks > 0) {
+            if (ticks-- % read_limit_frequency == 0) {
                 at_min = min_limit.read_threshold();
                 at_max = max_limit.read_threshold();
             }
