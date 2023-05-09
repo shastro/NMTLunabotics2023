@@ -82,7 +82,7 @@ struct StepperController {
                 if (at_min) {
                     homing_timer++;
                     if (homing_timer > homing_time_ticks) {
-                        pos = point = 0;
+                        pos = 0;
                         state = MOVE;
                         dir = STOP;
                         homing_timer = 0;
@@ -156,8 +156,11 @@ void setup() {
         
         switch (packet.id) {
             FRAME_CASE(DAVID_STEPPER_CTRL, david_stepper_ctrl) {
-                control.state = (frame.home)? control.HOME : control.MOVE;
-                control.setPoint(david_stepper_ctrl_set_point_decode(frame.set_point));
+                if (frame.home) {
+                    control.state = control.HOME;
+                } else {
+                    control.setPoint(david_stepper_ctrl_set_point_decode(frame.set_point));
+                }
             }
         }
 
