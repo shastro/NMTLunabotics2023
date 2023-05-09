@@ -64,7 +64,13 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
 
     can_id = pack_msg(msg->loco_ctrl, buff);
     printw(printable(msg->loco_ctrl).c_str());
-    send(buff, can_id, "Loco");
+    //send(buff, can_id, "Loco");
+    david_loco_ctrl_t t {
+        .left_vel = msg->loco_ctrl.left_vel,
+        .right_vel = msg->loco_ctrl.right_vel,
+    };
+    david_loco_ctrl_pack(buff, &t, sizeof(t));
+    can.transmit(DAVID_LOCO_CTRL_FRAME_ID, buff);
 
     can_id = pack_msg(msg->excav_ctrl, buff);
     printw(printable(msg->excav_ctrl).c_str());
