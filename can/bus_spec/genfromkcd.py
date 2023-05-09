@@ -52,7 +52,6 @@ def camel_to_snake(s):
 system_msg_path = os.path.join(msg_dir, 'System.msg')
 with open(system_msg_path, 'w') as s, open(lim, 'w') as l:
     s.write("# System message - auto generated from kcd\n\n")
-    s.write("Header header\n")
     l.write("// Input limits - auto generated from kcd\n\n")
     # Iterate over each message in the KCD file
     for msg in tree.NetworkDefinition.Bus.Message:

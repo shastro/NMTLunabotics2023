@@ -37,7 +37,6 @@ int main(int argc, char **argv) {
         ros::NodeHandle nh;
         ros::Subscriber sub =
             nh.subscribe("system", 5, callback);
-        ros::Rate(5);
 
         // Callback event loop
         ros::spin();
@@ -78,7 +77,6 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
     refresh();
 
     lastMsg = *msg;
-    rate.sleep();
 }
 
 void send(uint8_t* buff, int id, const char* name) {

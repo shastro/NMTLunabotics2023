@@ -542,7 +542,7 @@ double david_stepper_ctrl_set_point_decode(uint16_t value)
 
 bool david_stepper_ctrl_set_point_is_in_range(uint16_t value)
 {
-    return (value <= 515u);
+    return (value <= 1684u);
 }
 
 int david_stepper_telem_pack(
@@ -627,7 +627,7 @@ double david_stepper_telem_position_decode(uint16_t value)
 
 bool david_stepper_telem_position_is_in_range(uint16_t value)
 {
-    return (value <= 515u);
+    return (value <= 1684u);
 }
 
 uint16_t david_stepper_telem_set_point_encode(double value)
@@ -642,5 +642,5 @@ double david_stepper_telem_set_point_decode(uint16_t value)
 
 bool david_stepper_telem_set_point_is_in_range(uint16_t value)
 {
-    return (value <= 515u);
+    return (value <= 1684u);
 }
