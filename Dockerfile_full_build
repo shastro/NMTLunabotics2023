@@ -27,9 +27,7 @@ COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
 COPY ros/catkin_ws/src /ros/catkin_ws/src
 COPY can /can
 
-RUN cd /ros/catkin_ws && \
-    rm -rf /ros/catkin_ws/build /ros/catkin_ws/devel && \
-    /ros_entrypoint.sh catkin_make
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
 
 # Add /catkin_ws to the ROS environment.
 COPY ros/ros_entrypoint.sh /ros_entrypoint.sh
