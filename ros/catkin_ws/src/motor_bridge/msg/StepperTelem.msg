@@ -2,5 +2,5 @@
 
 bool at_min_stop
 bool at_max_stop
-float64 left_position
-float64 right_position
+float64 position
+float64 set_point

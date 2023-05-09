@@ -265,14 +265,14 @@ struct david_stepper_telem_t {
      * Scale: 0.296875
      * Offset: 0.0
      */
-    uint16_t left_position;
+    uint16_t position;
 
     /**
      * Range: 0..515.3684210526315789473684211 (0.0..153 mm)
      * Scale: 0.296875
      * Offset: 0.0
      */
-    uint16_t right_position;
+    uint16_t set_point;
 };
 
 /**
@@ -992,7 +992,7 @@ bool david_stepper_telem_at_max_stop_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint16_t david_stepper_telem_left_position_encode(double value);
+uint16_t david_stepper_telem_position_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1001,7 +1001,7 @@ uint16_t david_stepper_telem_left_position_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_stepper_telem_left_position_decode(uint16_t value);
+double david_stepper_telem_position_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1010,7 +1010,7 @@ double david_stepper_telem_left_position_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_stepper_telem_left_position_is_in_range(uint16_t value);
+bool david_stepper_telem_position_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1019,7 +1019,7 @@ bool david_stepper_telem_left_position_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t david_stepper_telem_right_position_encode(double value);
+uint16_t david_stepper_telem_set_point_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1028,7 +1028,7 @@ uint16_t david_stepper_telem_right_position_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_stepper_telem_right_position_decode(uint16_t value);
+double david_stepper_telem_set_point_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1037,7 +1037,7 @@ double david_stepper_telem_right_position_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_stepper_telem_right_position_is_in_range(uint16_t value);
+bool david_stepper_telem_set_point_is_in_range(uint16_t value);
 
 
 #ifdef __cplusplus

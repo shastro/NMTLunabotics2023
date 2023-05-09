@@ -47,6 +47,7 @@ int main(int argc, char **argv) {
 }
 
 void callback(const motor_bridge::System::ConstPtr &msg) {
+    if (lastMsg == *msg) { return; }
     erase();
     move(0, 0);
 
