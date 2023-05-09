@@ -60,19 +60,19 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
 
     can_id = pack_msg(msg->pitch_ctrl, buff);
     printw(printable(msg->pitch_ctrl).c_str());
-    send(buff, can_id, "EStop");
+    send(buff, can_id, "Pitch");
 
     can_id = pack_msg(msg->loco_ctrl, buff);
     printw(printable(msg->loco_ctrl).c_str());
-    send(buff, can_id, "EStop");
+    send(buff, can_id, "Loco");
 
     can_id = pack_msg(msg->excav_ctrl, buff);
     printw(printable(msg->excav_ctrl).c_str());
-    send(buff, can_id, "EStop");
+    send(buff, can_id, "Excav");
 
     can_id = pack_msg(msg->stepper_ctrl, buff);
     printw(printable(msg->stepper_ctrl).c_str());
-    send(buff, can_id, "EStop");
+    send(buff, can_id, "Stepper");
 
     refresh();
 
@@ -88,7 +88,9 @@ void send(uint8_t* buff, int id, const char* name) {
         printw(": ");
         printw(err.c_str());
         printw("\n");
+        refresh();
         attroff(COLOR_PAIR(1));
+        refresh();
     }
 }
 
