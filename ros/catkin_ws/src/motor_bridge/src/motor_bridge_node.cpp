@@ -17,18 +17,19 @@ static SocketCAN can;
 motor_bridge::System lastMsg;
 bool reduce_can = true;
 void callback(const motor_bridge::System::ConstPtr &msg);
+void send(uint8_t* buff, int id, const char* name);
 
 int main(int argc, char **argv) {
     try {
 
         // Setup ncurses
-        /*
         initscr();
         cbreak();
         keypad(stdscr, true);
         noecho();
         halfdelay(1);
-        */
+        start_color();
+        init_pair(1, COLOR_YELLOW, COLOR_BLACK);
 
         can = SocketCAN(CAN_BUS);
 
@@ -46,56 +47,47 @@ int main(int argc, char **argv) {
 }
 
 void callback(const motor_bridge::System::ConstPtr &msg) {
-    //erase();
-    //move(0, 0);
+    erase();
+    move(0, 0);
 
     uint8_t buff[8];
     int can_id;
-    std::stringstream out;
 
     can_id = pack_msg(msg->e_stop, buff);
-    out << msg->e_stop;
-    try {
-        can.transmit(can_id, buff);
-    } catch (std::string err) {
-        out << "\e[93mEstop: " << err << "\e[0m" << std::endl;
-    }
+    printw(printable(msg->e_stop).c_str());
+    send(buff, can_id, "EStop");
 
     can_id = pack_msg(msg->pitch_ctrl, buff);
-    out << msg->pitch_ctrl;
-    try {
-        can.transmit(can_id, buff);
-    } catch (std::string err) {
-        out << "\e[93mPitch: " << err << "\e[0m" << std::endl;
-    }
+    printw(printable(msg->pitch_ctrl).c_str());
+    send(buff, can_id, "EStop");
 
     can_id = pack_msg(msg->loco_ctrl, buff);
-    out << msg->loco_ctrl;
-    try {
-        can.transmit(can_id, buff);
-    } catch (std::string err) {
-        out << "\e[93mLoco: " << err << "\e[0m" << std::endl;
-    }
+    printw(printable(msg->loco_ctrl).c_str());
+    send(buff, can_id, "EStop");
 
     can_id = pack_msg(msg->excav_ctrl, buff);
-    out << msg->excav_ctrl;
-    try {
-        can.transmit(can_id, buff);
-    } catch (std::string err) {
-        out << "\e[93mExcav: " << err << "\e[0m" << std::endl;
-    }
+    printw(printable(msg->excav_ctrl).c_str());
+    send(buff, can_id, "EStop");
 
     can_id = pack_msg(msg->stepper_ctrl, buff);
-    out << msg->stepper_ctrl;
-    try {
-        can.transmit(can_id, buff);
-    } catch (std::string err) {
-        out << "\e[93mStepper: " << err << "\e[0m" << std::endl;
-    }
+    printw(printable(msg->stepper_ctrl).c_str());
+    send(buff, can_id, "EStop");
 
-    //printw(out.str().c_str());
-    //refresh();
-    std::cout << out.str() << std::endl;
+    refresh();
 
     lastMsg = *msg;
 }
+
+void send(uint8_t* buff, int id, const char* name) {
+    try {
+        can.transmit(id, buff);
+    } catch (std::string err) {
+        attron(COLOR_PAIR(1));
+        printw(name);
+        printw(": ");
+        printw(err.c_str());
+        printw("\n");
+        attroff(COLOR_PAIR(1));
+    }
+}
+

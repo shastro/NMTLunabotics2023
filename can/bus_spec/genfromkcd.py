@@ -145,16 +145,18 @@ with (open(can_c, 'w') as c,
         ah.write("        david_" + camel_to_snake(msg[0]) + "_unpack(&t, packet.buff, packet.len);\n")
         ah.write("        function(t);\n    }\n}\n\n")
     
+    # Print helpers
     h.write('\n')
     for msg in msgs:
-        func = "std::ostream& operator<<(std::ostream& s, const motor_bridge::" + msg[0] + "& msg)"
+        func = "std::string printable(const motor_bridge::" + msg[0] + "& msg)"
         h.write(func + ";\n")
         c.write(func + " {\n")
+        c.write("    std::stringstream s;");
         c.write("    s << \"" + msg[0]  + " - \";\n")
         for name in msg[1]:
             c.write("    s << \"" + name + ": \" << (int)msg." + name + " << \", \";\n")
         c.write("    s << std::endl;\n")
-        c.write("    return s;\n")
+        c.write("    return s.str();\n")
         c.write("}\n\n")
 
 # Add messsage files to cmake
