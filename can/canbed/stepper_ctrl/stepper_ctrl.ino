@@ -6,21 +6,6 @@
 #include "arduino_lib.hpp"
 #include "david.h"
 
-struct Stepper {
-    OutPin pulse;
-    OutPin direction;
-
-    Stepper(int pulse_pin, int dir_pin) :
-    pulse(pulse_pin), direction(dir_pin) {}
-
-    void doStep(unsigned int step) {
-        const int pulse_sequence[] = {HIGH, HIGH, LOW, LOW};
-        const int dir_sequence[] = {LOW, HIGH, HIGH, LOW};
-        pulse.write(pulse_sequence[step % 4]);
-        direction.write(dir_sequence[step % 4]);
-    }        
-};
-
 struct StepperController {
     Stepper right;
     Stepper left;
