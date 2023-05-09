@@ -8,6 +8,8 @@
 #include <Wire.h>
 #include <mcp_can.h>
 
+#define sign(i) (((i) > 0) - ((i) < 0))
+
 // Pin CAN runs on.
 #define SPI_CS_PIN 17
 
@@ -40,6 +42,7 @@ struct CANPacket {
 
 // Set up a CAN connection.
 inline MCP_CAN setup_can() {
+    Serial.begin(115200);
     MCP_CAN can(SPI_CS_PIN);
     while (can.begin(CAN_500KBPS) != CAN_OK) {
         Serial.println("CAN bus fail!");
@@ -75,11 +78,12 @@ class OutPin {
 // Input pins.
 class InPin {
     int num;
-
+    float threshold;
   public:
-    InPin(int num) : num(num) { pinMode(num, INPUT); }
+    InPin(int num, float threshold = 0.8f) : num(num), threshold(threshold) { pinMode(num, INPUT); }
     bool read() { return digitalRead(num) == HIGH; }
-    double read_analog() { return analogRead(num) / 1023.0; }
+    float read_analog() { return (analogRead(num) / 1023.0); }
+    bool read_threshold() { return read_analog() > threshold; }
 };
 
 // Relay controller.
