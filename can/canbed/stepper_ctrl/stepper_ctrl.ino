@@ -44,15 +44,15 @@ struct StepperController {
     StepperController(int pulse_l, int dir_l, int pulse_r, int dir_r, int min, int max) :
     left(pulse_l, dir_l), right(pulse_r, dir_r), min_limit(min), max_limit(max) {
         state = HOME;
-        pos = 1000;
+        pos = 0;
         point = 0;
         dir = STOP;
     }
 
-    #define STEP_TO_MM 0.296875
-    void setPoint(unsigned int p) {
+#define STEP_TO_MM ((1.0/500.0))
+    void setPoint(double p) {
         // TODO: double check that this isnt fucky
-        point = p;
+        point = p / (STEP_TO_MM);
     }
     
     void doStep(enum Dirs dir) {
@@ -64,8 +64,8 @@ struct StepperController {
     }
 
     const int ticks_per_loop = 100; 
-    const int read_limit_frequency = 5;
-    const int step_delay_micros = 10;
+    const int read_limit_frequency = 20;
+    const int step_delay_micros = 1;
     const int homing_time_ticks = 10;
     void loop() {
         int ticks = ticks_per_loop;
@@ -113,8 +113,7 @@ struct StepperController {
     void pack_telemetry(unsigned char buf[8]) {
         david_stepper_telem_t data = {0};
         data.at_min_stop = min_limit.read_threshold();
-        /* data.at_max_stop = max_limit.read_threshold(); */
-        data.at_max_stop = state;
+        data.at_max_stop = max_limit.read_threshold();
         // TODO(lcf): steppers should always be at same pos, so we can get rid of
         // left/right position and have position and point in kcd to verify commands
         // are updating point correctly
@@ -139,10 +138,7 @@ void setup() {
 
     bool eStopped = false;
     for (;;) {
-
-        // TODO: investigate if a non-blocking can_read would allow us to reduce
-        // ticks_per_loop to reduce command latency.
-        // So don't have `while (can.checkReceive)`, just do the call and then continue
+  
         CANPacket packet = can_read(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
@@ -157,38 +153,14 @@ void setup() {
 
         if (eStopped)
             continue;
-
-        /* if (packet.id == DAVID_STEPPER_CTRL_FRAME_ID) { */
-        /*     david_stepper_ctrl_t frame; */
-        /*     david_stepper_ctrl_unpack(&frame, packet.buf, packet.len); */
-        /*     control.state = (frame.home)? control.HOME : control.MOVE; */
-        /*     control.setPoint(frame.set_point); */
-        /* } */
         
         switch (packet.id) {
             FRAME_CASE(DAVID_STEPPER_CTRL, david_stepper_ctrl) {
-                /* david_stepper_ctrl_t frame; */
-                /* david_stepper_ctrl_unpack(&frame, packet.buf, packet.len); */
                 control.state = (frame.home)? control.HOME : control.MOVE;
-                control.setPoint(frame.set_point);
+                control.setPoint(david_stepper_ctrl_set_point_decode(frame.set_point));
             }
         }
 
-
-        /* int ticks = control.ticks_per_loop; */
-        /* while (ticks-- > 0) { */
-            /* control.doStep(control.step++); */
-        /* } */
         control.loop();
-
-        /* for (int i = 0; i < 100; i++) { */
-        /*     control.doStep(control.step++); */
-        /*     delayMicroseconds(50); */
-        /* } */
-        /* for (int i = 0; i < 100; i++) { */
-        /*     control.doStep(control.step--); */
-        /*     delayMicroseconds(50); */
-        /* } */
-
     }
 }
