@@ -1,5 +1,3 @@
-#include "david.h"
-
 
 /*
  * unpackers.hpp
@@ -7,27 +5,83 @@
  * Auto generated from KCD file
  */
 
-// struct CANPacket {
-//     uint32_t len;
-//     uint32_t id;
-//     unsigned char buf[8];
-// };
+#include "david.h"
 
-// template <typename T>
-// void david_excav_ctrl_run(const CANPacket &packet, T function) {
-//     if (packet.id == DAVID_EXCAV_CTRL_FRAME_ID) {
-//         struct david_excav_ctrl_t s;
-//         david_excav_ctrl_unpack(&s, packet.buf, packet.len);
-//         function(s);
-//     }
-// }
+struct CANPacket {
+    uint32_t len;
+    uint32_t id;
+    unsigned char buff[8];
+};
 
+template <typename T>
+void e_stop_dispatch(const CANPacket &packet, T function) {
+    if (packet.id == DAVID_EStop_FRAME_ID) {
+        struct david_e_stop_t t;
+        david_e_stop_unpack(&t, packet.buff, packet.len);
+        function(t);
+    }
+}
 
-void unpackEStop(int can_id, uint8_t* buff, int8* stop);
-void unpackPitchCtrl(int can_id, uint8_t* buff, int16* set_point, int16* left_offset, int16* right_offset);
-void unpackPitchPositionTelem(int can_id, uint8_t* buff, int16* left_position, int16* right_position);
-void unpackPitchDriverTelem(int can_id, uint8_t* buff, int8* left_current, int8* right_current, int8* left_temperature, int8* right_temperature);
-void unpackLocoCtrl(int can_id, uint8_t* buff, int16* left_vel, int16* right_vel);
-void unpackExcavCtrl(int can_id, uint8_t* buff, int16* vel);
-void unpackStepperCtrl(int can_id, uint8_t* buff, bool* home, int16* set_point);
-void unpackStepperTelem(int can_id, uint8_t* buff, bool* at_min_stop, bool* at_max_stop, int16* left_position, int16* right_position);
+template <typename T>
+void pitch_ctrl_dispatch(const CANPacket &packet, T function) {
+    if (packet.id == DAVID_PitchCtrl_FRAME_ID) {
+        struct david_pitch_ctrl_t t;
+        david_pitch_ctrl_unpack(&t, packet.buff, packet.len);
+        function(t);
+    }
+}
+
+template <typename T>
+void pitch_position_telem_dispatch(const CANPacket &packet, T function) {
+    if (packet.id == DAVID_PitchPositionTelem_FRAME_ID) {
+        struct david_pitch_position_telem_t t;
+        david_pitch_position_telem_unpack(&t, packet.buff, packet.len);
+        function(t);
+    }
+}
+
+template <typename T>
+void pitch_driver_telem_dispatch(const CANPacket &packet, T function) {
+    if (packet.id == DAVID_PitchDriverTelem_FRAME_ID) {
+        struct david_pitch_driver_telem_t t;
+        david_pitch_driver_telem_unpack(&t, packet.buff, packet.len);
+        function(t);
+    }
+}
+
+template <typename T>
+void loco_ctrl_dispatch(const CANPacket &packet, T function) {
+    if (packet.id == DAVID_LocoCtrl_FRAME_ID) {
+        struct david_loco_ctrl_t t;
+        david_loco_ctrl_unpack(&t, packet.buff, packet.len);
+        function(t);
+    }
+}
+
+template <typename T>
+void excav_ctrl_dispatch(const CANPacket &packet, T function) {
+    if (packet.id == DAVID_ExcavCtrl_FRAME_ID) {
+        struct david_excav_ctrl_t t;
+        david_excav_ctrl_unpack(&t, packet.buff, packet.len);
+        function(t);
+    }
+}
+
+template <typename T>
+void stepper_ctrl_dispatch(const CANPacket &packet, T function) {
+    if (packet.id == DAVID_StepperCtrl_FRAME_ID) {
+        struct david_stepper_ctrl_t t;
+        david_stepper_ctrl_unpack(&t, packet.buff, packet.len);
+        function(t);
+    }
+}
+
+template <typename T>
+void stepper_telem_dispatch(const CANPacket &packet, T function) {
+    if (packet.id == DAVID_StepperTelem_FRAME_ID) {
+        struct david_stepper_telem_t t;
+        david_stepper_telem_unpack(&t, packet.buff, packet.len);
+        function(t);
+    }
+}
+

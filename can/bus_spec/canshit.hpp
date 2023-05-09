@@ -6,6 +6,8 @@
  */
 
 #include <iostream>
+#include "david.h"
+
 #include <motor_bridge/EStop.h>
 #include <motor_bridge/PitchCtrl.h>
 #include <motor_bridge/PitchPositionTelem.h>

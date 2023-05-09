@@ -5,7 +5,7 @@
  * Auto generated from KCD file
  */
 
-#include <canshit.hpp>
+#include "canshit.hpp"
 #include <ros/ros.h>
 
 int pack_msg(const motor_bridge::EStop& msg, uint8_t* buff) {

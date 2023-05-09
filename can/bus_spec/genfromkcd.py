@@ -17,7 +17,6 @@ tree = untangle.parse(kcd)
 # Can file names
 can_c = "canshit.cpp"
 can_h = "canshit.hpp"
-ards_c = "unpackers.cpp"
 ards_h = "unpackers.hpp"
 lim = "limits.hpp"
 
@@ -30,14 +29,15 @@ template = """
 
 """
 
-c_template = """
-/*
- * {0}
- * Can message generation helpers
- * Auto generated from KCD file
- */
+packet = """
+struct CANPacket {
+    uint32_t len;
+    uint32_t id;
+    unsigned char buff[8];
+};
 
 """
+
 
 msgs = []
 
@@ -103,20 +103,18 @@ with open(system_msg_path, 'w') as s, open(lim, 'w') as l:
 
 with (open(can_c, 'w') as c,
         open(can_h, 'w') as h,
-        open(ards_c, 'w') as ac,
         open(ards_h, 'w') as ah):
     # Add stuff to c and h that always needs to be there
     h.write(template.format(can_h))
     h.write("#include <iostream>\n")
-    ah.write("#include <david.h>\n\n")
+    h.write("#include \"david.h\"\n\n")
     c.write(template.format(can_c))
-    c.write("#include <" + can_h + ">\n")
+    c.write("#include \"" + can_h + "\"\n")
     c.write("#include <ros/ros.h>\n\n")
 
     ah.write(template.format(ards_h))
-    ah.write("#include <david.h>\n")
-    ac.write(template.format(ards_c))
-    ac.write("#include <" + ards_h + ">\n\n")
+    ah.write("#include \"david.h\"\n")
+    ah.write(packet)
 
     for msg in msgs:
         h.write("#include <motor_bridge/" + msg[0] + ".h>\n")
@@ -139,19 +137,13 @@ with (open(can_c, 'w') as c,
         c.write("}\n\n")
 
         # Unpack functions
-        func = "void unpack" + msg[0] + "(int can_id, uint8_t* buff"
-        for name, var in zip(msg[1], msg[2]):
-            func += ", " + var + "* " + name
-        func += ")"
-        ah.write(func + ";\n")
-        ac.write(func + "{\n")
-        ac.write("    if (can_id == DAVID_" + msg[0] + "_FRAME_ID) {\n")
-        ac.write("        david_" + camel_to_snake(msg[0]) + "_t t;\n")
-        ac.write("        david_" + camel_to_snake(msg[0]) + "_unpack(&t, buff, 8);\n")
-        for name in msg[1]:
-            ac.write("        *" + name + " = t." + name + ";\n")
-        ac.write("   }\n}\n\n")
-
+        func = ("template <typename T>\nvoid " + camel_to_snake(msg[0])
+                + "_dispatch(const CANPacket &packet, T function) {\n")
+        ah.write(func)
+        ah.write("    if (packet.id == DAVID_" + msg[0] + "_FRAME_ID) {\n")
+        ah.write("        struct david_" + camel_to_snake(msg[0]) + "_t t;\n")
+        ah.write("        david_" + camel_to_snake(msg[0]) + "_unpack(&t, packet.buff, packet.len);\n")
+        ah.write("        function(t);\n    }\n}\n\n")
     
     h.write('\n')
     for msg in msgs:
