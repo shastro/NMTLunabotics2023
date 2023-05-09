@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     int min = -max;
     int dead = 20;
     ros::Publisher pub = nh.advertise<motor_bridge::System>("/system", 5);
-    ros::Rate rate(50);
+    //ros::Rate rate(50);
 
     // Setup ncurses
     initscr();
@@ -175,7 +175,7 @@ int main(int argc, char *argv[]) {
         refresh();
 
         pub.publish(s);
-        rate.sleep();
+        //rate.sleep();
     }
     endwin();
     return 0;
