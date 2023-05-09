@@ -22,11 +22,13 @@ int main(int argc, char **argv) {
     try {
 
         // Setup ncurses
+        /*
         initscr();
         cbreak();
         keypad(stdscr, true);
         noecho();
         halfdelay(1);
+        */
 
         can = SocketCAN(CAN_BUS);
 
@@ -44,8 +46,8 @@ int main(int argc, char **argv) {
 }
 
 void callback(const motor_bridge::System::ConstPtr &msg) {
-    erase();
-    move(0, 0);
+    //erase();
+    //move(0, 0);
 
     uint8_t buff[8];
     int can_id;
@@ -72,7 +74,7 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
     try {
         can.transmit(can_id, buff);
     } catch (std::string err) {
-        //out << "\e[93mLoco: " << err << "\e[0m" << std::endl;
+        out << "\e[93mLoco: " << err << "\e[0m" << std::endl;
     }
 
     can_id = pack_msg(msg->excav_ctrl, buff);
@@ -80,7 +82,7 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
     try {
         can.transmit(can_id, buff);
     } catch (std::string err) {
-        //out << "\e[93mExcav: " << err << "\e[0m" << std::endl;
+        out << "\e[93mExcav: " << err << "\e[0m" << std::endl;
     }
 
     can_id = pack_msg(msg->stepper_ctrl, buff);
@@ -88,11 +90,12 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
     try {
         can.transmit(can_id, buff);
     } catch (std::string err) {
-        //out << "\e[93mStepper: " << err << "\e[0m" << std::endl;
+        out << "\e[93mStepper: " << err << "\e[0m" << std::endl;
     }
 
-    printw(out.str().c_str());
-    refresh();
+    //printw(out.str().c_str());
+    //refresh();
+    std::cout << out.str() << std::endl;
 
     lastMsg = *msg;
 }
