@@ -150,6 +150,7 @@ with (open(can_c, 'w') as c,
         func = "std::string printable(motor_bridge::" + msg[0] + "& msg)"
         h.write(func + ";\n")
         c.write(func + " {\n")
+        c.write("std::stringstream s;");
         c.write("    s << \"" + msg[0]  + " - \";\n")
         for name in msg[1]:
             c.write("    s << \"" + name + ": \" << (int)msg." + name + " << \", \";\n")

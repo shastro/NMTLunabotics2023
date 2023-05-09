@@ -93,14 +93,14 @@ int pack_msg(const motor_bridge::StepperTelem& msg, uint8_t* buff) {
 }
 
 std::string printable(motor_bridge::EStop& msg) {
-    s << "EStop - ";
+std::stringstream s;    s << "EStop - ";
     s << "stop: " << (int)msg.stop << ", ";
     s << std::endl;
     return s.str();
 }
 
 std::string printable(motor_bridge::PitchCtrl& msg) {
-    s << "PitchCtrl - ";
+std::stringstream s;    s << "PitchCtrl - ";
     s << "set_point: " << (int)msg.set_point << ", ";
     s << "left_offset: " << (int)msg.left_offset << ", ";
     s << "right_offset: " << (int)msg.right_offset << ", ";
@@ -109,7 +109,7 @@ std::string printable(motor_bridge::PitchCtrl& msg) {
 }
 
 std::string printable(motor_bridge::PitchPositionTelem& msg) {
-    s << "PitchPositionTelem - ";
+std::stringstream s;    s << "PitchPositionTelem - ";
     s << "left_position: " << (int)msg.left_position << ", ";
     s << "right_position: " << (int)msg.right_position << ", ";
     s << std::endl;
@@ -117,7 +117,7 @@ std::string printable(motor_bridge::PitchPositionTelem& msg) {
 }
 
 std::string printable(motor_bridge::PitchDriverTelem& msg) {
-    s << "PitchDriverTelem - ";
+std::stringstream s;    s << "PitchDriverTelem - ";
     s << "left_current: " << (int)msg.left_current << ", ";
     s << "right_current: " << (int)msg.right_current << ", ";
     s << "left_temperature: " << (int)msg.left_temperature << ", ";
@@ -128,7 +128,7 @@ std::string printable(motor_bridge::PitchDriverTelem& msg) {
 }
 
 std::string printable(motor_bridge::LocoCtrl& msg) {
-    s << "LocoCtrl - ";
+std::stringstream s;    s << "LocoCtrl - ";
     s << "left_vel: " << (int)msg.left_vel << ", ";
     s << "right_vel: " << (int)msg.right_vel << ", ";
     s << std::endl;
@@ -136,14 +136,14 @@ std::string printable(motor_bridge::LocoCtrl& msg) {
 }
 
 std::string printable(motor_bridge::ExcavCtrl& msg) {
-    s << "ExcavCtrl - ";
+std::stringstream s;    s << "ExcavCtrl - ";
     s << "vel: " << (int)msg.vel << ", ";
     s << std::endl;
     return s.str();
 }
 
 std::string printable(motor_bridge::StepperCtrl& msg) {
-    s << "StepperCtrl - ";
+std::stringstream s;    s << "StepperCtrl - ";
     s << "home: " << (int)msg.home << ", ";
     s << "set_point: " << (int)msg.set_point << ", ";
     s << std::endl;
@@ -151,7 +151,7 @@ std::string printable(motor_bridge::StepperCtrl& msg) {
 }
 
 std::string printable(motor_bridge::StepperTelem& msg) {
-    s << "StepperTelem - ";
+std::stringstream s;    s << "StepperTelem - ";
     s << "at_min_stop: " << (int)msg.at_min_stop << ", ";
     s << "at_max_stop: " << (int)msg.at_max_stop << ", ";
     s << "left_position: " << (int)msg.left_position << ", ";
