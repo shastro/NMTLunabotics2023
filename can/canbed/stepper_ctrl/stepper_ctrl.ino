@@ -32,9 +32,9 @@ struct StepperController {
     };
     enum States state;
     enum Dirs {
-        BACKWARD = -1,
+        BACKWARD = 1,
         STOP = 0,
-        FORWARD = 1
+        FORWARD = -1
     };
     unsigned int pos;
     unsigned int point;
