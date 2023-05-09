@@ -90,6 +90,7 @@ int main(int argc, char *argv[]) {
         if (g.buttons.xbox) {
             estopped = true;
             pub.publish(s);
+            endwin();
             return 0;
         }
         s.e_stop.stop = estopped;
@@ -172,5 +173,6 @@ int main(int argc, char *argv[]) {
 
         pub.publish(s);
     }
+    endwin();
     return 0;
 }
