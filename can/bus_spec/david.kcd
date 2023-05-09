@@ -103,10 +103,10 @@
                 <NodeRef id="1"/>
             </Producer>
             <Signal name="LeftVel" offset="0" length="16">
-                <Value type="unsigned" slope="0.0030517578125" intercept="0" min="-100" max="100"/>
+                <Value type="unsigned" slope="0.0030517578125" intercept="-100" min="-100" max="100"/>
             </Signal>
             <Signal name="RightVel" offset="16" length="16">
-                <Value type="unsigned" slope="0.0030517578125" intercept="0" min="-100" max="100"/>
+                <Value type="unsigned" slope="0.0030517578125" intercept="-100" min="-100" max="100"/>
             </Signal>
         </Message>
 
@@ -120,7 +120,7 @@
                 100 is 100% power in reverse
             </Notes>
             <Signal name="Vel" offset="2" length="16">
-                <Value type="unsigned" slope="0.0030517578125" intercept="0" min="-100" max="100"/>
+                <Value type="unsigned" slope="0.0030517578125" intercept="-100" min="-100" max="100"/>
             </Signal>
         </Message>
 

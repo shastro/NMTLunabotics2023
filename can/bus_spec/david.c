@@ -404,32 +404,36 @@ int david_loco_ctrl_unpack(
 
 uint16_t david_loco_ctrl_left_vel_encode(double value)
 {
-    return (uint16_t)(value / 0.0030517578125);
+    return (uint16_t)((value - -100.0) / 0.0030517578125);
 }
 
 double david_loco_ctrl_left_vel_decode(uint16_t value)
 {
-    return ((double)value * 0.0030517578125);
+    return (((double)value * 0.0030517578125) + -100.0);
 }
 
 bool david_loco_ctrl_left_vel_is_in_range(uint16_t value)
 {
-    return (value <= 32768u);
+    (void)value;
+
+    return (true);
 }
 
 uint16_t david_loco_ctrl_right_vel_encode(double value)
 {
-    return (uint16_t)(value / 0.0030517578125);
+    return (uint16_t)((value - -100.0) / 0.0030517578125);
 }
 
 double david_loco_ctrl_right_vel_decode(uint16_t value)
 {
-    return ((double)value * 0.0030517578125);
+    return (((double)value * 0.0030517578125) + -100.0);
 }
 
 bool david_loco_ctrl_right_vel_is_in_range(uint16_t value)
 {
-    return (value <= 32768u);
+    (void)value;
+
+    return (true);
 }
 
 int david_excav_ctrl_pack(
@@ -468,17 +472,19 @@ int david_excav_ctrl_unpack(
 
 uint16_t david_excav_ctrl_vel_encode(double value)
 {
-    return (uint16_t)(value / 0.0030517578125);
+    return (uint16_t)((value - -100.0) / 0.0030517578125);
 }
 
 double david_excav_ctrl_vel_decode(uint16_t value)
 {
-    return ((double)value * 0.0030517578125);
+    return (((double)value * 0.0030517578125) + -100.0);
 }
 
 bool david_excav_ctrl_vel_is_in_range(uint16_t value)
 {
-    return (value <= 32768u);
+    (void)value;
+
+    return (true);
 }
 
 int david_stepper_ctrl_pack(

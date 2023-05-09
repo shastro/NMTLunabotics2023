@@ -173,16 +173,16 @@ struct david_pitch_driver_telem_t {
  */
 struct david_loco_ctrl_t {
     /**
-     * Range: -32768..32768 (-100..100 -)
+     * Range: 0..65536 (-100..100 -)
      * Scale: 0.0030517578125
-     * Offset: 0
+     * Offset: -100
      */
     uint16_t left_vel;
 
     /**
-     * Range: -32768..32768 (-100..100 -)
+     * Range: 0..65536 (-100..100 -)
      * Scale: 0.0030517578125
-     * Offset: 0
+     * Offset: -100
      */
     uint16_t right_vel;
 };
@@ -200,9 +200,9 @@ struct david_loco_ctrl_t {
  */
 struct david_excav_ctrl_t {
     /**
-     * Range: -32768..32768 (-100..100 -)
+     * Range: 0..65536 (-100..100 -)
      * Scale: 0.0030517578125
-     * Offset: 0
+     * Offset: -100
      */
     uint16_t vel;
 };
