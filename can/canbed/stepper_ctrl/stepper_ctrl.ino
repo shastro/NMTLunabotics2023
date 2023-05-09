@@ -154,7 +154,7 @@ void setup() {
         /* CANPacket packet = can_read(can); */
         CANPacket packet = {0xFFFFFFFF, 0};
         for (int i = 0; i < 64; i++) {
-            while (can.checkReceive() != CAN_MSGAVAIL) {
+            if (can.checkReceive() == CAN_MSGAVAIL) {
                 unsigned char len;
                 if (can.readMsgBuf(&len, packet.buf) == CAN_OK) {
                     packet.len = len;
