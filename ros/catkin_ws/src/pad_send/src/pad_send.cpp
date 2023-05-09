@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
     double stepper_delta = 0.000001 * PITCH_CTRL_SET_POINT_MAX;
     bool estopped = false;
     bool adjust = false;
+    bool homing = false;
     int count = 0;
     bool lastX = false;
     bool lastY = false;
@@ -63,7 +64,7 @@ int main(int argc, char *argv[]) {
         g.update();
         erase();
         move(0, 0);
-        if (count < 10) {
+        if (count < 50) {
             count++;
             continue;
         }
@@ -102,6 +103,11 @@ int main(int argc, char *argv[]) {
             adjust = !adjust;
         }
 
+        // Homing
+        if (g.buttons.B && !lastB) {
+            homing = !homing;
+        }
+
         if (!adjust && !estopped) {
             // Pitch control with dpad
             if (g.dpad.up) {
@@ -126,7 +132,7 @@ int main(int argc, char *argv[]) {
             }
 
             // Extend bumpers
-            if (g.buttons.B) {
+            if (homing) {
                 out << "Arm Homing\n";
                 stepper_set = STEPPER_CTRL_SET_POINT_MIN;
                 s.stepper_ctrl.home = true;
