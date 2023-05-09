@@ -55,48 +55,37 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
     int can_id;
 
     can_id = pack_msg(msg->e_stop, buff);
-    printw(printable(msg->e_stop).c_str());
-    send(buff, can_id, "EStop");
+    send(buff, can_id, "EStop", printable(msg->e_stop;);
 
     can_id = pack_msg(msg->pitch_ctrl, buff);
-    printw(printable(msg->pitch_ctrl).c_str());
-    send(buff, can_id, "Pitch");
+    send(buff, can_id, "Pitch", printable();
 
     can_id = pack_msg(msg->loco_ctrl, buff);
-    printw(printable(msg->loco_ctrl).c_str());
-    //send(buff, can_id, "Loco");
-    david_loco_ctrl_t t {
-        .left_vel = msg->loco_ctrl.left_vel,
-        .right_vel = msg->loco_ctrl.right_vel,
-    };
-    david_loco_ctrl_pack(buff, &t, sizeof(t));
-    can.transmit(DAVID_LOCO_CTRL_FRAME_ID, buff);
+    send(buff, can_id, "Loco");
 
     can_id = pack_msg(msg->excav_ctrl, buff);
-    printw(printable(msg->excav_ctrl).c_str());
     send(buff, can_id, "Excav");
 
     can_id = pack_msg(msg->stepper_ctrl, buff);
-    printw(printable(msg->stepper_ctrl).c_str());
     send(buff, can_id, "Stepper");
-
-    refresh();
 
     lastMsg = *msg;
 }
 
-void send(uint8_t* buff, int id, const char* name) {
+void send(uint8_t* buff, int id, const char* name, std::string print) {
     try {
         can.transmit(id, buff);
-    } catch (std::string err) {
         attron(COLOR_PAIR(1));
+        printw(print)
+        attroff(COLOR_PAIR(1));
+    } catch (std::string err) {
+        attron(COLOR_PAIR(2));
         printw(name);
         printw(": ");
         printw(err.c_str());
         printw("\n");
-        refresh();
-        attroff(COLOR_PAIR(1));
-        refresh();
+        attroff(COLOR_PAIR(2));
     }
+    refresh();
 }
 
