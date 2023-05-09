@@ -1,7 +1,0 @@
-{
-  "cpu": {
-    "fqbn": "arduino:avr:leonardo",
-    "name": "MEGA2560",
-    "port": "serial:///dev/ttyACM0"
-  }
-}
