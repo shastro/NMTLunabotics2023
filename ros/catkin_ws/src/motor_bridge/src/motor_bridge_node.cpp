@@ -26,7 +26,7 @@ void loco(const motor_bridge::System::ConstPtr &msg);
 void excav(const motor_bridge::System::ConstPtr &msg);
 void stepper(const motor_bridge::System::ConstPtr &msg);
 
-void exit(int s);
+//void exit(int s);
 
 int main(int argc, char **argv) {
     // Setup ncurses
@@ -39,9 +39,9 @@ int main(int argc, char **argv) {
     init_pair(1, COLOR_WHITE, COLOR_BLACK);
     init_pair(2, COLOR_YELLOW, COLOR_BLACK);
 
-    sigIntHandler.sa_handler = exit;
-    sigemptyset(&sigIntHandler.sa_mask);
-    sigIntHandler.sa_flags = 0;
+    //sigIntHandler.sa_handler = exit;
+    //sigemptyset(&sigIntHandler.sa_mask);
+    //sigIntHandler.sa_flags = 0;
 
     try {
         can = SocketCAN(CAN_BUS);
@@ -72,7 +72,7 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
 
     lastMsg = *msg;
 
-    sigaction(SIGINT, &sigIntHandler, NULL);
+    //sigaction(SIGINT, &sigIntHandler, NULL);
 }
 
 void stop(const motor_bridge::System::ConstPtr &msg) {
@@ -126,8 +126,9 @@ void send(uint8_t* buff, int id, const char* name, std::string print) {
     }
     refresh();
 }
-
+/*
 void exit(int s) {
     endwin();
     exit(1);
 }
+*/
