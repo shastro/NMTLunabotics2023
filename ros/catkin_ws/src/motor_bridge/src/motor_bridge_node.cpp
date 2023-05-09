@@ -17,6 +17,7 @@ static SocketCAN can;
 motor_bridge::System lastMsg;
 bool reduce_can = true;
 void callback(const motor_bridge::System::ConstPtr &msg);
+void send(uint8_t* buff, int id, const char* name);
 
 int main(int argc, char **argv) {
     try {
@@ -84,7 +85,7 @@ void send(uint8_t* buff, int id, const char* name) {
         attron(COLOR_PAIR(1));
         printw(name);
         printw(": ");
-        printw(err);
+        printw(err.c_str());
         printw("\n");
         attroff(COLOR_PAIR(1));
     }

@@ -28,7 +28,7 @@ extern "C" {
 #define DAVID_E_STOP_LENGTH (1u)
 #define DAVID_PITCH_CTRL_LENGTH (4u)
 #define DAVID_PITCH_POSITION_TELEM_LENGTH (3u)
-#define DAVID_PITCH_DRIVER_TELEM_LENGTH (4u)
+#define DAVID_PITCH_DRIVER_TELEM_LENGTH (5u)
 #define DAVID_LOCO_CTRL_LENGTH (4u)
 #define DAVID_EXCAV_CTRL_LENGTH (3u)
 #define DAVID_STEPPER_CTRL_LENGTH (2u)
@@ -48,6 +48,10 @@ extern "C" {
 
 
 /* Signal choices. */
+#define DAVID_PITCH_DRIVER_TELEM_DIRECTION_STOP_CHOICE (0u)
+#define DAVID_PITCH_DRIVER_TELEM_DIRECTION_EXTEND_CHOICE (1u)
+#define DAVID_PITCH_DRIVER_TELEM_DIRECTION_RETRACT_CHOICE (2u)
+
 #define DAVID_STEPPER_CTRL_HOME_FALSE_CHOICE (0u)
 #define DAVID_STEPPER_CTRL_HOME_TRUE_CHOICE (1u)
 
@@ -153,6 +157,13 @@ struct david_pitch_driver_telem_t {
      * Offset: -40
      */
     uint8_t right_temperature;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t direction;
 };
 
 /**
@@ -162,16 +173,16 @@ struct david_pitch_driver_telem_t {
  */
 struct david_loco_ctrl_t {
     /**
-     * Range: 0..65536 (-100..100 -)
+     * Range: -32768..32768 (-100..100 -)
      * Scale: 0.0030517578125
-     * Offset: -100
+     * Offset: 0
      */
     uint16_t left_vel;
 
     /**
-     * Range: 0..65536 (-100..100 -)
+     * Range: -32768..32768 (-100..100 -)
      * Scale: 0.0030517578125
-     * Offset: -100
+     * Offset: 0
      */
     uint16_t right_vel;
 };
@@ -189,9 +200,9 @@ struct david_loco_ctrl_t {
  */
 struct david_excav_ctrl_t {
     /**
-     * Range: 0..65536 (-100..100 -)
+     * Range: -32768..32768 (-100..100 -)
      * Scale: 0.0030517578125
-     * Offset: -100
+     * Offset: 0
      */
     uint16_t vel;
 };
@@ -645,6 +656,33 @@ double david_pitch_driver_telem_right_temperature_decode(uint8_t value);
  * @return true if in range, false otherwise.
  */
 bool david_pitch_driver_telem_right_temperature_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t david_pitch_driver_telem_direction_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_pitch_driver_telem_direction_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_pitch_driver_telem_direction_is_in_range(uint8_t value);
 
 /**
  * Pack message LocoCtrl.
