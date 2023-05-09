@@ -1,5 +1,3 @@
-// Locomotion and excavation controllers.
-
 #include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
@@ -12,10 +10,10 @@ void setup() {
     MCP_CAN can = setup_can();
 
     #define INHIBIT 11
-    #define RELAY_LEFT 4
-    #define RELAY_RIGHT 5
+    #define RELAY_CCW 5
+    #define RELAY_CW 4
     #define RELAY_COMMON 6
-    MidwestMotorController excav(INHIBIT, RELAY_LEFT, RELAY_RIGHT, RELAY_COMMON);
+    MidwestMotorController excav(INHIBIT, RELAY_CCW, RELAY_CW, RELAY_COMMON);
 
     bool eStopped = false;
     for (;;) {
@@ -33,7 +31,7 @@ void setup() {
 
         switch (packet.id) {
             FRAME_CASE(DAVID_EXCAV_CTRL, david_excav_ctrl) {
-                excav.setVel(david_excav_ctrl_vel_decode(frame.vel) / 100.0f);
+                excav.setVel(david_excav_ctrl_vel_decode(frame.vel));
             }
         }
     }

@@ -130,16 +130,16 @@ class MidwestMotorController {
     Relay relay;
 
   public:
-    MidwestMotorController(int inhibit, int relay_left, int relay_right,
+    MidwestMotorController(int inhibit, int relay_ccw, int relay_cw,
                     int relay_common)
-        : enable(inhibit), relay(relay_left, relay_right, relay_common) {
+        : enable(inhibit), relay(relay_ccw, relay_cw, relay_common) {
         setVel(0);
     }
 
-    // The dead-zone of velocity in meters per second; within this region
-    // the motors are turned off.
+    const double vel_scale = 100.0;
     const double vel_deadzone = 0.01;
     void setVel(double vel) {
+        vel /= vel_scale;
         // Experimentally determined that the motors' maximum velocity
         // is somewhere around 0.45-0.5 duty cycle. It's unclear why,
         // but as a result for better control we can just multiply by
@@ -152,7 +152,6 @@ class MidwestMotorController {
             vel *= 1.5;
 
         enable.write(!(abs(vel) > vel_deadzone));
-        // ((vel > 0)? relay.output_right() : relay.output_left()).write_pwm(abs(vel));
         if (vel > 0)
             relay.output_right().write_pwm(abs(vel));
         else
