@@ -127,7 +127,7 @@ struct StepperController {
 void setup() {
     MCP_CAN can(SPI_CS_PIN);
     Serial.begin(9600);
-    while (CAN_OK != can.begin(CAN_500KBPS))
+    while (CAN_OK != can.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
     {
         Serial.println("CAN BUS FAIL!");
         delay(100);
@@ -156,7 +156,7 @@ void setup() {
         for (int i = 0; i < 64; i++) {
             while (can.checkReceive() != CAN_MSGAVAIL) {
                 unsigned char len;
-                if (can.readMsgBuf(&packet.id, &len, packet.buf) == CAN_OK) {
+                if (can.readMsgBuf(&len, packet.buf) == CAN_OK) {
                     packet.len = len;
                     packet.id = can.getCanId();
                     break;
