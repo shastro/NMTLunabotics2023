@@ -223,6 +223,11 @@ struct MidwestMotorController {
         setVel(0.0);
     }
 
+    MidwestMotorController(int inhibit, Relay relay)
+        : enable(inhibit), relay(relay) {
+        setVel(0.0);
+    }
+
     const double vel_scale = 100.0;
     const double vel_deadzone = 0.01;
     void setVel(double vel) {
@@ -235,7 +240,7 @@ struct MidwestMotorController {
 
         // The motors are slightly more responsive when going forwards
         // than when going backwards.
-        if (vel < 0)
+        if (vel > 0)
             vel *= 1.5;
 
         enable.write(abs(vel) > vel_deadzone);

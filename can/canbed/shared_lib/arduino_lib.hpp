@@ -240,7 +240,7 @@ struct MidwestMotorController {
 
         // The motors are slightly more responsive when going forwards
         // than when going backwards.
-        if (vel < 0)
+        if (vel > 0)
             vel *= 1.5;
 
         enable.write(abs(vel) > vel_deadzone);
