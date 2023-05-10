@@ -56,7 +56,7 @@ cleanup () {
 trap cleanup INT
 
 # Set up the ROS core.
-docker run "${params[@]}" $IMAGE_NAME bash -c "cd /ros/catkin_ws && catkin_make && roscore"
+docker run "${params[@]}" $IMAGE_NAME roscore
 
 # Run the camera node.
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh /scripts/unfuck_realsense
