@@ -57,7 +57,7 @@ void setup() {
         
         switch (packet.id) {
             FRAME_CASE(DAVID_MAST_CTRL, david_mast_ctrl) {
-                control.dir = frame.direction;
+                control.dir = frame.direction-1;
             }
         }
         control.loop();
