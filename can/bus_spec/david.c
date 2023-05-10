@@ -475,17 +475,16 @@ int david_excav_ctrl_pack(
     const struct david_excav_ctrl_t *src_p,
     size_t size)
 {
-    if (size < 3u) {
+    if (size < 2u) {
         return (-EINVAL);
     }
 
-    memset(&dst_p[0], 0, 3);
+    memset(&dst_p[0], 0, 2);
 
-    dst_p[0] |= pack_left_shift_u16(src_p->vel, 2u, 0xfcu);
-    dst_p[1] |= pack_right_shift_u16(src_p->vel, 6u, 0xffu);
-    dst_p[2] |= pack_right_shift_u16(src_p->vel, 14u, 0x03u);
+    dst_p[0] |= pack_left_shift_u16(src_p->vel, 0u, 0xffu);
+    dst_p[1] |= pack_right_shift_u16(src_p->vel, 8u, 0xffu);
 
-    return (3);
+    return (2);
 }
 
 int david_excav_ctrl_unpack(
@@ -493,13 +492,12 @@ int david_excav_ctrl_unpack(
     const uint8_t *src_p,
     size_t size)
 {
-    if (size < 3u) {
+    if (size < 2u) {
         return (-EINVAL);
     }
 
-    dst_p->vel = unpack_right_shift_u16(src_p[0], 2u, 0xfcu);
-    dst_p->vel |= unpack_left_shift_u16(src_p[1], 6u, 0xffu);
-    dst_p->vel |= unpack_left_shift_u16(src_p[2], 14u, 0x03u);
+    dst_p->vel = unpack_right_shift_u16(src_p[0], 0u, 0xffu);
+    dst_p->vel |= unpack_left_shift_u16(src_p[1], 8u, 0xffu);
 
     return (0);
 }
