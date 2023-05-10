@@ -5,15 +5,15 @@ set -x
 
 # robot.sh: runs the main robot container.
 
-# Always run as root.
-[ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
-
 DIR=../
 IMAGE_NAME=lunabotics-2023-ros
 CONTAINER_NAME=lunabotics-2023-robot
 
 # Ensure CAN is up-to-date.
 make -C $DIR/can/bus_spec
+
+# Always run as root.
+[ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
 
 # Build the image.
 docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
