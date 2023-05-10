@@ -57,17 +57,16 @@ inline CANPacket can_read(MCP_CAN &can) {
     if (can.checkReceive() == CAN_MSGAVAIL) {
         CANPacket packet;
         packet.len = 0;
-        packet.id = 0xFFFFFFFFFFF;
+        packet.id = 0xFFFFFFFF;
         can.readMsgBuf((unsigned char *)&packet.len, packet.buf);
         packet.id = can.getCanId();
         return packet;
     } else {
         CANPacket packet;
         packet.len = 8;
-        packet.id = 0xFFFFFFFFFFF;
+        packet.id = 0xFFFFFFFF;
         return packet;
     }
-
 }
 
 inline void can_send(MCP_CAN &can, CANPacket packet) {
@@ -90,8 +89,11 @@ class OutPin {
 class InPin {
     int num;
     float threshold;
+
   public:
-    InPin(int num, float threshold = 0.8f) : num(num), threshold(threshold) { pinMode(num, INPUT); }
+    InPin(int num, float threshold = 0.8f) : num(num), threshold(threshold) {
+        pinMode(num, INPUT);
+    }
     bool read() { return digitalRead(num) == HIGH; }
     float read_analog() { return (analogRead(num) / 1023.0); }
     bool read_threshold() { return read_analog() >= threshold; }
@@ -128,17 +130,16 @@ struct Stepper {
     OutPin pulse;
     OutPin direction;
 
-    Stepper(int pulse_pin, int dir_pin) :
-    pulse(pulse_pin), direction(dir_pin) {}
+    Stepper(int pulse_pin, int dir_pin)
+        : pulse(pulse_pin), direction(dir_pin) {}
 
     void doStep(unsigned int step) {
         const int pulse_sequence[] = {HIGH, HIGH, LOW, LOW};
         const int dir_sequence[] = {LOW, HIGH, HIGH, LOW};
         pulse.write(pulse_sequence[step % 4]);
         direction.write(dir_sequence[step % 4]);
-    }        
+    }
 };
-
 
 // Motor controller object.
 class MidwestMotorController {
@@ -147,7 +148,7 @@ class MidwestMotorController {
 
   public:
     MidwestMotorController(int inhibit, int relay_ccw, int relay_cw,
-                    int relay_common)
+                           int relay_common)
         : enable(inhibit), relay(relay_ccw, relay_cw, relay_common) {
         setVel(0);
     }
@@ -172,10 +173,7 @@ class MidwestMotorController {
             relay.output_right().write_pwm(abs(vel));
         else
             relay.output_left().write_pwm(abs(vel));
-
     }
-
 };
-
 
 #endif // ARDUINO_LIB_H
