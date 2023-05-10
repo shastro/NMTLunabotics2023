@@ -234,6 +234,7 @@ void setup()
             }
         }
 
+        delay(300);
         CANPacket driver_telemetry = {DAVID_PITCH_DRIVER_TELEM_FRAME_ID, 0};
         control.pack_telemetry(driver_telemetry.buf);
         can_send_i2c(can, driver_telemetry);
