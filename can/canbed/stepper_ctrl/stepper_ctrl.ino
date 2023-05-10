@@ -17,9 +17,9 @@ struct StepperController {
     };
     enum States state;
     enum Dirs {
-        BACKWARD = 1,
+        BACKWARD = -1,
         STOP = 0,
-        FORWARD = -1
+        FORWARD = 1
     };
     unsigned long int pos;
     unsigned long int point;
@@ -51,8 +51,7 @@ struct StepperController {
 
     const int ticks_per_loop = 2000; 
     const int read_limit_frequency = 200;
-    const int step_delay_micros = 0;
-    const int homing_time_ticks = 10; 
+    const int step_delay_micros = 5;
     void loop() {
         int ticks = ticks_per_loop;
         bool at_min = false;
@@ -66,16 +65,11 @@ struct StepperController {
             switch (state) {
             case HOME: {
                 if (at_min) {
-                    homing_timer++;
-                    if (homing_timer > homing_time_ticks) {
-                        pos = 0;
-                        state = MOVE;
-                        dir = STOP;
-                        homing_timer = 0;
-                    }
+                    pos = 0;
+                    state = MOVE;
+                    dir = STOP;
                 } else {
                     dir = BACKWARD;
-                    homing_timer = 0;
                 }
             } break;
             case MOVE: {
@@ -103,8 +97,8 @@ struct StepperController {
         // TODO(lcf): steppers should always be at same pos, so we can get rid of
         // left/right position and have position and point in kcd to verify commands
         // are updating point correctly
-        data.left_position = david_stepper_telem_left_position_encode(((double)pos)/STEP_TO_MM);
-        data.right_position = david_stepper_telem_left_position_encode(((double)point)/STEP_TO_MM);
+        data.position  = david_stepper_telem_position_encode(((double)pos)/STEP_TO_MM);
+        data.set_point  = david_stepper_telem_position_encode(((double)point)/STEP_TO_MM);
         david_stepper_telem_pack(buf, &data, 8);
     }
 };
@@ -143,7 +137,7 @@ void setup() {
                 if (frame.home) {
                     control.state = control.HOME;
                 } else {
-                    control.setPoint(david_stepper_ctrl_set_point_decode(frame.set_point));
+                    control.setPoint(david_stepper_telem_set_point_decode(frame.set_point));
                 }
             }
         }

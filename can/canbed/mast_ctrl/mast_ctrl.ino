@@ -6,6 +6,10 @@
 #include "arduino_lib.hpp"
 #include "david.h"
 
+// TODO(cad): measure steps to rotation, so that
+// TODO(cad): enforce a limit of rotations so that the cable does not get wound around
+// to much.
+
 struct StepperController {
     enum Dirs {
         CCW = -1,
@@ -30,9 +34,13 @@ StepperController(int pulse_c, int dir_c) :
         }
     }
 
+    const int ticks_per_loop = 50;
+    const int step_delay_micros = 200;
     void loop() {
-        doStep(dir);
-        delayMicroseconds(1000);
+        for (int i = 0; i < ticks_per_loop; i++) {
+            doStep(dir);
+            delayMicroseconds(step_delay_micros);
+        }
     }
 };
 
