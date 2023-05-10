@@ -11,6 +11,7 @@ void setup() {
     MCP_CAN can = setup_can();
 
     // PWM pins: 5, 6, 3, 9, 10, 11
+    // TODO: this is broken and is using non-PWM pins.
     MidwestMotorController left(11, Relay(A0, A1, A2));
     MidwestMotorController right(D8, Relay(D6, A3, 12));
 
