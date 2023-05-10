@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-[ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
-
 set -euo pipefail
 IFS=$'\n\t'
 set -x
@@ -10,6 +8,12 @@ set -x
 DIR=../
 IMAGE_NAME=lunabotics-2023-ros
 CONTAINER_NAME=lunabotics-2023-robot
+
+# Ensure CAN is up-to-date.
+make -C $DIR/can/bus_spec
+
+# Always run as root.
+[ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
 
 # Build the image.
 docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
@@ -52,7 +56,7 @@ cleanup () {
 trap cleanup INT
 
 # Set up the ROS core.
-docker run "${params[@]}" $IMAGE_NAME roscore
+docker run "${params[@]}" $IMAGE_NAME bash -c "cd /ros/catkin_ws && catkin_make && roscore"
 
 # Run the camera node.
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh /scripts/unfuck_realsense

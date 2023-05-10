@@ -1,3 +1,3 @@
 # EStop ros message - auto generated from kcd
 
-int8 stop
+uint8 stop

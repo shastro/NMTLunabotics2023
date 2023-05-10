@@ -1,1 +1,1 @@
-/home/cdundun/Documents/Luna/NMTLunabotics2023/can/bus_spec/david.c
+../../bus_spec/david.c

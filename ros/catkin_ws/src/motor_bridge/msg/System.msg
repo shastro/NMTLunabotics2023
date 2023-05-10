@@ -8,3 +8,4 @@ LocoCtrl loco_ctrl
 ExcavCtrl excav_ctrl
 StepperCtrl stepper_ctrl
 StepperTelem stepper_telem
+MastCtrl mast_ctrl

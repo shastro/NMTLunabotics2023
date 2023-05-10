@@ -7,7 +7,7 @@ david.c david.h: david.kcd
 	sed -ie '1d' david.c david.h
 
 canshit.cpp canshit.hpp unpackers.hpp limits.hpp: genfromkcd.py david.kcd
-	python $< > canshit.cpp canshit.hpp unpackers.hpp limits.hpp
+	python3 $< > canshit.cpp canshit.hpp unpackers.hpp limits.hpp
 
 clean:
 	$(RM) david.c david.h canshit.cpp canshit.hpp unpackers.hpp limits.hpp
