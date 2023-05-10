@@ -13,6 +13,16 @@
 // Pin CAN runs on.
 #define SPI_CS_PIN 17
 
+// Labels for pins.
+#define D4 4
+#define D5 5
+#define D6 6
+#define D8 8
+#define D9 9
+
+// Chase tells me this is correct ~~Alex
+#define RX 0
+
 // Generate a case label for unpacking a particular frame kind from
 // `packet`. `frame_upper` and `frame_lower` should be the name of the
 // frame, in SCREAMING_SNAKE_CASE and snake_case respectively.
@@ -150,6 +160,11 @@ class MidwestMotorController {
     MidwestMotorController(int inhibit, int relay_ccw, int relay_cw,
                     int relay_pwm)
         : enable(inhibit), relay(relay_ccw, relay_cw, relay_pwm) {
+        setVel(0);
+    }
+
+    MidwestMotorController(int inhibit, Relay relay)
+        : enable(inhibit), relay(relay) {
         setVel(0);
     }
 

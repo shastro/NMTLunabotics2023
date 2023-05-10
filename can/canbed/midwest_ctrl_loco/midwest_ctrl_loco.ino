@@ -3,29 +3,19 @@
 #include <Wire.h>
 #include <mcp_can.h>
 
+#include "arduino_lib.hpp"
 #include "david.h"
 #include "pins_arduino.h"
-#include "arduino_lib.hpp"
 
 void setup() {
     MCP_CAN can = setup_can();
 
     // PWM pins: 5, 6, 3, 9, 10, 11
-    // TODO: Needs correct pins and stuff
-    // TODO: Wire up inhbit pins and PWMs
-    #define LINHIBIT 6
-    #define LRELAY_CCW 12
-    #define LRELAY_CW A3
-    #define LRELAY_PWM 9
-    MidwestMotorController left(LINHIBIT, LRELAY_CCW, LRELAY_CW, LRELAY_PWM);
-    #define RINHIBIT 6
-    #define RRELAY_CCW A0
-    #define RRELAY_CW 9
-    #define RRELAY_PWM A2
-    MidwestMotorController right(RINHIBIT, RRELAY_CCW, RRELAY_CW, RRELAY_PWM);
-    
+    MidwestMotorController left(11, Relay(A0, A1, A2));
+    MidwestMotorController right(D8, Relay(D6, A3, 12));
+
     bool eStopped = false;
-    for (;;) {
+    while (1) {
         CANPacket packet = can_read(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
