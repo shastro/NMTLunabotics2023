@@ -47,6 +47,12 @@
                 <Value type="unsigned" unit="mm" slope="0.296875"
                        intercept="-76.5" min="-76.5" max="76.5"/>
             </Signal>
+            <Signal name="Home" offset="27" length="1">
+                <LabelSet>
+                    <Label name='False' value="0"/>
+                    <Label name='True' value="1"/>
+                </LabelSet>
+            </Signal>
         </Message>
         <Message id="0x110" name="PitchPositionTelem">
             <Producer>
