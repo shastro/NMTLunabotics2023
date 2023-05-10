@@ -20,7 +20,7 @@ void setup() {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
                 eStopped = frame.stop;
                 left.setVel(0.0);
-                // right.setVel(0.0);
+                right.setVel(0.0);
             }
         }
 
@@ -29,9 +29,8 @@ void setup() {
 
         switch (packet.id) {
             FRAME_CASE(DAVID_LOCO_CTRL, david_loco_ctrl) {
-                // left.setVel(david_loco_ctrl_left_vel_decode(frame.left_vel));
-                left.setVel(0);
-                // right.setVel(david_loco_ctrl_right_vel_decode(frame.right_vel));
+                left.setVel(david_loco_ctrl_left_vel_decode(frame.left_vel));
+                right.setVel(david_loco_ctrl_right_vel_decode(frame.right_vel));
             }
         }
     }
