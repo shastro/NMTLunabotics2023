@@ -223,6 +223,11 @@ struct MidwestMotorController {
         setVel(0.0);
     }
 
+    MidwestMotorController(int inhibit, Relay relay)
+        : enable(inhibit), relay(relay) {
+        setVel(0.0);
+    }
+
     const double vel_scale = 100.0;
     const double vel_deadzone = 0.01;
     void setVel(double vel) {
