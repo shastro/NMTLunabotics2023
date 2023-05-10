@@ -100,9 +100,7 @@ with open(system_msg_path, 'w') as s, open(lim, 'w') as l:
         # Add new message to combined message
         s.write(msg_name + " " + camel_to_snake(msg_name) + '\n')
 
-with (open(can_c, 'w') as c,
-        open(can_h, 'w') as h,
-        open(ards_h, 'w') as ah):
+with open(can_c, 'w') as c, open(can_h, 'w') as h, open(ards_h, 'w') as ah:
     # Add stuff to c and h that always needs to be there
     h.write(template.format(can_h))
     h.write("#include <iostream>\n")
