@@ -31,8 +31,9 @@ void setup() {
 
         switch (packet.id) {
             FRAME_CASE(DAVID_EXCAV_CTRL, david_excav_ctrl) {
-                excav.setVel(david_excav_ctrl_vel_decode(frame.vel));
-                Serial.println(frame.vel);
+                double vel = david_excav_ctrl_vel_decode(frame.vel);
+                excav.setVel(vel);
+                Serial.println(vel);
             }
         }
     }
