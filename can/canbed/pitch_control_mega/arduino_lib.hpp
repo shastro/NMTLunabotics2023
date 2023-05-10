@@ -1,5 +1,5 @@
 // Shared library code for Arduinos.
-
+// Valid Analog Write Pins: 3 5 6 9 10 11
 #ifndef ARDUINO_LIB_H
 #define ARDUINO_LIB_H
 
@@ -10,8 +10,41 @@
 
 #define sign(i) (((i) > 0) - ((i) < 0))
 
+// Pinout reference:
+// D4  RX
+// D5* TX
+// D6* SDA
+// A3  SCL
+// 12  D8
+// A0  D9*
+// A1  10*
+// A2  11*
+// 5V  GND
+// (* = PWM)
+
 // Pin CAN runs on.
 #define SPI_CS_PIN 17
+
+// Labels for pins.
+#define D4 4
+#define D5 5
+#define D6 6
+#define D8 8
+#define D9 9
+#define D13 13
+
+// Chase tells me this is correct ~~Alex
+#define RX 0
+
+// Pin that has the LED attached.
+#define BOARD_LED D13
+
+// Lock up the board, send an error message over serial, and flash the
+// LED forever.
+//
+// This should *only* be used for hardware configuration errors that
+// are completely unrecoverable.
+inline void panic(const char *error_message);
 
 // Generate a case label for unpacking a particular frame kind from
 // `packet`. `frame_upper` and `frame_lower` should be the name of the
@@ -76,11 +109,34 @@ inline void can_send(MCP_CAN &can, CANPacket packet) {
 // Output pins.
 class OutPin {
     int num;
+    bool allow_pwm;
 
   public:
-    OutPin(int num) : num(num) { pinMode(num, OUTPUT); }
+    OutPin(int num) : num(num) {
+        pinMode(num, OUTPUT);
+
+        // Only some pins are allowed to do PWM output. This only runs
+        // once at init, so isn't much of a speed concern.
+        switch (num) {
+        case 3:
+        case 5:
+        case 6:
+        case 9:
+        case 10:
+        case 11:
+            allow_pwm = true;
+            break;
+
+        default:
+            allow_pwm = false;
+        }
+    }
+
     void write(bool value) { digitalWrite(num, value ? HIGH : LOW); }
     void write_pwm(double duty_cycle) {
+        if (!allow_pwm)
+            panic("Attempted PWM on invalid PWM pin");
+
         analogWrite(num, min(duty_cycle, 1) * 255);
     }
 };
@@ -98,6 +154,20 @@ class InPin {
     float read_analog() { return (analogRead(num) / 1023.0); }
     bool read_threshold() { return read_analog() >= threshold; }
 };
+
+// Lock up the board, send an error message over serial, and flash the
+// LED forever.
+inline void panic(const char *error_message) {
+    // Panic and make the LED blink forever.
+    OutPin led(BOARD_LED);
+    while (true) {
+        Serial.println(error_message);
+        led.write(false);
+        delay(500);
+        led.write(true);
+        delay(500);
+    }
+}
 
 // Relay controller.
 struct Relay {
@@ -142,15 +212,15 @@ struct Stepper {
 };
 
 // Motor controller object.
-class MidwestMotorController {
+struct MidwestMotorController {
     OutPin enable;
     Relay relay;
 
   public:
     MidwestMotorController(int inhibit, int relay_ccw, int relay_cw,
-                    int relay_pwm)
+                           int relay_pwm)
         : enable(inhibit), relay(relay_ccw, relay_cw, relay_pwm) {
-        setVel(0);
+        setVel(0.0);
     }
 
     const double vel_scale = 100.0;
@@ -168,11 +238,12 @@ class MidwestMotorController {
         if (vel < 0)
             vel *= 1.5;
 
-        enable.write(!(abs(vel) > vel_deadzone));
-        if (vel > 0)
+        enable.write(abs(vel) > vel_deadzone);
+        if (vel > 0) {
             relay.output_right().write_pwm(abs(vel));
-        else
+        } else {
             relay.output_left().write_pwm(abs(vel));
+        }
     }
 };
 

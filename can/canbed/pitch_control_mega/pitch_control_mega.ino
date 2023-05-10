@@ -1,6 +1,4 @@
 // receive a frame from can bus
-
-#include <Wire.h>
 #include "arduino_lib.hpp"
 #include "Longan_I2C_CAN_Arduino.h"
 
@@ -152,7 +150,13 @@ struct PitchController {
         david_pitch_driver_telem_pack(buf, &data, 8);
     }
     void loop(){
-        while ((abs(left_pos - set_point) > tolerance) || (abs(right_pos - set_point) > tolerance)) {
+        int ticks = 1000;
+        const int read_limit_frequency = 200;
+        while(ticks > 0){
+            if (ticks-- % read_limit_frequency == 0) {
+                
+            }
+            
             // Left
             if (left_pos > set_point) {
                 left_m.setDirection(Dir::Retract);
@@ -168,6 +172,7 @@ struct PitchController {
                 left_m.setDirection(Dir::Extend);
             }
         }
+        delay(50);
     }
 };
 
@@ -204,10 +209,7 @@ inline void can_send_i2c(I2C_CAN &can, CANPacket packet) {
 
 void setup()
 {
-    // I2C_CAN can = setup_can_i2c();
-    Wire.begin();
-    delay(100);
-
+    I2C_CAN can = setup_can_i2c();
     // PinModes
     pinMode(HALL_PIN_L, INPUT_PULLUP);
     pinMode(HALL_PIN_R, INPUT_PULLUP);
@@ -224,26 +226,31 @@ void setup()
     // controller.loop();
     for(;;){
         int CMD_State = Dir::Stop;
-        // CANPacket packet = can_read_i2c(can);
-        // switch (packet.id) {
-        //     FRAME_CASE(DAVID_E_STOP, david_e_stop) {
-        //         e_stopped = frame.stop;
-        //         CMD_State = Dir::Stop;
-        //     }
-        // }
+        CANPacket packet = can_read_i2c(can);
+        switch (packet.id) {
+            FRAME_CASE(DAVID_E_STOP, david_e_stop) {
+                e_stopped = frame.stop;
+                CMD_State = Dir::Stop;
+            }
+        }
 
-        // CANPacket driver_telemetry = {DAVID_PITCH_DRIVER_TELEM_FRAME_ID, 0};
-        // control.pack_telemetry(driver_telemetry.buf);
-        // can_send_i2c(can, driver_telemetry);
-        // delay(100);
+        delay(300);
+        CANPacket driver_telemetry = {DAVID_PITCH_DRIVER_TELEM_FRAME_ID, 0};
+        control.pack_telemetry(driver_telemetry.buf);
+        can_send_i2c(can, driver_telemetry);
 
+
+        delay(300);
         control.left_m.setDirection(Dir::Extend);
         control.right_m.setDirection(Dir::Extend);
-        delay(20);
+        delay(300);
+        control.left_m.setDirection(Dir::Retract);
+        control.right_m.setDirection(Dir::Retract);
+        delay(300);
         // CANPacket driver_telemetry = {DAVID_PITCH_DRIVER_TELEM_FRAME_ID, 0};
         // can_send(can, driver_telemetry)
-        // if (eStopped)
-        //     continue;
+        if (e_stopped)
+            continue;
 
         // switch (packet.id) {
         //     FRAME_CASE(DAVID_PITCH_CTRL, david_pitch_ctrl) {
@@ -259,6 +266,8 @@ void setup()
         //     }
         // }
 
+
+        // control.loop();
         // left_m.setDirection(Dir::Stop);
         // right_m.setDirection(Dir::Stop);
         // delay(2000);
