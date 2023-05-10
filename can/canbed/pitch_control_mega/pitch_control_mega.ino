@@ -39,14 +39,14 @@ enum Dir {
 #define ACC 0x0A
 #define SPEED 150
 
-struct MDO4Driver {
+struct MD04Driver {
     int addr;  
 
-    MDO4Driver(unsigned addr_in) {
+    MD04Driver(unsigned addr_in) {
         addr = addr_in;
     }
 
-    byte getTemp() {
+    byte getTemperature() {
         return getData(TEMPREG);
     }
 
@@ -88,63 +88,169 @@ struct MDO4Driver {
 
 
 struct PitchController {
+
+    MD04Driver left_m;
+    MD04Driver right_m;
     double tolerance;
+
+    double left_pos;
+    double right_pos;
+
+    int left_count;
+    int right_count;
+
+    double set_point;
+    double left_offset;
+    double right_offset;
+
     enum States {
         Move = 0,
         Home = 1,
     };
 
+    PitchController(double tolerance_) : left_m(0x59), right_m(0x58) {
+        tolerance = tolerance_;
+        left_pos = 0.0;
+        right_pos = 0.0;
+
+        left_count = 0;
+        right_count = 0;
+
+        left_offset = 0.0;
+        right_offset = 0.0;
+
+    }
+
+    void setPoint(double set_point_) {
+        set_point = set_point_;
+    }
+
+    void setLeftOffset(double left_offset_){
+        left_offset = left_offset_;
+    
+    }
+
+    void setRightOffset(double right_offset_){
+        right_offset = right_offset_;
+    }
+
+    void pack_telemetry(unsigned char buf[8]){
+        
+        david_pitch_driver_telem_t data = {0};
+        byte left_current = left_m.getCurrent();
+        byte right_current = right_m.getCurrent();
+        byte left_temperature = left_m.getTemperature();
+        byte right_temperature = right_m.getTemperature();
+        data.left_temperature = david_pitch_driver_telem_left_temperature_encode((double)left_temperature);
+        data.right_temperature = david_pitch_driver_telem_right_temperature_encode((double)right_temperature);
+        data.left_current = david_pitch_driver_telem_left_current_encode((double)left_current*(186.0/20.0));
+        data.right_current = david_pitch_driver_telem_right_current_encode((double)right_current*(186.0/20.0));
+        david_pitch_driver_telem_pack(buf, &data, 8);
+    }
+    void loop(){
+        while ((abs(left_pos - set_point) > tolerance) || (abs(right_pos - set_point) > tolerance)) {
+            // Left
+            if (left_pos > set_point) {
+                left_m.setDirection(Dir::Retract);
+            }
+            if (left_pos < set_point) {
+                left_m.setDirection(Dir::Extend);
+            }
+            // Right
+            if (right_pos > set_point) {
+                right_m.setDirection(Dir::Retract);
+            }
+            if (right_pos < set_point) {
+                left_m.setDirection(Dir::Extend);
+            }
+        }
+    }
 };
 
+inline I2C_CAN setup_can_i2c() {
+    I2C_CAN can(I2C_CAN_ADDR);
+    Serial.begin(9600);
+    while (can.begin(CAN_500KBPS) != CAN_OK) {
+        Serial.println("CAN bus fail!");
+        delay(100);
+    }
+    Serial.println("CAN bus ok!");
+    return can;
+}
+
+inline CANPacket can_read_i2c(I2C_CAN &can) {
+    if (can.checkReceive() == CAN_MSGAVAIL) {
+        CANPacket packet;
+        packet.len = 0;
+        packet.id = 0xFFFFFFFFFFF;
+        can.readMsgBuf((unsigned char *)&packet.len, packet.buf);
+        packet.id = can.getCanId();
+        return packet;
+    } else {
+        CANPacket packet;
+        packet.len = 8;
+        packet.id = 0xFFFFFFFFFFF;
+        return packet;
+    }
+
+}
+inline void can_send_i2c(I2C_CAN &can, CANPacket packet) {
+    can.sendMsgBuf(packet.id, CAN_STDID, 8, packet.buf);
+}
 
 void setup()
 {
-    I2C_CAN can = setup_can();
+    I2C_CAN can = setup_can_i2c();
     Wire.begin();
-    MDO4Driver left_m(0x59);
-    MDO4Driver right_m(0x58);
     delay(100);
 
     // PinModes
     pinMode(HALL_PIN_L, INPUT_PULLUP);
     pinMode(HALL_PIN_R, INPUT_PULLUP);
 
-    PitchController control(left_m, right_m);
+    double tolerance = 1.0; // 1 mm
+    PitchController control(tolerance);
     // Interrupts
     // attachInterrupt(digitalPinToInterrupt(HALL_PIN_L, left_hall_handler, FALLING);
     // attachInterrupt(digitalPinToInterrupt(HALL_PIN_R, right_hall_handle, FALLING);
 
     double current_set_point = 0.0;
+    bool home_state = false;
+    bool e_stopped = false;
     // controller.loop();
     for(;;){
         int CMD_State = Dir::Stop;
-        CANPacket packet = can_read(can);
+        CANPacket packet = can_read_i2c(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
-                eStopped = frame.stop;
+                e_stopped = frame.stop;
                 CMD_State = Dir::Stop;
             }
         }
 
-        CANPacket driver_telemetry = {DAVID_PITCH_POSITION_TELEM_FRAME_ID, 0};
         CANPacket driver_telemetry = {DAVID_PITCH_DRIVER_TELEM_FRAME_ID, 0};
-        if (eStopped)
-            continue;
+        control.pack_telemetry(driver_telemetry.buf);
+        can_send_i2c(can, driver_telemetry);
 
-        switch (packet.id) {
-            FRAME_CASE(DAVID_PITCH_CTRL, david_pitch_ctrl) {
-                
-                if (frame.setpoint) {
-                    control.state = control.HOME;
-                } else {
-                    control.setPoint(david_stepper_ctrl_set_point_decode(frame.set_point));
-                }
-            }
-        }
+        // CANPacket driver_telemetry = {DAVID_PITCH_DRIVER_TELEM_FRAME_ID, 0};
+        // can_send(can, driver_telemetry)
+        // if (eStopped)
+        //     continue;
 
-        control.loop();
-        left_m.setDirection(Dir::Retract);
-        right_m.setDirection(Dir::Retract);
+        // switch (packet.id) {
+        //     FRAME_CASE(DAVID_PITCH_CTRL, david_pitch_ctrl) {
+
+        //         home_state = frame.home;
+        //         if (frame.home) {
+        //             break;
+        //         }
+        //         control.setPoint(david_pitch_ctrl_set_point_decode(frame.set_point));
+        //         control.setLeftOffset(david_pitch_ctrl_left_offset_decode(frame.left_offset));
+        //         control.setRightOffset(david_pitch_ctrl_right_offset_decode(frame.right_offset));
+
+        //     }
+        // }
+
         // left_m.setDirection(Dir::Stop);
         // right_m.setDirection(Dir::Stop);
         // delay(2000);
