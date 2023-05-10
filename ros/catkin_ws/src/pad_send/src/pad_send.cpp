@@ -144,12 +144,12 @@ int main(int argc, char *argv[]) {
             // Viagra
             if (g.dpad.left) {
                 out << "david's shaft left\n";
-                s.mast_ctrl.direction = 1;
+                s.mast_ctrl.direction = 0;
             } else if (g.dpad.right) {
                 out << "david's shaft right\n";
                 s.mast_ctrl.direction = 2;
             } else {
-                s.mast_ctrl.direction = 0;
+                s.mast_ctrl.direction = 1;
             }
 
             // Drive with both sticks
