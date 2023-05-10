@@ -15,6 +15,8 @@
 #define CAN_BUS "can0"
 static SocketCAN can;
 
+bool debug = false;
+
 motor_bridge::System lastMsg;
 struct sigaction sigIntHandler;
 
@@ -26,22 +28,24 @@ void loco(const motor_bridge::System::ConstPtr &msg);
 void excav(const motor_bridge::System::ConstPtr &msg);
 void stepper(const motor_bridge::System::ConstPtr &msg);
 
-//void exit(int s);
+void exit(int s);
 
 int main(int argc, char **argv) {
     // Setup ncurses
-    initscr();
-    cbreak();
-    keypad(stdscr, true);
-    noecho();
-    halfdelay(1);
-    start_color();
-    init_pair(1, COLOR_WHITE, COLOR_BLACK);
-    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+    if (debug) {
+        initscr();
+        cbreak();
+        keypad(stdscr, true);
+        noecho();
+        halfdelay(1);
+        start_color();
+        init_pair(1, COLOR_WHITE, COLOR_BLACK);
+        init_pair(2, COLOR_YELLOW, COLOR_BLACK);
 
-    //sigIntHandler.sa_handler = exit;
-    //sigemptyset(&sigIntHandler.sa_mask);
-    //sigIntHandler.sa_flags = 0;
+        sigIntHandler.sa_handler = exit;
+        sigemptyset(&sigIntHandler.sa_mask);
+        sigIntHandler.sa_flags = 0;
+    }
 
     try {
         can = SocketCAN(CAN_BUS);
@@ -72,7 +76,9 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
 
     lastMsg = *msg;
 
-    //sigaction(SIGINT, &sigIntHandler, NULL);
+    if (debug) {
+        sigaction(SIGINT, &sigIntHandler, NULL);
+    }
 }
 
 void stop(const motor_bridge::System::ConstPtr &msg) {
@@ -113,22 +119,25 @@ void stepper(const motor_bridge::System::ConstPtr &msg) {
 void send(uint8_t* buff, int id, const char* name, std::string print) {
     try {
         can.transmit(id, buff);
-        attron(COLOR_PAIR(1));
-        printw(print.c_str());
-        attroff(COLOR_PAIR(1));
+        if (debug) {
+            attron(COLOR_PAIR(1));
+            printw(print.c_str());
+            attroff(COLOR_PAIR(1));
+        }
     } catch (std::string err) {
-        attron(COLOR_PAIR(2));
-        printw(name);
-        printw(": ");
-        printw(err.c_str());
-        printw("\n");
-        attroff(COLOR_PAIR(2));
+        if (debug) {
+            attron(COLOR_PAIR(2));
+            printw(name);
+            printw(": ");
+            printw(err.c_str());
+            printw("\n");
+            attroff(COLOR_PAIR(2));
+        }
     }
-    refresh();
+    if (debug) { refresh(); }
 }
-/*
+
 void exit(int s) {
     endwin();
     exit(1);
 }
-*/
