@@ -41,6 +41,9 @@
 
 // Lock up the board, send an error message over serial, and flash the
 // LED forever.
+//
+// This should *only* be used for hardware configuration errors that
+// are completely unrecoverable.
 inline void panic(const char *error_message);
 
 // Generate a case label for unpacking a particular frame kind from
