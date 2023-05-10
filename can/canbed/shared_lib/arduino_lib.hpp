@@ -1,5 +1,5 @@
 // Shared library code for Arduinos.
-
+// Valid Analog Write Pins: 3 5 6 9 10 11
 #ifndef ARDUINO_LIB_H
 #define ARDUINO_LIB_H
 
@@ -212,7 +212,7 @@ struct Stepper {
 };
 
 // Motor controller object.
-class MidwestMotorController {
+struct MidwestMotorController {
     OutPin enable;
     Relay relay;
 
@@ -220,12 +220,7 @@ class MidwestMotorController {
     MidwestMotorController(int inhibit, int relay_ccw, int relay_cw,
                            int relay_pwm)
         : enable(inhibit), relay(relay_ccw, relay_cw, relay_pwm) {
-        setVel(0);
-    }
-
-    MidwestMotorController(int inhibit, Relay relay)
-        : enable(inhibit), relay(relay) {
-        setVel(0);
+        setVel(0.0);
     }
 
     const double vel_scale = 100.0;
@@ -244,10 +239,11 @@ class MidwestMotorController {
             vel *= 1.5;
 
         enable.write(abs(vel) > vel_deadzone);
-        if (vel > 0)
+        if (vel > 0) {
             relay.output_right().write_pwm(abs(vel));
-        else
+        } else {
             relay.output_left().write_pwm(abs(vel));
+        }
     }
 };
 

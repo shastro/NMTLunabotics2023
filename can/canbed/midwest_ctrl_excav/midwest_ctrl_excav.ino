@@ -9,7 +9,7 @@
 void setup() {
     MCP_CAN can = setup_can();
 
-    #define INHIBIT 11
+    #define INHIBIT A3
     #define RELAY_CCW 5
     #define RELAY_CW 4
     #define RELAY_PWM 6
@@ -32,6 +32,7 @@ void setup() {
         switch (packet.id) {
             FRAME_CASE(DAVID_EXCAV_CTRL, david_excav_ctrl) {
                 excav.setVel(david_excav_ctrl_vel_decode(frame.vel));
+                Serial.println(frame.vel);
             }
         }
     }
