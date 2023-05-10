@@ -32,7 +32,7 @@ StepperController(int pulse_c, int dir_c) :
 
     void loop() {
         doStep(dir);
-        delayMicroseconds(50);
+        delayMicroseconds(1000);
     }
 };
 

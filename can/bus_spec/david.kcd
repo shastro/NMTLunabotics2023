@@ -180,9 +180,9 @@
         <Message id="0x400" name="MastCtrl">
             <Signal name="Direction" offset="0" length="2">
                 <LabelSet>
+                    <Label name='CCW' value="-1"/>
                     <Label name='Stop' value="0"/>
-                    <Label name='Right' value="1"/>
-                    <Label name='Left' value="2"/>
+                    <Label name='CW' value="1"/>
                 </LabelSet>
             </Signal>
         </Message>
