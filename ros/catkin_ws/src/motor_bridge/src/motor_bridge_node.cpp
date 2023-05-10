@@ -27,6 +27,7 @@ void pitch(const motor_bridge::System::ConstPtr &msg);
 void loco(const motor_bridge::System::ConstPtr &msg);
 void excav(const motor_bridge::System::ConstPtr &msg);
 void stepper(const motor_bridge::System::ConstPtr &msg);
+void mast(const motor_bridge::System::ConstPtr &msg);
 
 void exit(int s);
 
@@ -114,6 +115,13 @@ void stepper(const motor_bridge::System::ConstPtr &msg) {
     int can_id;
     can_id = pack_msg(msg->stepper_ctrl, buff);
     send(buff, can_id, "Stepper", printable(msg->stepper_ctrl));
+}
+
+void mast(const motor_bridge::System::ConstPtr &msg) {
+    uint8_t buff[8];
+    int can_id;
+    can_id = pack_msg(msg->mast_ctrl, buff);
+    send(buff, can_id, "Mast", printable(msg->mast_ctrl));
 }
 
 void send(uint8_t* buff, int id, const char* name, std::string print) {

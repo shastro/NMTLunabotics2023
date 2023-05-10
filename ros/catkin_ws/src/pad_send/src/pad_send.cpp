@@ -51,6 +51,8 @@ int main(int argc, char *argv[]) {
     double pitch_set = (PITCH_CTRL_SET_POINT_MAX -
             PITCH_CTRL_SET_POINT_MIN) / 2;
     double stepper_set = 0;
+    double pitch_left_offset = 0;
+    double pitch_right_offset = 0;
 
     bool estopped = false;
     bool adjust = false;
@@ -86,10 +88,12 @@ int main(int argc, char *argv[]) {
         // Estop
         if (g.buttons.Y && ! lastY) {
             estopped = !estopped;
+            adjust = false;
+            homing = false;
         }
 
         if (g.buttons.xbox) {
-            estopped = true;
+            s.e_stop.stop = true;
             pub.publish(s);
             endwin();
             return 0;
@@ -100,28 +104,53 @@ int main(int argc, char *argv[]) {
 
         // Adjust mode
         if (g.buttons.A && !lastA) {
-            adjust = !adjust;
+            if (homing || estopped) {
+                out << "Cannot adjust while homing or estopped\n";
+            } else {
+                adjust = !adjust;
+            }
         }
 
         // Homing
         if (g.buttons.B && !lastB) {
-            homing = !homing;
+            if (adjust || estopped) {
+                out << "Cannot home while adjusting or estopped\n";
+            } else {
+                homing = !homing;
+            }
         }
 
         if (!adjust && !estopped) {
             // Pitch control with dpad
-            if (g.dpad.up) {
-                pitch_set += pitch_delta / rate;
-                if (pitch_set > PITCH_CTRL_SET_POINT_MAX)
-                    pitch_set = PITCH_CTRL_SET_POINT_MAX;
-                out << "Pitch Up\n";
-            } else if (g.dpad.down) {
-                pitch_set -= pitch_delta / rate;
-                if (pitch_set < PITCH_CTRL_SET_POINT_MIN)
-                    pitch_set = PITCH_CTRL_SET_POINT_MIN;
-                out << "Pitch Down\n";
+            if (homing) {
+                out << "Pitch Homing\n";
+                pitch_set = PITCH_CTRL_SET_POINT_MIN;
+            } else {
+                if (g.dpad.up) {
+                    pitch_set += pitch_delta / rate;
+                    if (pitch_set > PITCH_CTRL_SET_POINT_MAX)
+                        pitch_set = PITCH_CTRL_SET_POINT_MAX;
+                    out << "Pitch Up\n";
+                } else if (g.dpad.down) {
+                    pitch_set -= pitch_delta / rate;
+                    if (pitch_set < PITCH_CTRL_SET_POINT_MIN)
+                        pitch_set = PITCH_CTRL_SET_POINT_MIN;
+                    out << "Pitch Down\n";
+                }
             }
+            s.pitch_ctrl.set_point = homing;
             s.pitch_ctrl.set_point = pitch_set;
+
+            // Viagra
+            if (g.dpad.left) {
+                out << "david's shaft left\n";
+                s.mast_ctrl.direction = 1;
+            } else if (g.dpad.right) {
+                out << "david's shaft right\n";
+                s.mast_ctrl.direction = 2;
+            } else {
+                s.mast_ctrl.direction = 0;
+            }
 
             // Drive with both sticks
             s.loco_ctrl.left_vel = g.left_stick.y;
@@ -135,7 +164,6 @@ int main(int argc, char *argv[]) {
             if (homing) {
                 out << "Arm Homing\n";
                 stepper_set = STEPPER_CTRL_SET_POINT_MIN;
-                s.stepper_ctrl.home = true;
             } else {
                 s.stepper_ctrl.home = false;
                 if (g.buttons.right_bumper) {
@@ -150,6 +178,7 @@ int main(int argc, char *argv[]) {
                     out << "Arm Retract\n";
                 }
             }
+            s.stepper_ctrl.home = homing;
             s.stepper_ctrl.set_point = stepper_set;
 
             // Digger triggers
@@ -163,8 +192,20 @@ int main(int argc, char *argv[]) {
                 s.excav_ctrl.vel = 0;
             }
         } else {
-            out << "Adjust Not Implemented\n";
+            out << "Adjust mode\n";
+            pitch_left_offset += pitch_delta * g.left_stick.y;
+            if (pitch_left_offset > PITCH_CTRL_LEFT_OFFSET_MAX) {
+                pitch_left_offset = PITCH_CTRL_LEFT_OFFSET_MAX;
+            } else if (pitch_left_offset < PITCH_CTRL_LEFT_OFFSET_MIN) {
+                pitch_left_offset = PITCH_CTRL_LEFT_OFFSET_MIN;
+            }
 
+            pitch_right_offset += pitch_delta * g.right_stick.y;
+            if (pitch_right_offset > PITCH_CTRL_RIGHT_OFFSET_MAX) {
+                pitch_right_offset = PITCH_CTRL_RIGHT_OFFSET_MAX;
+            } else if (pitch_right_offset < PITCH_CTRL_RIGHT_OFFSET_MIN) {
+                pitch_right_offset = PITCH_CTRL_RIGHT_OFFSET_MIN;
+            }
         }
 
         // Update last state
