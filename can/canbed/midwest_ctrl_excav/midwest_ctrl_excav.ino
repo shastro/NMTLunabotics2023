@@ -12,8 +12,8 @@ void setup() {
     #define INHIBIT 11
     #define RELAY_CCW 5
     #define RELAY_CW 4
-    #define RELAY_COMMON 6
-    MidwestMotorController excav(INHIBIT, RELAY_CCW, RELAY_CW, RELAY_COMMON);
+    #define RELAY_PWM 6
+    MidwestMotorController excav(INHIBIT, RELAY_CCW, RELAY_CW, RELAY_PWM);
 
     bool eStopped = false;
     for (;;) {

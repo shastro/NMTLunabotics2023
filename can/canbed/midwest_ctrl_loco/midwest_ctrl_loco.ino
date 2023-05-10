@@ -9,18 +9,20 @@
 
 void setup() {
     MCP_CAN can = setup_can();
-    
+
+    // PWM pins: 5, 6, 3, 9, 10, 11
+    // TODO: Needs correct pins and stuff
     // TODO: Wire up inhbit pins and PWMs
-    #define LINHIBIT 0
-    #define LRELAY_CCW 4
-    #define LRELAY_CW 5
-    #define LRELAY_COMMON 6
-    MidwestMotorController left(LINHIBIT, LRELAY_CCW, LRELAY_CW, LRELAY_COMMON);
-    #define RINHIBIT 0
-    #define RRELAY_CCW 10
+    #define LINHIBIT 6
+    #define LRELAY_CCW 12
+    #define LRELAY_CW A3
+    #define LRELAY_PWM 9
+    MidwestMotorController left(LINHIBIT, LRELAY_CCW, LRELAY_CW, LRELAY_PWM);
+    #define RINHIBIT 6
+    #define RRELAY_CCW A0
     #define RRELAY_CW 9
-    #define RRELAY_COMMON 11
-    MidwestMotorController right(RINHIBIT, RRELAY_CCW, RRELAY_CW, RRELAY_COMMON);
+    #define RRELAY_PWM A2
+    MidwestMotorController right(RINHIBIT, RRELAY_CCW, RRELAY_CW, RRELAY_PWM);
     
     bool eStopped = false;
     for (;;) {
@@ -42,5 +44,8 @@ void setup() {
                 right.setVel(david_loco_ctrl_right_vel_decode(frame.right_vel));
             }
         }
+
+        // TODO(lcf): is this needed?
+        delayMicroseconds(1000);
     }
 }

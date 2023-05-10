@@ -21,23 +21,24 @@ struct StepperController {
         STOP = 0,
         FORWARD = -1
     };
-    unsigned int pos;
-    unsigned int point;
+    unsigned long int pos;
+    unsigned long int point;
     enum Dirs dir;
     unsigned int homing_timer;
 
     StepperController(int pulse_l, int dir_l, int pulse_r, int dir_r, int min, int max) :
     left(pulse_l, dir_l), right(pulse_r, dir_r), min_limit(min), max_limit(max) {
-        state = HOME;
+        state = MOVE;
         pos = 0;
         point = 0;
         dir = STOP;
     }
 
-#define STEP_TO_MM ((1.0/500.0))
+#define STEP_TO_MM (10000)
     void setPoint(double p) {
-        // TODO: double check that this isnt fucky
-        point = p / (STEP_TO_MM);
+        // TODO(lcf): double check that this isnt fucky
+        // TODO(lcf): THIS IS FUCKY, it moves soo little....
+        point = (unsigned long int)(p * (STEP_TO_MM));
     }
     
     void doStep(enum Dirs dir) {
@@ -58,8 +59,8 @@ struct StepperController {
         bool at_max = false;
         while (ticks > 0) {
             if (ticks-- % read_limit_frequency == 0) {
-                at_min = min_limit.read_threshold();
-                at_max = max_limit.read_threshold();
+                at_min = min_limit.read();
+                at_max = max_limit.read();
             }
 
             switch (state) {
@@ -97,13 +98,13 @@ struct StepperController {
 
     void pack_telemetry(unsigned char buf[8]) {
         david_stepper_telem_t data = {0};
-        data.at_min_stop = min_limit.read_threshold();
-        data.at_max_stop = max_limit.read_threshold();
+        data.at_min_stop = min_limit.read();
+        data.at_max_stop = max_limit.read();
         // TODO(lcf): steppers should always be at same pos, so we can get rid of
         // left/right position and have position and point in kcd to verify commands
         // are updating point correctly
-        data.left_position = david_stepper_telem_left_position_encode(((double)pos)*STEP_TO_MM);
-        data.right_position = david_stepper_telem_left_position_encode(((double)point)*STEP_TO_MM);
+        data.left_position = david_stepper_telem_left_position_encode(((double)pos)/STEP_TO_MM);
+        data.right_position = david_stepper_telem_left_position_encode(((double)point)/STEP_TO_MM);
         david_stepper_telem_pack(buf, &data, 8);
     }
 };
@@ -111,8 +112,6 @@ struct StepperController {
 void setup() {
     MCP_CAN can = setup_can();
     
-    /* #define RPUL 5 */ // For camera mast
-    /* #define RDIR 4 */
     #define RPUL 10
     #define RDIR 6
     #define LPUL 4

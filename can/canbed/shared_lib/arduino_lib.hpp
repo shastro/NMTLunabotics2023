@@ -147,8 +147,8 @@ class MidwestMotorController {
 
   public:
     MidwestMotorController(int inhibit, int relay_ccw, int relay_cw,
-                    int relay_common)
-        : enable(inhibit), relay(relay_ccw, relay_cw, relay_common) {
+                    int relay_pwm)
+        : enable(inhibit), relay(relay_ccw, relay_cw, relay_pwm) {
         setVel(0);
     }
 
