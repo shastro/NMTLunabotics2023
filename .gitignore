@@ -38,3 +38,11 @@ ros/catkin_ws/devel/*
 ros/catkin_ws/build/*
 ros/catkin_ws/.catkin_tools
 ros/catkin_ws/logs
+
+# Python generated files
+can/bus_spec/*.cpp
+can/bus_spec/*.h
+can/bus_spec/*.hpp
+can/bus_spec/*.ce
+can/bus_spec/*.he
+
