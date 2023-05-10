@@ -74,6 +74,7 @@ void callback(const motor_bridge::System::ConstPtr &msg) {
     loco(msg);
     excav(msg);
     stepper(msg);
+    mast(msg);
 
     lastMsg = *msg;
 
