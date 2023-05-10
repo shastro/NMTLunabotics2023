@@ -66,6 +66,22 @@
                 <Value type="unsigned" unit="mm" slope="0.296875"
                        intercept="0.0" min="0.0" max="153"/>
             </Signal>
+            <Signal name="LeftDirection" offset="18" length="2">
+                <!--slope = (125+40)/255-->
+                <LabelSet> 
+                    <Label name='Stop' value="0"/> 
+                    <Label name='Extend' value="1"/> 
+                    <Label name='Retract' value="2"/> 
+                </LabelSet> 
+            </Signal>
+            <Signal name="RightDirection" offset="20" length="2">
+                <!--slope = (125+40)/255-->
+                <LabelSet> 
+                    <Label name='Stop' value="0"/> 
+                    <Label name='Extend' value="1"/> 
+                    <Label name='Retract' value="2"/> 
+                </LabelSet> 
+            </Signal>
         </Message>
 
         <Message id="0x111" name="PitchDriverTelem">
@@ -94,14 +110,6 @@
                        intercept="-40" min="-40" max="125"/>
             </Signal>
 
-            <Signal name="Direction" offset="32" length="2">
-                <!--slope = (125+40)/255-->
-                <LabelSet> 
-                    <Label name='Stop' value="0"/> 
-                    <Label name='Extend' value="1"/> 
-                    <Label name='Retract' value="2"/> 
-                </LabelSet> 
-            </Signal>
         </Message>
 
         <Message id="0x200" name="LocoCtrl">
@@ -125,7 +133,7 @@
                 -100 is 100% power in reverse
                 100 is 100% power in reverse
             </Notes>
-            <Signal name="Vel" offset="0" length="16">
+            <Signal name="Vel" offset="2" length="16">
                 <Value type="unsigned" slope="0.0030517578125" intercept="-100" min="-100" max="100"/>
             </Signal>
         </Message>
