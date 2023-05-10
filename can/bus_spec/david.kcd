@@ -133,7 +133,7 @@
                 -100 is 100% power in reverse
                 100 is 100% power in reverse
             </Notes>
-            <Signal name="Vel" offset="2" length="16">
+            <Signal name="Vel" offset="0" length="16">
                 <Value type="unsigned" slope="0.0030517578125" intercept="-100" min="-100" max="100"/>
             </Signal>
         </Message>
