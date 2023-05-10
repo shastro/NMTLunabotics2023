@@ -10,8 +10,10 @@
 void setup() {
     MCP_CAN can = setup_can();
 
-    MidwestMotorController right(12, Relay(4, 5, 9));
-    MidwestMotorController left(A2, Relay(A1, 11, 10));
+    // PWM pins for leonardo
+    // 3, 5, 6, 9, 10, 11, 13
+    MidwestMotorController left(A2, A1, 11, 6);
+    MidwestMotorController right(12, 4, 5, 10);
 
     bool eStopped = false;
     for(;;) {
