@@ -1,11 +1,11 @@
 // receive a frame from can bus
 
 #include <Wire.h>
-#include "mcp_can.h"
+#include "arduino_lib.hpp"
+#include "Longan_I2C_CAN_Arduino.h"
 
 // Import CAN message constants
 #include "david.h"
-
 // Interrupt pins for the MEGA
 // 2, 3, 18, 19, 20, 21 (pins 20 & 21 are not available to use for interrupts while they are used for I2C communication)
 
@@ -15,8 +15,8 @@
 
 // I2C Registers
 #define SOFTREG             0x07                    // Byte to read software
-#define CMDBYTE             0x00                    // Command byte
-#define SPEEDBYTE           0x02                    // Byte to write to speed register
+#define CMDREG              0x00                    // Command byte
+#define SPEEDREG            0x02                    // Byte to write to speed register
 #define TEMPREG             0x04                    // Byte to read temperature
 #define CURRENTREG          0x05                    // Byte to read motor current
 #define STATUSREG           0x01
@@ -28,13 +28,21 @@ static const int64_t DEFAULT_HOMING_DELAY = 300;
 static const int64_t DEFAULT_TOLERANCE = 3;
 
 
-I2C CAN(SPI_CS_PIN); // Set CS pin
+#define I2C_CAN_ADDR 0x25
+
+enum Dir {
+    Stop = 0,
+    Extend = 1,
+    Retract = 2,
+};
+
+#define ACC 0x0A
+#define SPEED 150
 
 struct MDO4Driver {
-    unsigned addr;  
+    int addr;  
 
     MDO4Driver(unsigned addr_in) {
-        Wire.begin();
         addr = addr_in;
     }
 
@@ -43,18 +51,12 @@ struct MDO4Driver {
     }
 
     byte getCurrent() {
-        return getCurrent(CURRENTREG);
+        return getData(CURRENTREG);
     }
 
-    void setSpeed(byte speed) {
-        sendData(SPEEDBYTE, speed);
-    }
-
-    void setAcceleration(byte speed) {
-        sendData(ACCREG, speed);
-    }
-        
     void setDirection(Dir dir){
+        sendData(ACCREG, ACC);
+        sendData(SPEEDREG, SPEED);
         sendData(CMDREG, dir);
     }
 
@@ -75,6 +77,10 @@ struct MDO4Driver {
         Wire.write(reg);                    // Command like Direction, Speed
         Wire.write(val);                    // Value for the command
         int error = Wire.endTransmission();
+        if(error) {
+            Serial.print("I2C ERROR:");
+            Serial.println(error);
+        }
         delay(10);
     }
 
@@ -83,42 +89,70 @@ struct MDO4Driver {
 
 struct PitchController {
     double tolerance;
-
-    enum Dir {
-        Extend,
-        Retract,
-        Stop,
+    enum States {
+        Move = 0,
+        Home = 1,
     };
+
 };
 
 
 void setup()
 {
-    MDO4Driver left_m();
+    I2C_CAN can = setup_can();
+    Wire.begin();
+    MDO4Driver left_m(0x59);
+    MDO4Driver right_m(0x58);
     delay(100);
 
     // PinModes
     pinMode(HALL_PIN_L, INPUT_PULLUP);
     pinMode(HALL_PIN_R, INPUT_PULLUP);
 
+    PitchController control(left_m, right_m);
     // Interrupts
-    attachInterrupt(digitalPinToInterrupt(HALL_PIN_L, left_hall_handler, FALLING);
-    attachInterrupt(digitalPinToInterrupt(HALL_PIN_R, right_hall_handle, FALLING);
+    // attachInterrupt(digitalPinToInterrupt(HALL_PIN_L, left_hall_handler, FALLING);
+    // attachInterrupt(digitalPinToInterrupt(HALL_PIN_R, right_hall_handle, FALLING);
 
-    controller.loop();
+    double current_set_point = 0.0;
+    // controller.loop();
+    for(;;){
+        int CMD_State = Dir::Stop;
+        CANPacket packet = can_read(can);
+        switch (packet.id) {
+            FRAME_CASE(DAVID_E_STOP, david_e_stop) {
+                eStopped = frame.stop;
+                CMD_State = Dir::Stop;
+            }
+        }
+
+        CANPacket driver_telemetry = {DAVID_PITCH_POSITION_TELEM_FRAME_ID, 0};
+        CANPacket driver_telemetry = {DAVID_PITCH_DRIVER_TELEM_FRAME_ID, 0};
+        if (eStopped)
+            continue;
+
+        switch (packet.id) {
+            FRAME_CASE(DAVID_PITCH_CTRL, david_pitch_ctrl) {
+                
+                if (frame.setpoint) {
+                    control.state = control.HOME;
+                } else {
+                    control.setPoint(david_stepper_ctrl_set_point_decode(frame.set_point));
+                }
+            }
+        }
+
+        control.loop();
+        left_m.setDirection(Dir::Retract);
+        right_m.setDirection(Dir::Retract);
+        // left_m.setDirection(Dir::Stop);
+        // right_m.setDirection(Dir::Stop);
+        // delay(2000);
+        // left_m.setDirection(Dir::Extend);
+        // right_m.setDirection(Dir::Extend);
+        // delay(2000);
+        // left_m.setDirection(Dir::Stop);
+        // right_m.setDirection(Dir::Stop);
+        // delay(2000);
+    }
 }
-
-void loop()
-{
-    // Check for new messages
-    // Standard movement towards target counts
-
-
-    const static int MOTOR_ADDRESS[] = {0x59, 0x58};
-    sendData(MOTOR_ADDRESS[m],ACCREG, 0x0A);
-    sendData(MOTOR_ADDRESS[m],SPEEDBYTE, 0xAA);
-    sendData(MOTOR_ADDRESS[m],CMDBYTE, Motors[m].dir);
-    
-}
-
-
