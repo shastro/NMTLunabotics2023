@@ -115,6 +115,7 @@ int david_pitch_ctrl_pack(
     dst_p[2] |= pack_right_shift_u16(src_p->left_offset, 7u, 0x03u);
     dst_p[2] |= pack_left_shift_u16(src_p->right_offset, 2u, 0xfcu);
     dst_p[3] |= pack_right_shift_u16(src_p->right_offset, 6u, 0x07u);
+    dst_p[3] |= pack_left_shift_u8(src_p->home, 3u, 0x08u);
 
     return (4);
 }
@@ -134,6 +135,7 @@ int david_pitch_ctrl_unpack(
     dst_p->left_offset |= unpack_left_shift_u16(src_p[2], 7u, 0x03u);
     dst_p->right_offset = unpack_right_shift_u16(src_p[2], 2u, 0xfcu);
     dst_p->right_offset |= unpack_left_shift_u16(src_p[3], 6u, 0x07u);
+    dst_p->home = unpack_right_shift_u8(src_p[3], 3u, 0x08u);
 
     return (0);
 }
@@ -181,6 +183,21 @@ double david_pitch_ctrl_right_offset_decode(uint16_t value)
 bool david_pitch_ctrl_right_offset_is_in_range(uint16_t value)
 {
     return (value <= 515u);
+}
+
+uint8_t david_pitch_ctrl_home_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double david_pitch_ctrl_home_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool david_pitch_ctrl_home_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
 }
 
 int david_pitch_position_telem_pack(
