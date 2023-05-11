@@ -194,5 +194,13 @@
                 </LabelSet>
             </Signal>
         </Message>
+        <Message id="0x401" name="MastTelem">
+          <Notes>
+            Will print rotation angle. Min is -360, Max is 369 and Home is 0
+          </Notes>
+            <Signal name="Angle" offset="0" length="3">
+                <Value type="unsigned" slope="0.015" intercept="-360" min="-360" max="360"/>
+            </Signal>
+        </Message>
     </Bus>
 </NetworkDefinition>

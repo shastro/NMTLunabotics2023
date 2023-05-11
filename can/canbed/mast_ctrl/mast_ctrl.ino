@@ -25,14 +25,17 @@ struct StepperController {
 StepperController(int pulse_c, int dir_c) :
     cam(pulse_c, dir_c) {
         dir = STOP;
-        step = 0;
+        step = 26000;
     }
     void doStep(enum Dirs dir) {
         if (dir != STOP) {
+          if ((step >= 52000 && dir < 0) || (step <= 0 && dir > 0) || (step < 52000 && step > 0)) {
             step += dir;
             cam.doStep(step);
+            Serial.println(step);
+          }   
         }
-    }
+      }
 
     const int ticks_per_loop = 50;
     const int step_delay_micros = 200;
@@ -47,8 +50,8 @@ StepperController(int pulse_c, int dir_c) :
 void setup() {
     MCP_CAN can = setup_can();
     
-#define PUL 5 // For camera mast
-#define DIR 4
+    #define PUL 5 // For camera mast
+    #define DIR 4
     StepperController control(PUL, DIR);
 
     bool eStopped = false;
@@ -59,6 +62,11 @@ void setup() {
                 eStopped = frame.stop;
             }
         }
+
+        // Send Telemetry
+        CANPacket telemetry = {DAVID_MAST_TELEM_FRAME_ID, 0};
+        control.pack_telemetry(telemetry.buf);
+        can_send(can, telemetry);
 
         if (eStopped)
             continue;

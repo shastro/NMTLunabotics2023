@@ -24,6 +24,7 @@ extern "C" {
 #define DAVID_STEPPER_CTRL_FRAME_ID (0x300u)
 #define DAVID_STEPPER_TELEM_FRAME_ID (0x311u)
 #define DAVID_MAST_CTRL_FRAME_ID (0x400u)
+#define DAVID_MAST_TELEM_FRAME_ID (0x401u)
 
 /* Frame lengths in bytes. */
 #define DAVID_E_STOP_LENGTH (1u)
@@ -35,6 +36,7 @@ extern "C" {
 #define DAVID_STEPPER_CTRL_LENGTH (2u)
 #define DAVID_STEPPER_TELEM_LENGTH (3u)
 #define DAVID_MAST_CTRL_LENGTH (1u)
+#define DAVID_MAST_TELEM_LENGTH (1u)
 
 /* Extended or standard frame types. */
 #define DAVID_E_STOP_IS_EXTENDED (0)
@@ -46,6 +48,7 @@ extern "C" {
 #define DAVID_STEPPER_CTRL_IS_EXTENDED (0)
 #define DAVID_STEPPER_TELEM_IS_EXTENDED (0)
 #define DAVID_MAST_CTRL_IS_EXTENDED (0)
+#define DAVID_MAST_TELEM_IS_EXTENDED (0)
 
 /* Frame cycle times in milliseconds. */
 
@@ -315,6 +318,24 @@ struct david_mast_ctrl_t {
      * Offset: 0
      */
     uint8_t direction;
+};
+
+/**
+ * Signals in message MastTelem.
+ *
+ * 
+            Will print rotation angle. Min is -360, Max is 369 and Home is 0
+          
+ *
+ * All signal values are as on the CAN bus.
+ */
+struct david_mast_telem_t {
+    /**
+     * Range: 0..48000 (-360..360 -)
+     * Scale: 0.015
+     * Offset: -360
+     */
+    uint8_t angle;
 };
 
 /**
@@ -1189,6 +1210,61 @@ double david_mast_ctrl_direction_decode(uint8_t value);
  * @return true if in range, false otherwise.
  */
 bool david_mast_ctrl_direction_is_in_range(uint8_t value);
+
+/**
+ * Pack message MastTelem.
+ *
+ * @param[out] dst_p Buffer to pack the message into.
+ * @param[in] src_p Data to pack.
+ * @param[in] size Size of dst_p.
+ *
+ * @return Size of packed data, or negative error code.
+ */
+int david_mast_telem_pack(
+    uint8_t *dst_p,
+    const struct david_mast_telem_t *src_p,
+    size_t size);
+
+/**
+ * Unpack message MastTelem.
+ *
+ * @param[out] dst_p Object to unpack the message into.
+ * @param[in] src_p Message to unpack.
+ * @param[in] size Size of src_p.
+ *
+ * @return zero(0) or negative error code.
+ */
+int david_mast_telem_unpack(
+    struct david_mast_telem_t *dst_p,
+    const uint8_t *src_p,
+    size_t size);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t david_mast_telem_angle_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_mast_telem_angle_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_mast_telem_angle_is_in_range(uint8_t value);
 
 
 #ifdef __cplusplus
