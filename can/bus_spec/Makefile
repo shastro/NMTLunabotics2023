@@ -6,10 +6,10 @@ david.c david.h: david.kcd
 	sed -ie '1,/This file was generated/d' david.c david.h
 	sed -ie '1d' david.c david.h
 
-canshit.cpp canshit.hpp unpackers.hpp limits.hpp: genfromkcd.py david.kcd
-	python3 $< > canshit.cpp canshit.hpp unpackers.hpp limits.hpp
+canshit.cpp canshit.hpp unpackers.hpp limits.hpp ../../ros/catkin_ws/motor_bridge/msg: genfromkcd.py david.kcd 
+	python3 $<
 
 clean:
-	$(RM) david.c david.h canshit.cpp canshit.hpp unpackers.hpp limits.hpp
+	$(RM) david.c david.h canshit.cpp canshit.hpp unpackers.hpp limits.hpp ../../ros/catkin_ws/motor_bridge/msg/*
 
 .PHONY: clean
