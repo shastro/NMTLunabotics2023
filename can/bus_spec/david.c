@@ -711,8 +711,7 @@ int david_mast_ctrl_pack(
 
     memset(&dst_p[0], 0, 1);
 
-    dst_p[0] |= pack_left_shift_u8(src_p->home, 0u, 0x01u);
-    dst_p[0] |= pack_left_shift_u8(src_p->direction, 1u, 0x06u);
+    dst_p[0] |= pack_left_shift_u8(src_p->direction, 0u, 0x03u);
 
     return (1);
 }
@@ -726,25 +725,9 @@ int david_mast_ctrl_unpack(
         return (-EINVAL);
     }
 
-    dst_p->home = unpack_right_shift_u8(src_p[0], 0u, 0x01u);
-    dst_p->direction = unpack_right_shift_u8(src_p[0], 1u, 0x06u);
+    dst_p->direction = unpack_right_shift_u8(src_p[0], 0u, 0x03u);
 
     return (0);
-}
-
-uint8_t david_mast_ctrl_home_encode(double value)
-{
-    return (uint8_t)(value);
-}
-
-double david_mast_ctrl_home_decode(uint8_t value)
-{
-    return ((double)value);
-}
-
-bool david_mast_ctrl_home_is_in_range(uint8_t value)
-{
-    return (value <= 1u);
 }
 
 uint8_t david_mast_ctrl_direction_encode(double value)
@@ -767,17 +750,16 @@ int david_mast_telem_pack(
     const struct david_mast_telem_t *src_p,
     size_t size)
 {
-    if (size < 3u) {
+    if (size < 2u) {
         return (-EINVAL);
     }
 
-    memset(&dst_p[0], 0, 3);
+    memset(&dst_p[0], 0, 2);
 
-    dst_p[0] |= pack_left_shift_u16(src_p->angle, 3u, 0xf8u);
-    dst_p[1] |= pack_right_shift_u16(src_p->angle, 5u, 0xffu);
-    dst_p[2] |= pack_right_shift_u16(src_p->angle, 13u, 0x07u);
+    dst_p[0] |= pack_left_shift_u16(src_p->angle, 0u, 0xffu);
+    dst_p[1] |= pack_right_shift_u16(src_p->angle, 8u, 0xffu);
 
-    return (3);
+    return (2);
 }
 
 int david_mast_telem_unpack(
@@ -785,13 +767,12 @@ int david_mast_telem_unpack(
     const uint8_t *src_p,
     size_t size)
 {
-    if (size < 3u) {
+    if (size < 2u) {
         return (-EINVAL);
     }
 
-    dst_p->angle = unpack_right_shift_u16(src_p[0], 3u, 0xf8u);
-    dst_p->angle |= unpack_left_shift_u16(src_p[1], 5u, 0xffu);
-    dst_p->angle |= unpack_left_shift_u16(src_p[2], 13u, 0x07u);
+    dst_p->angle = unpack_right_shift_u16(src_p[0], 0u, 0xffu);
+    dst_p->angle |= unpack_left_shift_u16(src_p[1], 8u, 0xffu);
 
     return (0);
 }

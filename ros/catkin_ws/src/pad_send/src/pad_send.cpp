@@ -66,7 +66,6 @@ int main(int argc, char *argv[]) {
     double stepper = 0;
 
     bool pitch_home = false;
-    bool mast_home = false;
     bool stepper_home = false;
 
     bool lastX = false;
@@ -135,7 +134,6 @@ int main(int argc, char *argv[]) {
                 // Un home everyting
                 pitch_home = false;
                 stepper_home = false;
-                mast_home = false;
                 s.e_stop.stop = false;
 
                 // Pitch control with dpad
@@ -225,7 +223,6 @@ int main(int argc, char *argv[]) {
                 out << "Homing\n\n";
                 out << "Pitch: Dpad Up or Down\n";
                 out << "Extend: Dpad Left or Right\n";
-                out << "Mast: Bumper Left or Right\n";
                 out << "\n";
 
                 if (g.dpad.up || g.dpad.down) {
@@ -242,11 +239,6 @@ int main(int argc, char *argv[]) {
                     s.stepper_ctrl.set_point = stepper;
                 }
 
-                if (g.buttons.left_bumper || g.buttons.right_bumper) {
-                    out << "Mast Home\n";
-                    mast_home = true;
-                    s.mast_ctrl.direction = 1;
-                }
                 break;
 
             case mode::stop:
@@ -261,7 +253,6 @@ int main(int argc, char *argv[]) {
         // Sending homing messages
         s.pitch_ctrl.home = pitch_home;
         s.stepper_ctrl.home = stepper_home;
-        s.mast_ctrl.home = mast_home;
 
         // Update last state
         lastX = g.buttons.X;

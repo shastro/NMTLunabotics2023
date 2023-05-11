@@ -97,7 +97,6 @@ int pack_msg(const motor_bridge::StepperTelem& msg, uint8_t* buff) {
 
 int pack_msg(const motor_bridge::MastCtrl& msg, uint8_t* buff) {
     david_mast_ctrl_t t = {
-        .home = david_mast_ctrl_home_encode(msg.home),
         .direction = david_mast_ctrl_direction_encode(msg.direction),
     };
 
@@ -187,7 +186,6 @@ std::string printable(const motor_bridge::StepperTelem& msg) {
 
 std::string printable(const motor_bridge::MastCtrl& msg) {
     std::stringstream s;    s << "MastCtrl - ";
-    s << "home: " << (int)msg.home << ", ";
     s << "direction: " << (int)msg.direction << ", ";
     s << std::endl;
     return s.str();

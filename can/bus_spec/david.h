@@ -36,7 +36,7 @@ extern "C" {
 #define DAVID_STEPPER_CTRL_LENGTH (2u)
 #define DAVID_STEPPER_TELEM_LENGTH (3u)
 #define DAVID_MAST_CTRL_LENGTH (1u)
-#define DAVID_MAST_TELEM_LENGTH (3u)
+#define DAVID_MAST_TELEM_LENGTH (2u)
 
 /* Extended or standard frame types. */
 #define DAVID_E_STOP_IS_EXTENDED (0)
@@ -76,9 +76,6 @@ extern "C" {
 
 #define DAVID_STEPPER_TELEM_AT_MAX_STOP_FALSE_CHOICE (0u)
 #define DAVID_STEPPER_TELEM_AT_MAX_STOP_TRUE_CHOICE (1u)
-
-#define DAVID_MAST_CTRL_HOME_FALSE_CHOICE (0u)
-#define DAVID_MAST_CTRL_HOME_TRUE_CHOICE (1u)
 
 #define DAVID_MAST_CTRL_DIRECTION_CCW_CHOICE (0u)
 #define DAVID_MAST_CTRL_DIRECTION_STOP_CHOICE (1u)
@@ -330,13 +327,6 @@ struct david_mast_ctrl_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t home;
-
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
     uint8_t direction;
 };
 
@@ -351,7 +341,7 @@ struct david_mast_ctrl_t {
  */
 struct david_mast_telem_t {
     /**
-     * Range: 0..65536 (-360..360 -)
+     * Range: -45.51111111111111111111111111..65581.51111111111111111111111 (-360.5..360.5 -)
      * Scale: 0.010986328125
      * Offset: -360
      */
@@ -1230,33 +1220,6 @@ int david_mast_ctrl_unpack(
     struct david_mast_ctrl_t *dst_p,
     const uint8_t *src_p,
     size_t size);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint8_t david_mast_ctrl_home_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_mast_ctrl_home_decode(uint8_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_mast_ctrl_home_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
