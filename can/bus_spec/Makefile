@@ -10,6 +10,6 @@ canshit.cpp canshit.hpp unpackers.hpp limits.hpp ../../ros/catkin_ws/motor_bridg
 	python3 $<
 
 clean:
-	$(RM) david.c david.h canshit.cpp canshit.hpp unpackers.hpp limits.hpp ../../ros/catkin_ws/motor_bridge/msg/*
+	$(RM) -r david.c david.h canshit.cpp canshit.hpp unpackers.hpp limits.hpp ../../ros/catkin_ws/src/motor_bridge/msg
 
 .PHONY: clean

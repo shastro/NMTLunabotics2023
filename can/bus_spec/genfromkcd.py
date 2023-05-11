@@ -7,10 +7,6 @@ kcd = "david.kcd"
 msg_dir = "../../ros/catkin_ws/src/motor_bridge/msg"
 cmake = "../../ros/catkin_ws/src/motor_bridge/CMakeLists.txt"
 
-# Remove all current messages
-for m in os.listdir(msg_dir):
-    os.remove(os.path.join(msg_dir + "/" + m))
-
 # Load the KCD file and msg dir
 tree = untangle.parse(kcd)
 
@@ -45,10 +41,18 @@ def camel_to_snake(s):
     if s.isupper():
         return s.lower()
     return ''.join(['_'+i.lower() if i.isupper()
-            else i for i in s]).lstrip('_')
+        else i for i in s]).lstrip('_')
 
-# Create Messages
+    # Create Messages
 # Combined system message
+try:
+    os.mkdir(msg_dir)
+except OSError as err:
+    print("MSG dir Exists")
+# Remove all current messages
+for m in os.listdir(msg_dir):
+    os.remove(os.path.join(msg_dir + "/" + m))
+
 system_msg_path = os.path.join(msg_dir, 'System.msg')
 with open(system_msg_path, 'w') as s, open(lim, 'w') as l:
     s.write("# System message - auto generated from kcd\n\n")
@@ -89,11 +93,11 @@ with open(system_msg_path, 'w') as s, open(lim, 'w') as l:
                         l.write("double " + camel_to_snake(msg_name).upper()
                                 + "_" + name.upper() + "_MIN =  "
                                 + sig.Value['min'] + ";\n")
-                    if sig.Value['max'] is not None:
-                        l.write("double " + camel_to_snake(msg_name).upper()
-                                + "_" + name.upper() + "_MAX = "
-                                + sig.Value['max'] + ";\n")
-                m.write(var +  ' ' + name + '\n')
+                        if sig.Value['max'] is not None:
+                            l.write("double " + camel_to_snake(msg_name).upper()
+                                    + "_" + name.upper() + "_MAX = "
+                                    + sig.Value['max'] + ";\n")
+                            m.write(var +  ' ' + name + '\n')
 
         msgs.append([msg_name, names, types])
 
@@ -145,7 +149,7 @@ with open(can_c, 'w') as c, open(can_h, 'w') as h, open(ards_h, 'w') as ah:
         ah.write("        struct david_" + camel_to_snake(msg[0]) + "_t t;\n")
         ah.write("        david_" + camel_to_snake(msg[0]) + "_unpack(&t, packet.buff, packet.len);\n")
         ah.write("        function(t);\n    }\n}\n\n")
-    
+
     # Print helpers
     h.write('\n')
     for msg in msgs:
