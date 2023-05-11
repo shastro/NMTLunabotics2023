@@ -205,7 +205,7 @@
             Will print rotation angle. Min is -360, Max is 360 and Home is 0
           </Notes>
             <Signal name="Angle" offset="0" length="16">
-                <Value type="unsigned" slope="0.010986328125" intercept="-360" min="-360" max="360"/>
+                <Value type="unsigned" slope="0.010986328125" intercept="-360" min="-360.5" max="360.5"/>
             </Signal>
         </Message>
     </Bus>
