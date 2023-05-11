@@ -22,6 +22,8 @@ struct StepperController {
 
     unsigned int step;
 
+    #define STEP_TO_DEGREE (0.015)
+
     StepperController(int pulse_c, int dir_c) :
     cam(pulse_c, dir_c) {
         dir = STOP;
@@ -46,10 +48,10 @@ struct StepperController {
         }
     }
 
-        void pack_telemetry(unsigned char buf[8]) {
-        david_mast_telem_t data = {0};
-        data.angle = david_mast_telem_angle_encode(((double)step));
-        david_mast_telem_pack(buf, &data, 8);
+    void pack_telemetry(unsigned char buf[8]) {
+    david_mast_telem_t data = {0};
+    data.angle = david_mast_telem_angle_encode(((double)step/STEP_TO_DEGREE));
+    david_mast_telem_pack(buf, &data, 8);
     }
 };
 
