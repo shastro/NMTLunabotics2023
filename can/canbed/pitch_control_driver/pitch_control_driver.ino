@@ -86,9 +86,9 @@ struct ControlCommand {
 
 inline Dir choose_direction(double position, double set_point, double offset) {
     if (position < (set_point + offset)) {
-        return Dir::Retract;
-    } else if (position > (set_point + offset)){
         return Dir::Extend;
+    } else if (position > (set_point + offset)){
+        return Dir::Retract;
     } else {
         return Dir::Stop;
     }
@@ -156,7 +156,7 @@ struct PitchController {
             left_m.setDirection(choose_direction(left_position, command.set_point, command.left_offset));
             right_m.setDirection(choose_direction(right_position, command.set_point, command.right_offset));
             ticks--;
-            delay(10);
+            delay(1);
         }
     }
 
@@ -190,41 +190,50 @@ void setup()
         CANPacket driver_telemetry = {DAVID_PITCH_DRIVER_TELEM_FRAME_ID, 0};
         control.pack_telemetry(driver_telemetry.buf);
         can_send(can, driver_telemetry);
-
-        if (e_stopped)
-            control.stop();
-            continue;
-
-
-        switch (packet.id) {
-            FRAME_CASE(DAVID_PITCH_CTRL, david_pitch_ctrl) {
-
-                home_state = frame.home;
-                if (frame.home) {
-                    break;
-                }
-                ControlCommand command;
-                command.set_point = david_pitch_ctrl_set_point_decode(frame.set_point);
-                command.left_offset = david_pitch_ctrl_left_offset_decode(frame.left_offset);
-                command.right_offset = david_pitch_ctrl_right_offset_decode(frame.right_offset);
-                control.setCommand(command);
-
-            }
-            FRAME_CASE(DAVID_PITCH_POSITION_TELEM, david_pitch_position_telem) { 
-                 control.setLeftPosition(david_pitch_position_telem_left_position_decode(frame.left_position));
-                 control.setRightPosition(david_pitch_position_telem_right_position_decode(frame.right_position));
-                 control.home_done = david_pitch_position_telem_home_done_decode(frame.home_done);
-            }
-        }
-
-        if (home_state) {
-            if (!control.home_done) {
-                control.left_m.setDirection(Dir::Extend);
-                control.right_m.setDirection(Dir::Extend);
-            }
+        if(tick % 300 < 150) {
+            control.left_m.setDirection(Dir::Retract);
+            control.right_m.setDirection(Dir::Retract);
         } else {
-            control.loop();
+            control.left_m.setDirection(Dir::Extend);
+            control.right_m.setDirection(Dir::Extend);
         }
+        delay(10);
+        tick++;
+
+        // if (e_stopped)
+        //     control.stop();
+        //     continue;
+
+
+        // switch (packet.id) {
+        //     FRAME_CASE(DAVID_PITCH_CTRL, david_pitch_ctrl) {
+
+        //         home_state = frame.home;
+        //         if (frame.home) {
+        //             break;
+        //         }
+        //         ControlCommand command;
+        //         command.set_point = david_pitch_ctrl_set_point_decode(frame.set_point);
+        //         command.left_offset = david_pitch_ctrl_left_offset_decode(frame.left_offset);
+        //         command.right_offset = david_pitch_ctrl_right_offset_decode(frame.right_offset);
+        //         control.setCommand(command);
+
+        //     }
+        //     FRAME_CASE(DAVID_PITCH_POSITION_TELEM, david_pitch_position_telem) { 
+        //          control.setLeftPosition(david_pitch_position_telem_left_position_decode(frame.left_position));
+        //          control.setRightPosition(david_pitch_position_telem_right_position_decode(frame.right_position));
+        //          control.home_done = david_pitch_position_telem_home_done_decode(frame.home_done);
+        //     }
+        // }
+
+        // if (home_state) {
+        //     if (!control.home_done) {
+        //         control.left_m.setDirection(Dir::Retract);
+        //         control.right_m.setDirection(Dir::Retract);
+        //     }
+        // } else {
+        //     control.loop();
+        // }
 
         // left_m.setDirection(Dir::Stop);
         // right_m.setDirection(Dir::Stop);

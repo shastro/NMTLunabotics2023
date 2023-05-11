@@ -1,5 +1,7 @@
 // receive a frame from can bus
+
 #include "arduino_lib.hpp"
+#include "Wire.h"
 #include "Longan_I2C_CAN_Arduino.h"
 
 // Import CAN message constants
@@ -8,8 +10,8 @@
 // 2, 3, 18, 19, 20, 21 (pins 20 & 21 are not available to use for interrupts while they are used for I2C communication)
 
 // Pins
-#define HALL_PIN_L 18
-#define HALL_PIN_R 19
+#define HALL_PIN_L 2
+#define HALL_PIN_R 3
 
 static const int64_t trig_delay = 10000; // Microsecond delay
 static const int64_t DEFAULT_HOMING_DELAY = 300;
@@ -36,7 +38,7 @@ struct MotorState {
     Dir direction = Dir::Stop;
     volatile int count = 0.0;
     double position = 0.0;
-    double last_trigger = 0.0;
+    volatile double last_trigger = 0.0;
 
     void update_pos() {
         position = count * MM_PER_COUNT;
@@ -76,9 +78,9 @@ inline void can_send_i2c(I2C_CAN &can, CANPacket packet) {
 
 inline Dir choose_direction(double position, double set_point, double offset) {
     if (position < (set_point + offset)) {
-        return Dir::Retract;
-    } else if (position > (set_point + offset)){
         return Dir::Extend;
+    } else if (position > (set_point + offset)){
+        return Dir::Retract;
     } else {
         return Dir::Stop;
     }
@@ -135,8 +137,11 @@ void home(I2C_CAN can) {
             right_motor.direction = Dir::Stop;
             current_command.home = false;
             home_done = true;
+            left_motor.position = 152;
+            right_motor.position = 152;
             break;
         }
+        delay(10);
     }
 }
 
@@ -151,7 +156,6 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(HALL_PIN_L), left_hall_handler, FALLING);
     attachInterrupt(digitalPinToInterrupt(HALL_PIN_R), right_hall_handler, FALLING);
 
-    double current_set_point = 0.0;
     bool home_state = false;
     bool e_stopped = false;
     // controller.loop();
@@ -163,10 +167,6 @@ void setup()
             }
         }
 
-        // Send Telemetry
-        CANPacket position_telemetry = {DAVID_PITCH_POSITION_TELEM_FRAME_ID, 0};
-        pack_telemetry(position_telemetry.buf, left_motor, right_motor, home_done);
-        can_send_i2c(can, position_telemetry);
 
         if (e_stopped)
             continue;
@@ -179,12 +179,10 @@ void setup()
                 current_command.right_offset = david_pitch_ctrl_right_offset_decode(frame.right_offset);
                 current_command.home = david_pitch_ctrl_home_decode(frame.home);
 
-                if (frame.home) {
-                    break;
-                }
             }
         }
 
+        Serial.println(current_command.set_point);
         // Update direction
         left_motor.direction = choose_direction(left_motor.position, current_command.set_point, current_command.left_offset);
 
@@ -193,6 +191,16 @@ void setup()
         left_motor.update_pos();
         right_motor.update_pos();
 
+        // Serial.print("Left Pos: ");
+        // Serial.println(left_motor.position);
+        // Serial.print("Left Count: ");
+        // Serial.println(left_motor.count);
+        // Serial.print("Left Dir: ");
+        // Serial.println((int)left_motor.direction);
+        // Send Telemetry
+        CANPacket position_telemetry = {DAVID_PITCH_POSITION_TELEM_FRAME_ID, 0};
+        pack_telemetry(position_telemetry.buf, left_motor, right_motor, home_done);
+        can_send_i2c(can, position_telemetry);
     }
 }
 
