@@ -112,11 +112,16 @@ void setup() {
     #define LDIR 11
     #define MIN_LIMIT A0
     #define MAX_LIMIT A1
+
+    int count = 0;
+
     StepperController control(RPUL, RDIR, LPUL, LDIR, MIN_LIMIT, MAX_LIMIT);
 
     bool eStopped = false;
     for (;;) {
   
+        count++;
+
         CANPacket packet = can_read(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
@@ -125,10 +130,12 @@ void setup() {
         }
 
         // Send Telemetry
-        CANPacket telemetry = {DAVID_STEPPER_TELEM_FRAME_ID, 0};
-        control.pack_telemetry(telemetry.buf);
-        can_send(can, telemetry);
-
+        if (count % 2 == 0) {
+            CANPacket telemetry = {DAVID_STEPPER_TELEM_FRAME_ID, 0};
+            control.pack_telemetry(telemetry.buf);
+            can_send(can, telemetry);
+        }
+        
         if (eStopped)
             continue;
         
@@ -141,7 +148,6 @@ void setup() {
                 }
             }
         }
-
         control.loop();
     }
 }
