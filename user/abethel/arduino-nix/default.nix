@@ -16,10 +16,11 @@ let
   # arduino-cli lib install --git-url <name>
   gitPkgs = [
     "https://github.com/Longan-Labs/Longan_CAN_MCP2515"
+    "https://github.com/Longan-Labs/I2C_CAN_Arduino"
   ];
 
   # Hash of the output home dir.
-  buildHash = "sha256-kQ9Yb1h7Fdt2IE88lgrVFiRBGwS6/ORzV1k7je/bH4M=";
+  buildHash = "sha256-4cJEtU04xPPBhhlth+xgR1MuW3VvsadEhOcX/8nqlVM=";
 
   # --------
 
@@ -46,7 +47,7 @@ let
     name = "arduino-home";
     builder = writeScript "builder" ''
       #!${bash}/bin/bash
-      set -e
+      set -ex
 
       ${coreutils}/bin/mkdir -p $out
       export HOME=$out
