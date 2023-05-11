@@ -81,12 +81,12 @@
                     <Label name='Extend' value="1"/> 
                     <Label name='Retract' value="2"/> 
                 </LabelSet> 
+            </Signal>
             <Signal name="HomeDone" offset="22" length="1">
                 <LabelSet>
                     <Label name='False' value="0"/>
                     <Label name='True' value="1"/>
                 </LabelSet>
-            </Signal>
             </Signal>
         </Message>
 
