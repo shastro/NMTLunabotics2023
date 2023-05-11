@@ -17,7 +17,7 @@
 #define ACCREG              0x03
 
 
-enum Dir {
+enum class Dir {
     Stop = 0,
     Extend = 1,
     Retract = 2,
@@ -44,7 +44,7 @@ struct MD04Driver {
     void setDirection(Dir dir){
         sendData(ACCREG, ACC);
         sendData(SPEEDREG, SPEED);
-        sendData(CMDREG, dir);
+        sendData(CMDREG, (byte)dir);
     }
 
     byte getData(byte reg){                 // function for getting data from MD03
@@ -84,43 +84,39 @@ struct ControlCommand {
 
 };
 
+inline Dir choose_direction(double position, double set_point, double offset) {
+    if (position < (set_point + offset)) {
+        return Dir::Retract;
+    } else if (position > (set_point + offset)){
+        return Dir::Extend;
+    } else {
+        return Dir::Stop;
+    }
+}
+
 struct PitchController {
 
     MD04Driver left_m;
     MD04Driver right_m;
     double tolerance;
 
-    double left_pos;
-    double right_pos;
+    double left_position;
+    double right_position;
+
+    bool home_done;
 
     ControlCommand command;
 
     PitchController(double tolerance_) : left_m(0x59), right_m(0x58) {
         tolerance = tolerance_;
-        left_pos = 0.0;
-        right_pos = 0.0;
+        left_position = 0.0;
+        right_position = 0.0;
 
-        left_dir = Dir::Stop;
-        right_dir = Dir::Stop;
-
-        left_count = 0;
-        right_count = 0;
-
-        left_offset = 0.0;
-        right_offset = 0.0;
-
+        home_done = false;
     }
 
-    void setPoint(double set_point_) {
-        set_point = set_point_;
-    }
-
-    void setLeftDirection(double left_direction_){
-        left_direction = left_direction_;
-    }
-    
-    void setRightDirection(double right_direction_){
-        right_direction = right_direction_;
+    void setCommand(ControlCommand command_) {
+        command = command_;
     }
 
     void setLeftPosition(double left_position_){
@@ -129,14 +125,6 @@ struct PitchController {
 
     void setRightPosition(double right_position_){
         right_position = right_position_;
-    }
-
-    void setLeftOffset(double left_offset_){
-        left_offset = left_offset_;
-    }
-
-    void setRightOffset(double right_offset_){
-        right_offset = right_offset_;
     }
 
     void pack_telemetry(unsigned char buf[8]){
@@ -156,28 +144,22 @@ struct PitchController {
         data.right_current = david_pitch_driver_telem_right_current_encode((double)right_current);
         david_pitch_driver_telem_pack(buf, &data, 8);
     }
+
+    void stop() {
+        left_m.setDirection(Dir::Stop);
+        right_m.setDirection(Dir::Stop);
+    }
     void loop(){
         int ticks = 100;
-        const int read_limit_frequency = 200;
         while(ticks > 0){
             // Left
-            if (left_pos > set_point) {
-                left_m.setDirection(Dir::Retract);
-            }
-            if (left_pos < set_point) {
-                left_m.setDirection(Dir::Extend);
-            }
-            // Right
-            if (right_pos > set_point) {
-                right_m.setDirection(Dir::Retract);
-            }
-            if (right_pos < set_point) {
-                left_m.setDirection(Dir::Extend);
-            }
+            left_m.setDirection(choose_direction(left_position, command.set_point, command.left_offset));
+            right_m.setDirection(choose_direction(right_position, command.set_point, command.right_offset));
             ticks--;
             delay(10);
         }
     }
+
 };
 
 
@@ -198,12 +180,10 @@ void setup()
     int command_interval = 100;
     int tick = 0;
     for(;;){
-        int CMD_State = Dir::Stop;
         CANPacket packet = can_read(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
                 e_stopped = frame.stop;
-                CMD_State = Dir::Stop;
             }
         }
 
@@ -212,16 +192,9 @@ void setup()
         can_send(can, driver_telemetry);
 
         if (e_stopped)
+            control.stop();
             continue;
 
-        // if (tick % command_interval < command_interval/2) {
-        //     control.left_m.setDirection(Dir::Extend);
-        //     control.right_m.setDirection(Dir::Extend);
-        // } else {
-        //     control.left_m.setDirection(Dir::Retract);
-        //     control.right_m.setDirection(Dir::Retract);
-        // }
-        // tick += 1;
 
         switch (packet.id) {
             FRAME_CASE(DAVID_PITCH_CTRL, david_pitch_ctrl) {
@@ -230,21 +203,29 @@ void setup()
                 if (frame.home) {
                     break;
                 }
-                control.setPoint(david_pitch_ctrl_set_point_decode(frame.set_point));
-                control.setLeftOffset(david_pitch_ctrl_left_offset_decode(frame.left_offset));
-                control.setRightOffset(david_pitch_ctrl_right_offset_decode(frame.right_offset));
+                ControlCommand command;
+                command.set_point = david_pitch_ctrl_set_point_decode(frame.set_point);
+                command.left_offset = david_pitch_ctrl_left_offset_decode(frame.left_offset);
+                command.right_offset = david_pitch_ctrl_right_offset_decode(frame.right_offset);
+                control.setCommand(command);
 
             }
             FRAME_CASE(DAVID_PITCH_POSITION_TELEM, david_pitch_position_telem) { 
                  control.setLeftPosition(david_pitch_position_telem_left_position_decode(frame.left_position));
                  control.setRightPosition(david_pitch_position_telem_right_position_decode(frame.right_position));
-                 control.setLeftDirection(david_pitch_position_telem_left_direction_decode(frame.left_direction));
-                 control.setRightDirection(david_pitch_position_telem_right_direction_decode(frame.right_direction));
+                 control.home_done = david_pitch_position_telem_home_done_decode(frame.home_done);
             }
         }
 
+        if (home_state) {
+            if (!control.home_done) {
+                control.left_m.setDirection(Dir::Extend);
+                control.right_m.setDirection(Dir::Extend);
+            }
+        } else {
+            control.loop();
+        }
 
-        control.loop();
         // left_m.setDirection(Dir::Stop);
         // right_m.setDirection(Dir::Stop);
         // delay(2000);

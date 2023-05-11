@@ -84,13 +84,14 @@ inline Dir choose_direction(double position, double set_point, double offset) {
     }
 }
 
-void pack_telemetry(unsigned char buf[8], MotorState l_state, MotorState r_state) {
+void pack_telemetry(unsigned char buf[8], MotorState l_state, MotorState r_state, bool home_done) {
     david_pitch_position_telem_t data = {0};
 
     data.left_position = david_pitch_position_telem_left_position_encode(l_state.position);
     data.right_position = david_pitch_position_telem_right_position_encode(r_state.position);
-    data.left_direction = david_pitch_position_telem_left_direction_encode(l_state.direction);
-    data.right_direction = david_pitch_position_telem_right_direction_encode(r_state.direction);
+    data.left_direction = (unsigned char)l_state.direction;
+    data.right_direction = (unsigned char)r_state.direction;
+    data.home_done = david_pitch_position_telem_home_done_encode(home_done);
 
     david_pitch_position_telem_pack(buf, &data, 8);
 }
@@ -101,6 +102,7 @@ ControlCommand current_command;
 MotorState left_motor;
 MotorState right_motor;
 
+bool home_done = false;
 
 const int required_num_duplicates = 1000;
 void home(I2C_CAN can) {
@@ -109,6 +111,7 @@ void home(I2C_CAN can) {
     int left_duplicates = 0;
     int right_duplicates = 0;
 
+    home_done = false;
     left_motor.direction = Dir::Extend;
     right_motor.direction = Dir::Extend;
     for (;;) {
@@ -124,14 +127,15 @@ void home(I2C_CAN can) {
         right_motor.update_pos();
 
         CANPacket position_telemetry = {DAVID_PITCH_POSITION_TELEM_FRAME_ID, 0};
-        pack_telemetry(position_telemetry.buf, left_motor, right_motor);
+        pack_telemetry(position_telemetry.buf, left_motor, right_motor, home_done);
         can_send_i2c(can, position_telemetry);
 
         if ((left_duplicates > required_num_duplicates) || (right_duplicates > required_num_duplicates)) {
-            break;
             left_motor.direction = Dir::Stop;
             right_motor.direction = Dir::Stop;
             current_command.home = false;
+            home_done = true;
+            break;
         }
     }
 }
@@ -161,7 +165,7 @@ void setup()
 
         // Send Telemetry
         CANPacket position_telemetry = {DAVID_PITCH_POSITION_TELEM_FRAME_ID, 0};
-        pack_telemetry(position_telemetry.buf, left_motor, right_motor);
+        pack_telemetry(position_telemetry.buf, left_motor, right_motor, home_done);
         can_send_i2c(can, position_telemetry);
 
         if (e_stopped)
