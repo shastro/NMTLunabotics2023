@@ -94,3 +94,12 @@ void mast_ctrl_dispatch(const CANPacket &packet, T function) {
     }
 }
 
+template <typename T>
+void mast_telem_dispatch(const CANPacket &packet, T function) {
+    if (packet.id == DAVID_MastTelem_FRAME_ID) {
+        struct david_mast_telem_t t;
+        david_mast_telem_unpack(&t, packet.buff, packet.len);
+        function(t);
+    }
+}
+

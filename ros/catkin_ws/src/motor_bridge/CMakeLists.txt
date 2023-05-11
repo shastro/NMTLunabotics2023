@@ -27,6 +27,7 @@ add_message_files(
     StepperCtrl.msg
     StepperTelem.msg
     MastCtrl.msg
+    MastTelem.msg
 )
 
 generate_messages(DEPENDENCIES std_msgs)

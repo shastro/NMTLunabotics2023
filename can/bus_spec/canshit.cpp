@@ -35,6 +35,7 @@ int pack_msg(const motor_bridge::PitchPositionTelem& msg, uint8_t* buff) {
         .right_position = david_pitch_position_telem_right_position_encode(msg.right_position),
         .left_direction = david_pitch_position_telem_left_direction_encode(msg.left_direction),
         .right_direction = david_pitch_position_telem_right_direction_encode(msg.right_direction),
+        .home_done = david_pitch_position_telem_home_done_encode(msg.home_done),
     };
 
     david_pitch_position_telem_pack(buff, &t, sizeof(t));
@@ -96,11 +97,21 @@ int pack_msg(const motor_bridge::StepperTelem& msg, uint8_t* buff) {
 
 int pack_msg(const motor_bridge::MastCtrl& msg, uint8_t* buff) {
     david_mast_ctrl_t t = {
+        .home = david_mast_ctrl_home_encode(msg.home),
         .direction = david_mast_ctrl_direction_encode(msg.direction),
     };
 
     david_mast_ctrl_pack(buff, &t, sizeof(t));
     return DAVID_MAST_CTRL_FRAME_ID;
+}
+
+int pack_msg(const motor_bridge::MastTelem& msg, uint8_t* buff) {
+    david_mast_telem_t t = {
+        .angle = david_mast_telem_angle_encode(msg.angle),
+    };
+
+    david_mast_telem_pack(buff, &t, sizeof(t));
+    return DAVID_MAST_TELEM_FRAME_ID;
 }
 
 std::string printable(const motor_bridge::EStop& msg) {
@@ -126,6 +137,7 @@ std::string printable(const motor_bridge::PitchPositionTelem& msg) {
     s << "right_position: " << (int)msg.right_position << ", ";
     s << "left_direction: " << (int)msg.left_direction << ", ";
     s << "right_direction: " << (int)msg.right_direction << ", ";
+    s << "home_done: " << (int)msg.home_done << ", ";
     s << std::endl;
     return s.str();
 }
@@ -175,7 +187,15 @@ std::string printable(const motor_bridge::StepperTelem& msg) {
 
 std::string printable(const motor_bridge::MastCtrl& msg) {
     std::stringstream s;    s << "MastCtrl - ";
+    s << "home: " << (int)msg.home << ", ";
     s << "direction: " << (int)msg.direction << ", ";
+    s << std::endl;
+    return s.str();
+}
+
+std::string printable(const motor_bridge::MastTelem& msg) {
+    std::stringstream s;    s << "MastTelem - ";
+    s << "angle: " << (int)msg.angle << ", ";
     s << std::endl;
     return s.str();
 }

@@ -36,7 +36,7 @@ extern "C" {
 #define DAVID_STEPPER_CTRL_LENGTH (2u)
 #define DAVID_STEPPER_TELEM_LENGTH (3u)
 #define DAVID_MAST_CTRL_LENGTH (1u)
-#define DAVID_MAST_TELEM_LENGTH (1u)
+#define DAVID_MAST_TELEM_LENGTH (3u)
 
 /* Extended or standard frame types. */
 #define DAVID_E_STOP_IS_EXTENDED (0)
@@ -65,6 +65,9 @@ extern "C" {
 #define DAVID_PITCH_POSITION_TELEM_RIGHT_DIRECTION_EXTEND_CHOICE (1u)
 #define DAVID_PITCH_POSITION_TELEM_RIGHT_DIRECTION_RETRACT_CHOICE (2u)
 
+#define DAVID_PITCH_POSITION_TELEM_HOME_DONE_FALSE_CHOICE (0u)
+#define DAVID_PITCH_POSITION_TELEM_HOME_DONE_TRUE_CHOICE (1u)
+
 #define DAVID_STEPPER_CTRL_HOME_FALSE_CHOICE (0u)
 #define DAVID_STEPPER_CTRL_HOME_TRUE_CHOICE (1u)
 
@@ -73,6 +76,9 @@ extern "C" {
 
 #define DAVID_STEPPER_TELEM_AT_MAX_STOP_FALSE_CHOICE (0u)
 #define DAVID_STEPPER_TELEM_AT_MAX_STOP_TRUE_CHOICE (1u)
+
+#define DAVID_MAST_CTRL_HOME_FALSE_CHOICE (0u)
+#define DAVID_MAST_CTRL_HOME_TRUE_CHOICE (1u)
 
 #define DAVID_MAST_CTRL_DIRECTION_CCW_CHOICE (0u)
 #define DAVID_MAST_CTRL_DIRECTION_STOP_CHOICE (1u)
@@ -160,6 +166,13 @@ struct david_pitch_position_telem_t {
      * Offset: 0
      */
     uint8_t right_direction;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t home_done;
 };
 
 /**
@@ -317,6 +330,13 @@ struct david_mast_ctrl_t {
      * Scale: 1
      * Offset: 0
      */
+    uint8_t home;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
     uint8_t direction;
 };
 
@@ -324,18 +344,18 @@ struct david_mast_ctrl_t {
  * Signals in message MastTelem.
  *
  * 
-            Will print rotation angle. Min is -360, Max is 369 and Home is 0
+            Will print rotation angle. Min is -360, Max is 360 and Home is 0
           
  *
  * All signal values are as on the CAN bus.
  */
 struct david_mast_telem_t {
     /**
-     * Range: 0..48000 (-360..360 -)
-     * Scale: 0.015
+     * Range: 0..65536 (-360..360 -)
+     * Scale: 0.010986328125
      * Offset: -360
      */
-    uint8_t angle;
+    uint16_t angle;
 };
 
 /**
@@ -664,6 +684,33 @@ double david_pitch_position_telem_right_direction_decode(uint8_t value);
  * @return true if in range, false otherwise.
  */
 bool david_pitch_position_telem_right_direction_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t david_pitch_position_telem_home_done_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_pitch_position_telem_home_done_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_pitch_position_telem_home_done_is_in_range(uint8_t value);
 
 /**
  * Pack message PitchDriverTelem.
@@ -1191,6 +1238,33 @@ int david_mast_ctrl_unpack(
  *
  * @return Encoded signal.
  */
+uint8_t david_mast_ctrl_home_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_mast_ctrl_home_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_mast_ctrl_home_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
 uint8_t david_mast_ctrl_direction_encode(double value);
 
 /**
@@ -1246,7 +1320,7 @@ int david_mast_telem_unpack(
  *
  * @return Encoded signal.
  */
-uint8_t david_mast_telem_angle_encode(double value);
+uint16_t david_mast_telem_angle_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1255,7 +1329,7 @@ uint8_t david_mast_telem_angle_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_mast_telem_angle_decode(uint8_t value);
+double david_mast_telem_angle_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1264,7 +1338,7 @@ double david_mast_telem_angle_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_mast_telem_angle_is_in_range(uint8_t value);
+bool david_mast_telem_angle_is_in_range(uint16_t value);
 
 
 #ifdef __cplusplus

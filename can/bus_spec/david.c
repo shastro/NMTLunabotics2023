@@ -217,6 +217,7 @@ int david_pitch_position_telem_pack(
     dst_p[2] |= pack_right_shift_u16(src_p->right_position, 7u, 0x03u);
     dst_p[2] |= pack_left_shift_u8(src_p->left_direction, 2u, 0x0cu);
     dst_p[2] |= pack_left_shift_u8(src_p->right_direction, 4u, 0x30u);
+    dst_p[2] |= pack_left_shift_u8(src_p->home_done, 6u, 0x40u);
 
     return (3);
 }
@@ -236,6 +237,7 @@ int david_pitch_position_telem_unpack(
     dst_p->right_position |= unpack_left_shift_u16(src_p[2], 7u, 0x03u);
     dst_p->left_direction = unpack_right_shift_u8(src_p[2], 2u, 0x0cu);
     dst_p->right_direction = unpack_right_shift_u8(src_p[2], 4u, 0x30u);
+    dst_p->home_done = unpack_right_shift_u8(src_p[2], 6u, 0x40u);
 
     return (0);
 }
@@ -298,6 +300,21 @@ double david_pitch_position_telem_right_direction_decode(uint8_t value)
 bool david_pitch_position_telem_right_direction_is_in_range(uint8_t value)
 {
     return (value <= 3u);
+}
+
+uint8_t david_pitch_position_telem_home_done_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double david_pitch_position_telem_home_done_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool david_pitch_position_telem_home_done_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
 }
 
 int david_pitch_driver_telem_pack(
@@ -694,7 +711,8 @@ int david_mast_ctrl_pack(
 
     memset(&dst_p[0], 0, 1);
 
-    dst_p[0] |= pack_left_shift_u8(src_p->direction, 0u, 0x03u);
+    dst_p[0] |= pack_left_shift_u8(src_p->home, 0u, 0x01u);
+    dst_p[0] |= pack_left_shift_u8(src_p->direction, 1u, 0x06u);
 
     return (1);
 }
@@ -708,9 +726,25 @@ int david_mast_ctrl_unpack(
         return (-EINVAL);
     }
 
-    dst_p->direction = unpack_right_shift_u8(src_p[0], 0u, 0x03u);
+    dst_p->home = unpack_right_shift_u8(src_p[0], 0u, 0x01u);
+    dst_p->direction = unpack_right_shift_u8(src_p[0], 1u, 0x06u);
 
     return (0);
+}
+
+uint8_t david_mast_ctrl_home_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double david_mast_ctrl_home_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool david_mast_ctrl_home_is_in_range(uint8_t value)
+{
+    return (value <= 1u);
 }
 
 uint8_t david_mast_ctrl_direction_encode(double value)
@@ -733,15 +767,17 @@ int david_mast_telem_pack(
     const struct david_mast_telem_t *src_p,
     size_t size)
 {
-    if (size < 1u) {
+    if (size < 3u) {
         return (-EINVAL);
     }
 
-    memset(&dst_p[0], 0, 1);
+    memset(&dst_p[0], 0, 3);
 
-    dst_p[0] |= pack_left_shift_u8(src_p->angle, 0u, 0x07u);
+    dst_p[0] |= pack_left_shift_u16(src_p->angle, 3u, 0xf8u);
+    dst_p[1] |= pack_right_shift_u16(src_p->angle, 5u, 0xffu);
+    dst_p[2] |= pack_right_shift_u16(src_p->angle, 13u, 0x07u);
 
-    return (1);
+    return (3);
 }
 
 int david_mast_telem_unpack(
@@ -749,26 +785,28 @@ int david_mast_telem_unpack(
     const uint8_t *src_p,
     size_t size)
 {
-    if (size < 1u) {
+    if (size < 3u) {
         return (-EINVAL);
     }
 
-    dst_p->angle = unpack_right_shift_u8(src_p[0], 0u, 0x07u);
+    dst_p->angle = unpack_right_shift_u16(src_p[0], 3u, 0xf8u);
+    dst_p->angle |= unpack_left_shift_u16(src_p[1], 5u, 0xffu);
+    dst_p->angle |= unpack_left_shift_u16(src_p[2], 13u, 0x07u);
 
     return (0);
 }
 
-uint8_t david_mast_telem_angle_encode(double value)
+uint16_t david_mast_telem_angle_encode(double value)
 {
-    return (uint8_t)((value - -360.0) / 0.015);
+    return (uint16_t)((value - -360.0) / 0.010986328125);
 }
 
-double david_mast_telem_angle_decode(uint8_t value)
+double david_mast_telem_angle_decode(uint16_t value)
 {
-    return (((double)value * 0.015) + -360.0);
+    return (((double)value * 0.010986328125) + -360.0);
 }
 
-bool david_mast_telem_angle_is_in_range(uint8_t value)
+bool david_mast_telem_angle_is_in_range(uint16_t value)
 {
     (void)value;
 
