@@ -43,15 +43,15 @@ def camel_to_snake(s):
     return ''.join(['_'+i.lower() if i.isupper()
         else i for i in s]).lstrip('_')
 
-    # Create Messages
+# Create Messages
 # Combined system message
 try:
     os.mkdir(msg_dir)
 except OSError as err:
     print("MSG dir Exists")
-# Remove all current messages
-for m in os.listdir(msg_dir):
-    os.remove(os.path.join(msg_dir + "/" + m))
+    # Remove all current messages
+    for m in os.listdir(msg_dir):
+        os.remove(os.path.join(msg_dir + "/" + m))
 
 system_msg_path = os.path.join(msg_dir, 'System.msg')
 with open(system_msg_path, 'w') as s, open(lim, 'w') as l:
@@ -97,7 +97,7 @@ with open(system_msg_path, 'w') as s, open(lim, 'w') as l:
                             l.write("double " + camel_to_snake(msg_name).upper()
                                     + "_" + name.upper() + "_MAX = "
                                     + sig.Value['max'] + ";\n")
-                            m.write(var +  ' ' + name + '\n')
+                m.write(var +  ' ' + name + '\n')
 
         msgs.append([msg_name, names, types])
 
