@@ -112,9 +112,9 @@ void setup()
     bool home_state = false;
     bool e_stopped = false;
     long loop_count = 0;
-    int telem_freq = 3;
+    int telem_freq = 2;
     for(;;){
-        CANPacket packet = can_read_non_blocking(can);
+        CANPacket packet = can_read_blocking(can);
         if (packet.id == 0xFFFFFFFF) {
             delay(5);
             continue;
@@ -158,8 +158,8 @@ void setup()
         // Serial.println(left_motor.count);
         // Serial.print("Left Trig: ");
         // Serial.println(left_motor.last_trigger);
-        // Serial.print("Left Dir: ");
-        // Serial.println((int)left_motor.direction);;
+        Serial.print("Left Dir: ");
+        Serial.println((int)left_motor.direction);;
         // Send Telemetry
         if ((loop_count % telem_freq) == 0) {
             CANPacket position_telemetry(DAVID_PITCH_POSITION_TELEM_FRAME_ID);
