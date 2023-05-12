@@ -67,10 +67,20 @@ inline void panic(const char *error_message);
                  frame_lower##_unpack(&frame, packet.buf, packet.len), once;   \
                  once = false)
 
+// Sentinel ID value to indicate that a CAN packet is empty.
+#define CAN_PACKET_EMPTY 0xffffffff
+
 struct CANPacket {
-    uint32_t id;
-    uint32_t len;
+    uint32_t id = CAN_PACKET_EMPTY;
+    uint32_t len = 0;
     unsigned char buf[8];
+
+    // This allows code like the following:
+    // CANPacket pkt = can_read_nonblocking(can);
+    // if (pkt) {
+    //     // this is only entered if `can_read_nonblocking` succeeded.
+    // }
+    operator bool() const { return id != CAN_PACKET_EMPTY; }
 };
 
 // Set up a CAN connection.
@@ -85,22 +95,35 @@ inline MCP_CAN setup_can() {
     return can;
 }
 
-// Read a CAN packet. Blocks until one is available.
-inline CANPacket can_read(MCP_CAN &can) {
+// Read a CAN packet. Does not block and immediately returns a
+// CANPacket that coerces to `false` if none is available.
+inline CANPacket can_read_nonblocking(MCP_CAN &can) {
+    CANPacket packet;
     if (can.checkReceive() == CAN_MSGAVAIL) {
-        CANPacket packet;
-        packet.len = 0;
-        packet.id = 0xFFFFFFFF;
         can.readMsgBuf((unsigned char *)&packet.len, packet.buf);
         packet.id = can.getCanId();
         return packet;
     } else {
-        CANPacket packet;
-        packet.len = 8;
-        packet.id = 0xFFFFFFFF;
         return packet;
     }
 }
+
+// Read a CAN packet. Blocks until one is available.
+inline CANPacket can_read_blocking(MCP_CAN &can) {
+    while (can.checkReceive() != CAN_MSGAVAIL)
+        ;
+
+    return can_read_nonblocking(can);
+}
+
+// Use can_read_nonblocking or can_read_blocking instead.
+// [[deprecated]] inline CANPacket can_read(MCP_CAN &can) {
+//     return can_read_nonblocking(can);
+// }
+
+// arduino_cli doesn't emit warnings for deprecated functions; I'm not
+// bothering deprecating it and I'm just gonna delete the function
+// instead. ~~Alex
 
 inline void can_send(MCP_CAN &can, CANPacket packet) {
     can.sendMsgBuf(packet.id, CAN_STDID, 8, packet.buf);
