@@ -1,8 +1,6 @@
 // receive a frame from can bus
 
 #include "arduino_lib.hpp"
-#include "Wire.h"
-#include "Longan_I2C_CAN_Arduino.h"
 
 // Import CAN message constants
 #include "david.h"
@@ -16,9 +14,8 @@
 static const int64_t trig_delay = 10000; // Microsecond delay
 static const int64_t DEFAULT_HOMING_DELAY = 300;
 
-#define I2C_CAN_ADDR 0x25
 
-static const int MM_PER_COUNT = 0.17896;
+static const double MM_PER_COUNT = 0.17896;
 
 enum class Dir {
     Stop = 0,
@@ -45,36 +42,6 @@ struct MotorState {
     }
 };
 
-inline I2C_CAN setup_can_i2c() {
-    I2C_CAN can(I2C_CAN_ADDR);
-    Serial.begin(9600);
-    while (can.begin(CAN_500KBPS) != CAN_OK) {
-        Serial.println("CAN bus fail!");
-        delay(100);
-    }
-    Serial.println("CAN bus ok!");
-    return can;
-}
-
-inline CANPacket can_read_i2c(I2C_CAN &can) {
-    if (can.checkReceive() == CAN_MSGAVAIL) {
-        CANPacket packet;
-        packet.len = 0;
-        packet.id = 0xFFFFFFFF;
-        can.readMsgBuf((unsigned char *)&packet.len, packet.buf);
-        packet.id = can.getCanId();
-        return packet;
-    } else {
-        CANPacket packet;
-        packet.len = 8;
-        packet.id = 0xFFFFFFFF;
-        return packet;
-    }
-
-}
-inline void can_send_i2c(I2C_CAN &can, CANPacket packet) {
-    can.sendMsgBuf(packet.id, CAN_STDID, 8, packet.buf);
-}
 
 inline Dir choose_direction(double position, double set_point, double offset) {
     if (position < (set_point + offset)) {
@@ -107,7 +74,7 @@ MotorState right_motor;
 bool home_done = false;
 
 const int required_num_duplicates = 1000;
-void home(I2C_CAN can) {
+void home(MCP_CAN can) {
     int prev_count_l = 0xFFFFFFFF;
     int prev_count_r = 0xFFFFFFFF;
     int left_duplicates = 0;
@@ -130,7 +97,7 @@ void home(I2C_CAN can) {
 
         CANPacket position_telemetry = {DAVID_PITCH_POSITION_TELEM_FRAME_ID, 0};
         pack_telemetry(position_telemetry.buf, left_motor, right_motor, home_done);
-        can_send_i2c(can, position_telemetry);
+        can_send(can, position_telemetry);
 
         if ((left_duplicates > required_num_duplicates) || (right_duplicates > required_num_duplicates)) {
             left_motor.direction = Dir::Stop;
@@ -147,7 +114,7 @@ void home(I2C_CAN can) {
 
 void setup()
 {
-    I2C_CAN can = setup_can_i2c();
+    MCP_CAN can = setup_can();
     // PinModes
     pinMode(HALL_PIN_L, INPUT_PULLUP);
     pinMode(HALL_PIN_R, INPUT_PULLUP);
@@ -158,9 +125,11 @@ void setup()
 
     bool home_state = false;
     bool e_stopped = false;
+    long loop_count = 0;
+    int telem_freq = 10;
     // controller.loop();
     for(;;){
-        CANPacket packet = can_read_i2c(can);
+        CANPacket packet = can_read(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
                 e_stopped = frame.stop;
@@ -182,7 +151,7 @@ void setup()
             }
         }
 
-        Serial.println(current_command.set_point);
+        // Serial.println(current_command.set_point);
         // Update direction
         left_motor.direction = choose_direction(left_motor.position, current_command.set_point, current_command.left_offset);
 
@@ -195,12 +164,18 @@ void setup()
         // Serial.println(left_motor.position);
         // Serial.print("Left Count: ");
         // Serial.println(left_motor.count);
+        // Serial.print("Left Trig: ");
+        // Serial.println(left_motor.last_trigger);
         // Serial.print("Left Dir: ");
         // Serial.println((int)left_motor.direction);
         // Send Telemetry
-        CANPacket position_telemetry = {DAVID_PITCH_POSITION_TELEM_FRAME_ID, 0};
-        pack_telemetry(position_telemetry.buf, left_motor, right_motor, home_done);
-        can_send_i2c(can, position_telemetry);
+        if ((loop_count % telem_freq) == 0) {
+            CANPacket position_telemetry = {DAVID_PITCH_POSITION_TELEM_FRAME_ID, 0};
+            pack_telemetry(position_telemetry.buf, left_motor, right_motor, home_done);
+            can_send(can, position_telemetry);
+        }
+        loop_count++;
+        delay(5);
     }
 }
 

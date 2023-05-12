@@ -190,7 +190,7 @@ void setup()
         CANPacket driver_telemetry = {DAVID_PITCH_DRIVER_TELEM_FRAME_ID, 0};
         control.pack_telemetry(driver_telemetry.buf);
         can_send(can, driver_telemetry);
-        if(tick % 300 < 150) {
+        if(tick % 500 < 250) {
             control.left_m.setDirection(Dir::Retract);
             control.right_m.setDirection(Dir::Retract);
         } else {
