@@ -27,10 +27,12 @@ enum class Dir {
 #define SPEED 150
 
 struct MD04Driver {
-    int addr;  
+    int addr;
+    Dir direction;  
 
     MD04Driver(unsigned addr_in) {
         addr = addr_in;
+        direction = Dir::Stop;
     }
 
     byte getTemperature() {
@@ -42,6 +44,7 @@ struct MD04Driver {
     }
 
     void setDirection(Dir dir){
+        direction = dir;
         sendData(ACCREG, ACC);
         sendData(SPEEDREG, SPEED);
         sendData(CMDREG, (byte)dir);
@@ -112,6 +115,7 @@ struct PitchController {
         left_position = 0.0;
         right_position = 0.0;
 
+
         home_done = false;
     }
 
@@ -142,6 +146,9 @@ struct PitchController {
         // Current
         data.left_current = david_pitch_driver_telem_left_current_encode((double)left_current);
         data.right_current = david_pitch_driver_telem_right_current_encode((double)right_current);
+        // Direction
+        data.left_direction = (uint8_t)left_m.direction;
+        data.right_direction = (uint8_t)right_m.direction;
         david_pitch_driver_telem_pack(buf, &data, 8);
     }
 
@@ -190,6 +197,7 @@ void setup()
         CANPacket driver_telemetry = {DAVID_PITCH_DRIVER_TELEM_FRAME_ID, 0};
         control.pack_telemetry(driver_telemetry.buf);
         can_send(can, driver_telemetry);
+
         if(tick % 500 < 250) {
             control.left_m.setDirection(Dir::Retract);
             control.right_m.setDirection(Dir::Retract);

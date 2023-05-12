@@ -11,7 +11,7 @@
 #define HALL_PIN_L 2
 #define HALL_PIN_R 3
 
-static const int64_t trig_delay = 10000; // Microsecond delay
+static const int64_t trig_delay = 20000; // Microsecond delay
 static const int64_t DEFAULT_HOMING_DELAY = 300;
 
 
@@ -33,7 +33,7 @@ struct ControlCommand {
 
 struct MotorState {
     Dir direction = Dir::Stop;
-    volatile int count = 0.0;
+    volatile int count = 0;
     double position = 0.0;
     volatile double last_trigger = 0.0;
 
@@ -43,23 +43,11 @@ struct MotorState {
 };
 
 
-inline Dir choose_direction(double position, double set_point, double offset) {
-    if (position < (set_point + offset)) {
-        return Dir::Extend;
-    } else if (position > (set_point + offset)){
-        return Dir::Retract;
-    } else {
-        return Dir::Stop;
-    }
-}
-
 void pack_telemetry(unsigned char buf[8], MotorState l_state, MotorState r_state, bool home_done) {
     david_pitch_position_telem_t data = {0};
 
     data.left_position = david_pitch_position_telem_left_position_encode(l_state.position);
     data.right_position = david_pitch_position_telem_right_position_encode(r_state.position);
-    data.left_direction = (unsigned char)l_state.direction;
-    data.right_direction = (unsigned char)r_state.direction;
     data.home_done = david_pitch_position_telem_home_done_encode(home_done);
 
     david_pitch_position_telem_pack(buf, &data, 8);
@@ -81,8 +69,6 @@ void home(MCP_CAN can) {
     int right_duplicates = 0;
 
     home_done = false;
-    left_motor.direction = Dir::Extend;
-    right_motor.direction = Dir::Extend;
     for (;;) {
         if (left_motor.count == prev_count_l) {
             left_duplicates++;
@@ -141,33 +127,37 @@ void setup()
             continue;
 
         switch (packet.id) {
-            FRAME_CASE(DAVID_PITCH_CTRL, david_pitch_ctrl) {
 
+            FRAME_CASE(DAVID_PITCH_DRIVER_TELEM, david_pitch_driver_telem) {
+                Serial.println("HERE!");
+                left_motor.direction = (Dir)david_pitch_driver_telem_left_direction_decode(frame.left_direction);
+                right_motor.direction = (Dir)david_pitch_driver_telem_right_direction_decode(frame.right_direction);
+            }
+            FRAME_CASE(DAVID_PITCH_CTRL, david_pitch_ctrl) {
                 current_command.set_point = david_pitch_ctrl_set_point_decode(frame.set_point);
                 current_command.left_offset = david_pitch_ctrl_left_offset_decode(frame.left_offset);
                 current_command.right_offset = david_pitch_ctrl_right_offset_decode(frame.right_offset);
                 current_command.home = david_pitch_ctrl_home_decode(frame.home);
 
             }
+            
         }
 
         // Serial.println(current_command.set_point);
         // Update direction
-        left_motor.direction = choose_direction(left_motor.position, current_command.set_point, current_command.left_offset);
+        // left_motor.direction = choose_direction(left_motor.position, current_command.set_point, current_command.left_offset);
 
-        right_motor.direction = choose_direction(right_motor.position, current_command.set_point, current_command.right_offset);
+        // right_motor.direction = choose_direction(right_motor.position, current_command.set_point, current_command.right_offset);
 
         left_motor.update_pos();
         right_motor.update_pos();
 
-        // Serial.print("Left Pos: ");
-        // Serial.println(left_motor.position);
         // Serial.print("Left Count: ");
         // Serial.println(left_motor.count);
         // Serial.print("Left Trig: ");
         // Serial.println(left_motor.last_trigger);
         // Serial.print("Left Dir: ");
-        // Serial.println((int)left_motor.direction);
+        // Serial.println((int)left_motor.direction);;
         // Send Telemetry
         if ((loop_count % telem_freq) == 0) {
             CANPacket position_telemetry = {DAVID_PITCH_POSITION_TELEM_FRAME_ID, 0};
