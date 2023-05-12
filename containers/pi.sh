@@ -64,5 +64,8 @@ docker exec $CONTAINER_NAME sh -c '
     echo "yaml https://raw.githubusercontent.com/UbiquityRobotics/rosdep/master/raspberry-pi.yaml" > \
     /etc/ros/rosdep/sources.list.d/30-ubiquity.list
     tail -f /dev/null
+    rosdep init
+    rosdep update
+    rosdep install --from-paths src --ignore-src --rosdistro=noetic -y
     '
 
