@@ -81,7 +81,7 @@ void home(MCP_CAN can) {
         // left_motor.update_pos();
         // right_motor.update_pos();
 
-        CANPacket position_telemetry = {DAVID_PITCH_POSITION_TELEM_FRAME_ID, 0};
+        CANPacket position_telemetry(DAVID_PITCH_POSITION_TELEM_FRAME_ID);
         pack_telemetry(position_telemetry.buf, left_motor, right_motor, home_done);
         can_send(can, position_telemetry);
 
@@ -114,8 +114,8 @@ void setup()
     long loop_count = 0;
     int telem_freq = 3;
     for(;;){
-        CANPacket packet = can_read(can);
-        if (packet.id == 0xFFFFFFFF) {
+        CANPacket packet = can_read_nonblocking(can);
+        if (!packet) {
             delay(5);
             continue;
         }
@@ -162,7 +162,7 @@ void setup()
         // Serial.println((int)left_motor.direction);;
         // Send Telemetry
         if ((loop_count % telem_freq) == 0) {
-            CANPacket position_telemetry = {DAVID_PITCH_POSITION_TELEM_FRAME_ID, 0};
+            CANPacket position_telemetry(DAVID_PITCH_POSITION_TELEM_FRAME_ID);
             pack_telemetry(position_telemetry.buf, left_motor, right_motor, home_done);
             can_send(can, position_telemetry);
         }

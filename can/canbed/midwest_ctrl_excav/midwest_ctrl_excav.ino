@@ -17,7 +17,7 @@ void setup() {
 
     bool eStopped = false;
     for (;;) {
-        CANPacket packet = can_read(can);
+        CANPacket packet = can_read_blocking(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
                 eStopped = frame.stop;

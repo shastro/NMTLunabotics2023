@@ -75,6 +75,9 @@ struct CANPacket {
     uint32_t len = 0;
     unsigned char buf[8];
 
+    CANPacket() {}
+    CANPacket(uint32_t id) : id(id) {}
+
     // This allows code like the following:
     // CANPacket pkt = can_read_nonblocking(can);
     // if (pkt) {

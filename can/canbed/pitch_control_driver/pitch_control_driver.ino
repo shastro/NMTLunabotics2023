@@ -187,14 +187,14 @@ void setup()
     int command_interval = 100;
     int tick = 0;
     for(;;){
-        CANPacket packet = can_read(can);
+        CANPacket packet = can_read_nonblocking(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
                 e_stopped = frame.stop;
             }
         }
 
-        CANPacket driver_telemetry = {DAVID_PITCH_DRIVER_TELEM_FRAME_ID, 0};
+        CANPacket driver_telemetry(DAVID_PITCH_DRIVER_TELEM_FRAME_ID);
         control.pack_telemetry(driver_telemetry.buf);
         can_send(can, driver_telemetry);
 
