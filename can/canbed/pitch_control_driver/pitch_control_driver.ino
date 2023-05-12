@@ -24,7 +24,7 @@ enum class Dir {
 };
 
 #define ACC 0x0A
-#define SPEED 150
+#define SPEED 100
 
 struct MD04Driver {
     int addr;

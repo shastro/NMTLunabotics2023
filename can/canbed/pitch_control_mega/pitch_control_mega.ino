@@ -11,12 +11,11 @@
 #define HALL_PIN_L 2
 #define HALL_PIN_R 3
 
-static const int64_t trig_delay  = 12000; // Microsecond delay
+static const int64_t trig_delay  = 7500; // Microsecond delay
 // Period is 10k mus
 static const int64_t DEFAULT_HOMING_DELAY = 300;
-
-
 static const double MM_PER_COUNT = 0.17896;
+
 
 enum class Dir {
     Stop = 0,
@@ -33,21 +32,23 @@ struct ControlCommand {
 };
 
 struct MotorState {
-    Dir direction = Dir::Stop;
+    volatile Dir direction = Dir::Stop;
     volatile int count = 0;
-    volatile double last_trigger = 0.0;
+    volatile int64_t last_trigger = 0;
 
-    // void update_pos() {
-    //     position = count * MM_PER_COUNT;
-    // }
 };
 
+ControlCommand current_command;
+MotorState left_motor;
+MotorState right_motor;
 
-void pack_telemetry(unsigned char buf[8], MotorState l_state, MotorState r_state, bool home_done) {
+void pack_telemetry(unsigned char buf[8], bool home_done) {
     david_pitch_position_telem_t data = {0};
 
-    data.left_position = david_pitch_position_telem_left_position_encode(l_state.count * MM_PER_COUNT);
-    data.right_position = david_pitch_position_telem_right_position_encode(r_state.count * MM_PER_COUNT);
+    data.left_position = david_pitch_position_telem_left_position_encode((double)left_motor.count * MM_PER_COUNT);
+    data.right_position = david_pitch_position_telem_right_position_encode((double)right_motor.count * MM_PER_COUNT);
+    data.left_direction = (int)left_motor.direction;
+    data.right_direction = (int)right_motor.direction;
     data.home_done = david_pitch_position_telem_home_done_encode(home_done);
 
     david_pitch_position_telem_pack(buf, &data, 8);
@@ -55,9 +56,6 @@ void pack_telemetry(unsigned char buf[8], MotorState l_state, MotorState r_state
 
 
 
-ControlCommand current_command;
-MotorState left_motor;
-MotorState right_motor;
 
 bool home_done = false;
 
@@ -82,12 +80,12 @@ void home(MCP_CAN can) {
         // right_motor.update_pos();
 
         CANPacket position_telemetry(DAVID_PITCH_POSITION_TELEM_FRAME_ID);
-        pack_telemetry(position_telemetry.buf, left_motor, right_motor, home_done);
+        pack_telemetry(position_telemetry.buf, home_done);
         can_send(can, position_telemetry);
 
         if ((left_duplicates > required_num_duplicates) || (right_duplicates > required_num_duplicates)) {
-            left_motor.direction = Dir::Stop;
-            right_motor.direction = Dir::Stop;
+            // left_motor.direction = Dir::Stop;
+            // right_motor.direction = Dir::Stop;
             current_command.home = false;
             home_done = true;
             // left_motor.position = 152;
@@ -132,8 +130,8 @@ void setup()
 
         switch (packet.id) {
             FRAME_CASE(DAVID_PITCH_DRIVER_TELEM, david_pitch_driver_telem) {
-                left_motor.direction = (Dir)david_pitch_driver_telem_left_direction_decode(frame.left_direction);
-                right_motor.direction = (Dir)david_pitch_driver_telem_right_direction_decode(frame.right_direction);
+                left_motor.direction =  (Dir)frame.left_direction;
+                right_motor.direction = (Dir)frame.right_direction;
             }
             FRAME_CASE(DAVID_PITCH_CTRL, david_pitch_ctrl) {
                 current_command.set_point = david_pitch_ctrl_set_point_decode(frame.set_point);
@@ -145,25 +143,9 @@ void setup()
             
         }
 
-        // Serial.println(current_command.set_point);
-        // Update direction
-        // left_motor.direction = choose_direction(left_motor.position, current_command.set_point, current_command.left_offset);
-
-        // right_motor.direction = choose_direction(right_motor.position, current_command.set_point, current_command.right_offset);
-
-        // left_motor.update_pos();
-        // right_motor.update_pos();
-
-        // Serial.print("Left Count: ");
-        // Serial.println(left_motor.count);
-        // Serial.print("Left Trig: ");
-        // Serial.println(left_motor.last_trigger);
-        Serial.print("Left Dir: ");
-        Serial.println((int)left_motor.direction);;
-        // Send Telemetry
         if ((loop_count % telem_freq) == 0) {
             CANPacket position_telemetry(DAVID_PITCH_POSITION_TELEM_FRAME_ID);
-            pack_telemetry(position_telemetry.buf, left_motor, right_motor, home_done);
+            pack_telemetry(position_telemetry.buf, home_done);
             can_send(can, position_telemetry);
         }
         loop_count++;
