@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+# Set up routing from the local machine to the camera pi, which is at
+# 10.0.0.100.
+
+sudo route add -net 10.0.0.0/24 gw jetson
