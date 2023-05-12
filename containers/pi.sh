@@ -36,7 +36,7 @@ params=(
     --device-cgroup-rule "c 189:* rmw"
     
     # Environmental variables
-    -e ROS_MASTER_URI=http://$it:11311
+    -e ROS_MASTER_URI=http://jetson:11311
     -e ROS_IP=$it
 
     # Name the container.
@@ -63,5 +63,6 @@ docker exec $CONTAINER_NAME sh -c '
     touch /etc/ros/rosdep/sources.list.d/30-ubiquity.list
     echo "yaml https://raw.githubusercontent.com/UbiquityRobotics/rosdep/master/raspberry-pi.yaml" > \
     /etc/ros/rosdep/sources.list.d/30-ubiquity.list
+    tail -f /dev/null
     '
 
