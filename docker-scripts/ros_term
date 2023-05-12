@@ -69,6 +69,7 @@ params=(
     --rm
     -it
     --network=host
+    --privileged
     -v $DIR:$DIR
     -e DISPLAY
     -v /tmp/.X11-unix:/tmp/.X11-unix:rw

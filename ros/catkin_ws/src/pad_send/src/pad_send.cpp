@@ -12,8 +12,15 @@ int max = 98;   // Max value for sticks/triggers
 int min = -max; // Min val ... well yeah
 int dead = 20;  // Can't be too touchy. < dead = 0
 int rate = 100; //in hertz
+
 double pitch_delta = 8.0 / rate; // in mm/s
 double stepper_delta = 20.0 / rate; // in mm/s
+
+double min_max_mod = 0.999;
+double pitch_max = PITCH_CTRL_SET_POINT_MAX * min_max_mod;
+double pitch_min = PITCH_CTRL_SET_POINT_MIN * min_max_mod;
+double stepper_max = STEPPER_CTRL_SET_POINT_MAX * min_max_mod;
+double stepper_min = STEPPER_CTRL_SET_POINT_MIN * min_max_mod;
 
 enum class mode {
     normal,
@@ -139,13 +146,11 @@ int main(int argc, char *argv[]) {
                 // Pitch control with dpad
                 if (g.dpad.up) {
                     pitch += pitch_delta;
-                    pitch = std::min(pitch,
-                            PITCH_CTRL_SET_POINT_MAX);
+                    pitch = std::min(pitch, pitch_max);
                     out << "Pitch Up: " << pitch << "\n";
                 } else if (g.dpad.down) {
                     pitch -= pitch_delta;
-                    pitch = std::max(pitch,
-                            PITCH_CTRL_SET_POINT_MIN);
+                    pitch = std::max(pitch, pitch_min);
                     out << "Pitch Down: " << pitch << "\n";
                 }
                 s.pitch_ctrl.set_point = pitch;
@@ -172,13 +177,11 @@ int main(int argc, char *argv[]) {
                 // Extend dpad
                 if (g.dpad.left) {
                     stepper += stepper_delta;
-                    stepper = std::min(stepper,
-                            STEPPER_CTRL_SET_POINT_MAX);
+                    stepper = std::min(stepper, stepper_max);
                     out << "Arm Extend: " << stepper << "\n";
                 } else if (g.dpad.right) {
                     stepper -= stepper_delta;
-                    stepper = std::max(stepper,
-                            STEPPER_CTRL_SET_POINT_MIN);
+                    stepper = std::max(stepper, stepper_min);
                     out << "Arm Retract: " << stepper << "\n";
                 }
                 s.stepper_ctrl.set_point = stepper;
@@ -228,14 +231,14 @@ int main(int argc, char *argv[]) {
                 if (g.dpad.up || g.dpad.down) {
                     out << "Pitch Home\n";
                     pitch_home = true;
-                    pitch = PITCH_CTRL_SET_POINT_MAX;
+                    pitch = pitch_max;
                     s.pitch_ctrl.set_point = pitch;
                 }
 
                 if (g.dpad.left || g.dpad.right) {
                     out << "Extend Home\n";
                     stepper_home = true;
-                    stepper = STEPPER_CTRL_SET_POINT_MIN;
+                    stepper = stepper_min;
                     s.stepper_ctrl.set_point = stepper;
                 }
 
