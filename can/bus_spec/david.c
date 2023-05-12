@@ -215,8 +215,6 @@ int david_pitch_position_telem_pack(
     dst_p[1] |= pack_right_shift_u16(src_p->left_position, 8u, 0x01u);
     dst_p[1] |= pack_left_shift_u16(src_p->right_position, 1u, 0xfeu);
     dst_p[2] |= pack_right_shift_u16(src_p->right_position, 7u, 0x03u);
-    dst_p[2] |= pack_left_shift_u8(src_p->left_direction, 2u, 0x0cu);
-    dst_p[2] |= pack_left_shift_u8(src_p->right_direction, 4u, 0x30u);
     dst_p[2] |= pack_left_shift_u8(src_p->home_done, 6u, 0x40u);
 
     return (3);
@@ -235,8 +233,6 @@ int david_pitch_position_telem_unpack(
     dst_p->left_position |= unpack_left_shift_u16(src_p[1], 8u, 0x01u);
     dst_p->right_position = unpack_right_shift_u16(src_p[1], 1u, 0xfeu);
     dst_p->right_position |= unpack_left_shift_u16(src_p[2], 7u, 0x03u);
-    dst_p->left_direction = unpack_right_shift_u8(src_p[2], 2u, 0x0cu);
-    dst_p->right_direction = unpack_right_shift_u8(src_p[2], 4u, 0x30u);
     dst_p->home_done = unpack_right_shift_u8(src_p[2], 6u, 0x40u);
 
     return (0);
@@ -272,36 +268,6 @@ bool david_pitch_position_telem_right_position_is_in_range(uint16_t value)
     return (value <= 515u);
 }
 
-uint8_t david_pitch_position_telem_left_direction_encode(double value)
-{
-    return (uint8_t)(value);
-}
-
-double david_pitch_position_telem_left_direction_decode(uint8_t value)
-{
-    return ((double)value);
-}
-
-bool david_pitch_position_telem_left_direction_is_in_range(uint8_t value)
-{
-    return (value <= 3u);
-}
-
-uint8_t david_pitch_position_telem_right_direction_encode(double value)
-{
-    return (uint8_t)(value);
-}
-
-double david_pitch_position_telem_right_direction_decode(uint8_t value)
-{
-    return ((double)value);
-}
-
-bool david_pitch_position_telem_right_direction_is_in_range(uint8_t value)
-{
-    return (value <= 3u);
-}
-
 uint8_t david_pitch_position_telem_home_done_encode(double value)
 {
     return (uint8_t)(value);
@@ -322,18 +288,20 @@ int david_pitch_driver_telem_pack(
     const struct david_pitch_driver_telem_t *src_p,
     size_t size)
 {
-    if (size < 4u) {
+    if (size < 5u) {
         return (-EINVAL);
     }
 
-    memset(&dst_p[0], 0, 4);
+    memset(&dst_p[0], 0, 5);
 
     dst_p[0] |= pack_left_shift_u8(src_p->left_current, 0u, 0xffu);
     dst_p[1] |= pack_left_shift_u8(src_p->right_current, 0u, 0xffu);
     dst_p[2] |= pack_left_shift_u8(src_p->left_temperature, 0u, 0xffu);
     dst_p[3] |= pack_left_shift_u8(src_p->right_temperature, 0u, 0xffu);
+    dst_p[4] |= pack_left_shift_u8(src_p->left_direction, 0u, 0x03u);
+    dst_p[4] |= pack_left_shift_u8(src_p->right_direction, 2u, 0x0cu);
 
-    return (4);
+    return (5);
 }
 
 int david_pitch_driver_telem_unpack(
@@ -341,7 +309,7 @@ int david_pitch_driver_telem_unpack(
     const uint8_t *src_p,
     size_t size)
 {
-    if (size < 4u) {
+    if (size < 5u) {
         return (-EINVAL);
     }
 
@@ -349,6 +317,8 @@ int david_pitch_driver_telem_unpack(
     dst_p->right_current = unpack_right_shift_u8(src_p[1], 0u, 0xffu);
     dst_p->left_temperature = unpack_right_shift_u8(src_p[2], 0u, 0xffu);
     dst_p->right_temperature = unpack_right_shift_u8(src_p[3], 0u, 0xffu);
+    dst_p->left_direction = unpack_right_shift_u8(src_p[4], 0u, 0x03u);
+    dst_p->right_direction = unpack_right_shift_u8(src_p[4], 2u, 0x0cu);
 
     return (0);
 }
@@ -415,6 +385,36 @@ bool david_pitch_driver_telem_right_temperature_is_in_range(uint8_t value)
     (void)value;
 
     return (true);
+}
+
+uint8_t david_pitch_driver_telem_left_direction_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double david_pitch_driver_telem_left_direction_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool david_pitch_driver_telem_left_direction_is_in_range(uint8_t value)
+{
+    return (value <= 3u);
+}
+
+uint8_t david_pitch_driver_telem_right_direction_encode(double value)
+{
+    return (uint8_t)(value);
+}
+
+double david_pitch_driver_telem_right_direction_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool david_pitch_driver_telem_right_direction_is_in_range(uint8_t value)
+{
+    return (value <= 3u);
 }
 
 int david_loco_ctrl_pack(

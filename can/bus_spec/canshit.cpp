@@ -33,8 +33,6 @@ int pack_msg(const motor_bridge::PitchPositionTelem& msg, uint8_t* buff) {
     david_pitch_position_telem_t t = {
         .left_position = david_pitch_position_telem_left_position_encode(msg.left_position),
         .right_position = david_pitch_position_telem_right_position_encode(msg.right_position),
-        .left_direction = david_pitch_position_telem_left_direction_encode(msg.left_direction),
-        .right_direction = david_pitch_position_telem_right_direction_encode(msg.right_direction),
         .home_done = david_pitch_position_telem_home_done_encode(msg.home_done),
     };
 
@@ -48,6 +46,8 @@ int pack_msg(const motor_bridge::PitchDriverTelem& msg, uint8_t* buff) {
         .right_current = david_pitch_driver_telem_right_current_encode(msg.right_current),
         .left_temperature = david_pitch_driver_telem_left_temperature_encode(msg.left_temperature),
         .right_temperature = david_pitch_driver_telem_right_temperature_encode(msg.right_temperature),
+        .left_direction = david_pitch_driver_telem_left_direction_encode(msg.left_direction),
+        .right_direction = david_pitch_driver_telem_right_direction_encode(msg.right_direction),
     };
 
     david_pitch_driver_telem_pack(buff, &t, sizeof(t));
@@ -134,8 +134,6 @@ std::string printable(const motor_bridge::PitchPositionTelem& msg) {
     std::stringstream s;    s << "PitchPositionTelem - ";
     s << "left_position: " << (int)msg.left_position << ", ";
     s << "right_position: " << (int)msg.right_position << ", ";
-    s << "left_direction: " << (int)msg.left_direction << ", ";
-    s << "right_direction: " << (int)msg.right_direction << ", ";
     s << "home_done: " << (int)msg.home_done << ", ";
     s << std::endl;
     return s.str();
@@ -147,6 +145,8 @@ std::string printable(const motor_bridge::PitchDriverTelem& msg) {
     s << "right_current: " << (int)msg.right_current << ", ";
     s << "left_temperature: " << (int)msg.left_temperature << ", ";
     s << "right_temperature: " << (int)msg.right_temperature << ", ";
+    s << "left_direction: " << (int)msg.left_direction << ", ";
+    s << "right_direction: " << (int)msg.right_direction << ", ";
     s << std::endl;
     return s.str();
 }
