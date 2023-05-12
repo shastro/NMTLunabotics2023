@@ -3,9 +3,8 @@ FROM ros:noetic-ros-core
 RUN apt-get update -y
 
 # Standard tools
-RUN apt-get install -y clang make gcc g++ inetutils-ping net-tools git tmux python3-pip
 RUN DEBIAN_FRONTEND='noninteractive' apt-get install -y libpcl-dev
-
+RUN apt-get install -y clang make gcc g++ inetutils-ping net-tools git tmux python3-pip
 RUN pip3 install rosdep
 
 # 2. Install ROS packages from apt.
