@@ -59,6 +59,7 @@ trap cleanup INT
 docker run "${params[@]}" $IMAGE_NAME rosrun usb_cam usb_cam_node _image_width:=320 image_height:=240 _framerate:=10
 
 docker exec $CONTAINER_NAME sh -c '
+    mkdir -p /etc/ros/rosdep/sources.list.d
     touch /etc/ros/rosdep/sources.list.d/30-ubiquity.list
     echo "yaml https://raw.githubusercontent.com/UbiquityRobotics/rosdep/master/raspberry-pi.yaml" > \
     /etc/ros/rosdep/sources.list.d/30-ubiquity.list
