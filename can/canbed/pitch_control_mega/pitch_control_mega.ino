@@ -11,7 +11,7 @@
 #define HALL_PIN_L 2
 #define HALL_PIN_R 3
 
-static const int64_t trig_delay = 2000; // Microsecond delay
+static const int64_t trig_delay  = 12000; // Microsecond delay
 // Period is 10k mus
 static const int64_t DEFAULT_HOMING_DELAY = 300;
 
@@ -114,8 +114,8 @@ void setup()
     long loop_count = 0;
     int telem_freq = 3;
     for(;;){
-        CANPacket packet = can_read_nonblocking(can);
-        if (!packet) {
+        CANPacket packet = can_read_non_blocking(can);
+        if (packet.id == 0xFFFFFFFF) {
             delay(5);
             continue;
         }

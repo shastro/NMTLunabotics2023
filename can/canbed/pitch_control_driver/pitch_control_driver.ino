@@ -198,12 +198,16 @@ void setup()
         control.pack_telemetry(driver_telemetry.buf);
         can_send(can, driver_telemetry);
 
-        if(tick % 500 < 250) {
+        int tickmod = tick % 750;
+        if(tickmod < 250) {
             control.left_m.setDirection(Dir::Retract);
             control.right_m.setDirection(Dir::Retract);
+        } else if (tickmod > 250 && tickmod < 500){
+         control.left_m.setDirection(Dir::Extend);
+         control.right_m.setDirection(Dir::Extend);
         } else {
-            control.left_m.setDirection(Dir::Extend);
-            control.right_m.setDirection(Dir::Extend);
+         control.left_m.setDirection(Dir::Stop);
+         control.right_m.setDirection(Dir::Stop);
         }
         delay(10);
         tick++;
