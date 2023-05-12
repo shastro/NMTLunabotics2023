@@ -5,4 +5,37 @@ IFS=$'\n\t'
 # Set up routing from the local machine to the camera pi, which is at
 # 10.0.0.100.
 
-sudo route add -net 10.0.0.0/24 gw jetson
+lookup_addr () {
+    # Looking up addresses is weirdly almost impossible in bash in a
+    # way that respects /etc/hosts and acts exactly as the standard
+    # system resolver would. Shell out to C to do the lookup instead.
+    C_FILE=$(mktemp --suffix=.c)
+    cat > $C_FILE <<EOF
+#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+
+int main(int argc, char **argv) {
+    struct addrinfo *result;
+    if (getaddrinfo(argv[1], NULL, NULL, &result)) {
+        fprintf(stderr, "lookup error on %s\n", argv[1]);
+        return 1;
+    }
+
+    struct sockaddr_in *addr = (struct sockaddr_in *)result->ai_addr;
+    const unsigned char *ip_data = (const unsigned char *)&addr->sin_addr.s_addr;
+
+    for (int i = 0; i < 4; i++)
+        printf("%s%d", i == 0 ? "" : ".", ip_data[i]);
+}
+EOF
+    BUILD_FILE=$(mktemp)
+    cc -o $BUILD_FILE $C_FILE
+    $BUILD_FILE "$@"
+
+    rm $BUILD_FILE $C_FILE
+}
+
+sudo ip route add "10.0.0.0/24" via "$(lookup_addr jetson)" dev "wlp0s20f3" proto static
