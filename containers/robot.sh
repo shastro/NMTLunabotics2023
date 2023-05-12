@@ -64,7 +64,11 @@ docker exec -d $CONTAINER_NAME /ros_entrypoint.sh /scripts/unfuck_realsense
 # Run the motor_bridge node.
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun motor_bridge motor_bridge
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh roslaunch realsense2_camera rs_camera.launch camera:=cam_1 serial_no_camera1:=213522250920
+<<<<<<< HEAD
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh roslaunch realsense2_camera rs_camera.launch camera:=cam_2 serial_no_camera2:=213522253528
+=======
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh roslaunch realsense2_camera rs_camera.launch camaer:=cam_2 serial_no_camera2:=213522253528
+>>>>>>> 5ad47cfc09b147655c7ce88d62ff27776bdd62bc
 
 # # For now run keyboard control here.
 # docker exec -it $CONTAINER_NAME /ros_entrypoint.sh rosrun david_keyboard david_keyboard
