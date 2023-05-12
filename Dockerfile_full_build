@@ -3,8 +3,10 @@ FROM ros:noetic-ros-core
 RUN apt-get update -y
 
 # Standard tools
-RUN apt-get install -y clang make gcc g++ inetutils-ping net-tools git tmux python-rosdep
+RUN apt-get install -y clang make gcc g++ inetutils-ping net-tools git tmux python3-pip
 RUN DEBIAN_FRONTEND='noninteractive' apt-get install -y libpcl-dev
+
+RUN pip3 install rosdep
 
 # 2. Install ROS packages from apt.
 RUN apt-get install -y \
@@ -21,11 +23,21 @@ RUN apt-get install -y \
     ros-noetic-rosmon \
     ros-noetic-rviz \
     ros-noetic-tf2-tools \
-    ros-noetic-usb-cam
+    ros-noetic-usb-cam \
+    ros-noetic-compressed-image-transport
 
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
 COPY can /can
+
+COPY ros/catkin_ws/src/raspicam_node /ros/catkin_ws/src/raspicam_node
+RUN mkdir -p /etc/ros/rosdep/sources.list.d
+RUN touch /etc/ros/rosdep/sources.list.d/30-ubiquity.list
+RUN echo "yaml https://raw.githubusercontent.com/UbiquityRobotics/rosdep/master/raspberry-pi.yaml" > /etc/ros/rosdep/sources.list.d/30-ubiquity.list
+RUN rosdep init
+RUN rosdep update
+RUN rosdep install --from-paths /ros/catkin_ws/src/raspicam_node --ignore-src --rosdistro=noetic -y
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
 
 # Incremental-ish builds to avoid full rebuilds. Keep these in order
 # from least to most often changed.
@@ -59,7 +71,6 @@ RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
 
 #COPY ros/catkin_ws/src/david_tui /ros/catkin_ws/src/david_tui
 #RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
-
 
 COPY ros/catkin_ws/src/motor_bridge /ros/catkin_ws/src/motor_bridge
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make

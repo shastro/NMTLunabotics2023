@@ -9,9 +9,6 @@ DIR=../
 IMAGE_NAME=lunabotics-2023-ros
 CONTAINER_NAME=lunabotics-2023-robot
 
-# Ensure CAN is up-to-date.
-make -C $DIR/can/bus_spec
-
 # Always run as root.
 [ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
 
@@ -34,8 +31,7 @@ params=(
     # Device rules for accessing Realsense cameras.
     --device-cgroup-rule "c 81:* rmw"
     --device-cgroup-rule "c 189:* rmw"
-    --privileged
-
+    
     # Environmental variables
     -e ROS_MASTER_URI=http://jetson:11311
     -e ROS_IP=$it
@@ -57,7 +53,5 @@ cleanup () {
 trap cleanup INT
 
 # Set up the ROS core.
-docker run "${params[@]}" $IMAGE_NAME rosrun usb_cam usb_cam_node _image_width:=320 _image_height:=240 _framerate:=10
-docker exec $CONTAINER_NAME /ros_entrypoint.sh roslaunch raspicam_node camerav1_1280x720.launch
-
+docker run "${params[@]}" $IMAGE_NAME rosrun usb_cam usb_cam_node
 
