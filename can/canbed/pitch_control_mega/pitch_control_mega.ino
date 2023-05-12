@@ -11,7 +11,8 @@
 #define HALL_PIN_L 2
 #define HALL_PIN_R 3
 
-static const int64_t trig_delay = 20000; // Microsecond delay
+static const int64_t trig_delay = 2000; // Microsecond delay
+// Period is 10k mus
 static const int64_t DEFAULT_HOMING_DELAY = 300;
 
 
@@ -34,20 +35,19 @@ struct ControlCommand {
 struct MotorState {
     Dir direction = Dir::Stop;
     volatile int count = 0;
-    double position = 0.0;
     volatile double last_trigger = 0.0;
 
-    void update_pos() {
-        position = count * MM_PER_COUNT;
-    }
+    // void update_pos() {
+    //     position = count * MM_PER_COUNT;
+    // }
 };
 
 
 void pack_telemetry(unsigned char buf[8], MotorState l_state, MotorState r_state, bool home_done) {
     david_pitch_position_telem_t data = {0};
 
-    data.left_position = david_pitch_position_telem_left_position_encode(l_state.position);
-    data.right_position = david_pitch_position_telem_right_position_encode(r_state.position);
+    data.left_position = david_pitch_position_telem_left_position_encode(l_state.count * MM_PER_COUNT);
+    data.right_position = david_pitch_position_telem_right_position_encode(r_state.count * MM_PER_COUNT);
     data.home_done = david_pitch_position_telem_home_done_encode(home_done);
 
     david_pitch_position_telem_pack(buf, &data, 8);
@@ -78,8 +78,8 @@ void home(MCP_CAN can) {
         }
         prev_count_l = left_motor.count;
         prev_count_r = right_motor.count;
-        left_motor.update_pos();
-        right_motor.update_pos();
+        // left_motor.update_pos();
+        // right_motor.update_pos();
 
         CANPacket position_telemetry = {DAVID_PITCH_POSITION_TELEM_FRAME_ID, 0};
         pack_telemetry(position_telemetry.buf, left_motor, right_motor, home_done);
@@ -90,8 +90,8 @@ void home(MCP_CAN can) {
             right_motor.direction = Dir::Stop;
             current_command.home = false;
             home_done = true;
-            left_motor.position = 152;
-            right_motor.position = 152;
+            // left_motor.position = 152;
+            // right_motor.position = 152;
             break;
         }
         delay(10);
@@ -112,10 +112,13 @@ void setup()
     bool home_state = false;
     bool e_stopped = false;
     long loop_count = 0;
-    int telem_freq = 10;
-    // controller.loop();
+    int telem_freq = 3;
     for(;;){
         CANPacket packet = can_read(can);
+        if (packet.id == 0xFFFFFFFF) {
+            delay(5);
+            continue;
+        }
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
                 e_stopped = frame.stop;
@@ -123,13 +126,12 @@ void setup()
         }
 
 
-        if (e_stopped)
+        if (e_stopped) {
             continue;
+        }
 
         switch (packet.id) {
-
             FRAME_CASE(DAVID_PITCH_DRIVER_TELEM, david_pitch_driver_telem) {
-                Serial.println("HERE!");
                 left_motor.direction = (Dir)david_pitch_driver_telem_left_direction_decode(frame.left_direction);
                 right_motor.direction = (Dir)david_pitch_driver_telem_right_direction_decode(frame.right_direction);
             }
@@ -149,8 +151,8 @@ void setup()
 
         // right_motor.direction = choose_direction(right_motor.position, current_command.set_point, current_command.right_offset);
 
-        left_motor.update_pos();
-        right_motor.update_pos();
+        // left_motor.update_pos();
+        // right_motor.update_pos();
 
         // Serial.print("Left Count: ");
         // Serial.println(left_motor.count);
@@ -165,7 +167,6 @@ void setup()
             can_send(can, position_telemetry);
         }
         loop_count++;
-        delay(5);
     }
 }
 

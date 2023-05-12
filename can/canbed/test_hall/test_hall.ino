@@ -3,12 +3,13 @@ volatile int count = 0;//if the interrupt will change this value, it must be vol
 volatile double last_time = 0.0;
 static const double MM_PER_COUNT = 0.17896;
 
-double trig_delay = 20000;
+double trig_delay = 5000;
 
 void setup() {
- pinMode(3, INPUT_PULLUP); //set as input
- attachInterrupt(digitalPinToInterrupt(3), interruptName, FALLING); //Interrupt initialization
- Serial.begin(9600);
+    pinMode(3, INPUT_PULLUP); //set as input
+    EIFR = bit(INTF0);
+    attachInterrupt(digitalPinToInterrupt(3), interruptName, FALLING); //Interrupt initialization
+    Serial.begin(9600);
 }//end setup
 
 void loop() {
