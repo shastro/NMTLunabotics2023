@@ -83,4 +83,27 @@ docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
     camera:=l515_2 serial_no:=f0461308 filters:=pointcloud
 
 docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
-    realsense2_camera rs_t265.launch
+       realsense2_camera rs_t265.launch
+
+# Temporary: transforms required by rviz.
+tf_frames=(
+    d455_1_color_frame
+    d455_1_color_optical_frame
+    d455_1_depth_frame
+    d455_1_link
+    d455_2_color_frame
+    d455_2_color_optical_frame
+    d455_2_depth_frame
+    d455_2_link
+    l515_1_depth_frame
+    l515_1_depth_optical_frame
+    l515_1_link
+    l515_2_depth_frame
+    l515_2_depth_optical_frame
+    l515_2_link
+)
+
+for frame in "${tf_frames[@]}"; do
+    docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh \
+           rosrun tf2_ros static_transform_publisher 0 0 0 0 0 0 world "$frame"
+done
