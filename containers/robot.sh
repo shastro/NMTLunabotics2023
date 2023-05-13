@@ -87,6 +87,7 @@ docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
 
 # Temporary: transforms required by rviz.
 tf_frames=(
+    map
     d455_1_color_frame
     d455_1_color_optical_frame
     d455_1_depth_frame
