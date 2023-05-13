@@ -11,8 +11,9 @@
 #define HALL_PIN_L 2
 #define HALL_PIN_R 3
 
-static const int64_t trig_delay  = 7500; // Microsecond delay
-// Period is 10k mus
+// static const int64_t trig_delay  = 22500; // Microsecond delay
+static const int64_t trig_delay  = 16000; // Microsecond delay
+// Period is 15k mus so we wait 1.5 times the period
 static const int64_t DEFAULT_HOMING_DELAY = 300;
 static const double MM_PER_COUNT = 0.17896;
 
@@ -59,14 +60,18 @@ void pack_telemetry(unsigned char buf[8], bool home_done) {
 
 bool home_done = false;
 
-const int required_num_duplicates = 1000;
-void home(MCP_CAN can) {
+const int required_num_duplicates = 10;
+void home(MCP_CAN &can) {
+    delay(300);
     int prev_count_l = 0xFFFFFFFF;
     int prev_count_r = 0xFFFFFFFF;
     int left_duplicates = 0;
     int right_duplicates = 0;
 
     home_done = false;
+
+    int loop_count = 0;
+    int telem_freq = 3;
     for (;;) {
         if (left_motor.count == prev_count_l) {
             left_duplicates++;
@@ -76,23 +81,22 @@ void home(MCP_CAN can) {
         }
         prev_count_l = left_motor.count;
         prev_count_r = right_motor.count;
-        // left_motor.update_pos();
-        // right_motor.update_pos();
 
-        CANPacket position_telemetry(DAVID_PITCH_POSITION_TELEM_FRAME_ID);
-        pack_telemetry(position_telemetry.buf, home_done);
-        can_send(can, position_telemetry);
+        if (loop_count % telem_freq == 0){
+            CANPacket position_telemetry(DAVID_PITCH_POSITION_TELEM_FRAME_ID);
+            pack_telemetry(position_telemetry.buf, home_done);
+            can_send(can, position_telemetry);
+        }
 
+        delay(10);
         if ((left_duplicates > required_num_duplicates) || (right_duplicates > required_num_duplicates)) {
-            // left_motor.direction = Dir::Stop;
-            // right_motor.direction = Dir::Stop;
             current_command.home = false;
             home_done = true;
-            // left_motor.position = 152;
-            // right_motor.position = 152;
+            left_motor.count = 152.0 / MM_PER_COUNT;
+            right_motor.count = 152.0 / MM_PER_COUNT;
             break;
         }
-        delay(10);
+        loop_count++;
     }
 }
 
@@ -148,6 +152,11 @@ void setup()
             pack_telemetry(position_telemetry.buf, home_done);
             can_send(can, position_telemetry);
         }
+
+        if (current_command.home) {
+            home(can);
+        }
+        
         loop_count++;
     }
 }
