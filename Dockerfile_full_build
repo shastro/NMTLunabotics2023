@@ -29,15 +29,6 @@ COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
 COPY can /can
 
-COPY ros/catkin_ws/src/raspicam_node /ros/catkin_ws/src/raspicam_node
-RUN mkdir -p /etc/ros/rosdep/sources.list.d
-RUN touch /etc/ros/rosdep/sources.list.d/30-ubiquity.list
-RUN echo "yaml https://raw.githubusercontent.com/UbiquityRobotics/rosdep/master/raspberry-pi.yaml" > /etc/ros/rosdep/sources.list.d/30-ubiquity.list
-RUN rosdep init
-RUN rosdep update
-RUN rosdep install --from-paths /ros/catkin_ws/src/raspicam_node --ignore-src --rosdistro=noetic -y
-RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
-
 # Incremental-ish builds to avoid full rebuilds. Keep these in order
 # from least to most often changed.
 # Uncomment the ones to be compiled
