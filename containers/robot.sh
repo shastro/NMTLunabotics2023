@@ -62,9 +62,25 @@ docker run "${params[@]}" $IMAGE_NAME roscore
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh /scripts/unfuck_realsense
 
 # Run the motor_bridge node.
-docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun motor_bridge motor_bridge
-docker exec -d $CONTAINER_NAME /ros_entrypoint.sh roslaunch realsense2_camera rs_camera.launch camera:=cam_1 serial_no_camera1:=213522250920
-docker exec -d $CONTAINER_NAME /ros_entrypoint.sh roslaunch realsense2_camera rs_camera.launch camera:=cam_2 serial_no_camera2:=213522253528
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun \
+    motor_bridge motor_bridge
 
-# # For now run keyboard control here.
-# docker exec -it $CONTAINER_NAME /ros_entrypoint.sh rosrun david_keyboard david_keyboard
+# Run cameras
+docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
+    realsense2_camera rs_camera.launch \
+    camera:=d455_1 serial_no:=213522250920 filters:=pointcloud
+
+docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
+    realsense2_camera rs_camera.launch \
+    camera:=d455_2 serial_no:=213522253528 filters:=pointcloud
+
+docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
+    realsense2_camera rs_camera.launch \
+    camera:=l515_1 serial_no:=f1381818 filters:=pointcloud
+
+docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
+    realsense2_camera rs_camera.launch \
+    camera:=l515_2 serial_no:=f0461308 filters:=pointcloud
+
+docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
+    realsense2_camera rs_t265.launch
