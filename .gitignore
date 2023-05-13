@@ -39,3 +39,11 @@ ros/catkin_ws/build/*
 ros/catkin_ws/.catkin_tools
 ros/catkin_ws/logs
 
+# Generated files
+can/bus_spec/david.c
+can/bus_spec/david.h
+can/bus_spec/canshit.cpp
+can/bus_spec/canshit.hpp
+can/bus_spec/limits.hpp
+can/bus_spec/unpackers.cpp
+ros/catkin_ws/src/motor_bridge/msg/
