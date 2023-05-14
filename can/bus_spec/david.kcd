@@ -30,21 +30,21 @@
                 <!--Slope should be the max value in the units you
                      want divided by the max value of the region (eg
                      153/2^9) -->
-                <Value type="unsigned" unit="mm" slope="0.296875"
-                       intercept="0.0" min="0.0" max="153"/>
+                <Value type="unsigned" unit="mm" slope="0.3515625"
+                       intercept="0.0" min="0.0" max="180"/>
             </Signal>
             <Signal name="LeftOffset" offset="9" length="9">
                 <!--Slope should be the max value in the units you
                      want divided by the max value of the region (eg
                      153/2^9) -->
-                <Value type="unsigned" unit="mm" slope="0.296875"
+                <Value type="unsigned" unit="mm" slope="0.3515625"
                        intercept="-76.5" min="-76.5" max="76.5"/>
             </Signal>
             <Signal name="RightOffset" offset="18" length="9">
                 <!--Slope should be the max value in the units you
                      want divided by the max value of the region (eg
                      153/2^9) -->
-                <Value type="unsigned" unit="mm" slope="0.296875"
+                <Value type="unsigned" unit="mm" slope="0.3515625"
                        intercept="-76.5" min="-76.5" max="76.5"/>
             </Signal>
             <Signal name="Home" offset="27" length="1">
@@ -59,12 +59,12 @@
                 <NodeRef id="2"/>
             </Producer>
             <Signal name="LeftPosition" offset="0" length="9">
-                <Value type="unsigned" unit="mm" slope="0.296875"
-                       intercept="0.0" min="0.0" max="153"/>
+                <Value type="unsigned" unit="mm" slope="0.3515625"
+                       intercept="0.0" min="0.0" max="180"/>
             </Signal>
             <Signal name="RightPosition" offset="9" length="9">
-                <Value type="unsigned" unit="mm" slope="0.296875"
-                       intercept="0.0" min="0.0" max="153"/>
+                <Value type="unsigned" unit="mm" slope="0.3515625"
+                       intercept="0.0" min="0.0" max="180"/>
             </Signal>
             <Signal name="HomeDone" offset="18" length="1">
                 <LabelSet>
@@ -177,7 +177,7 @@
                 </LabelSet>
             </Signal>
             <Signal name="SetPoint" offset="1" length="11">
-                <Value type="unsigned" unit="mm" slope="0.296875"
+                <Value type="unsigned" unit="mm" slope="0.3515625"
                        intercept="0.0" min="0.0" max="500"/>
             </Signal>
         </Message>
@@ -199,11 +199,11 @@
                 </LabelSet>
             </Signal>
             <Signal name="Position" offset="2" length="11">
-                <Value type="unsigned" unit="mm" slope="0.296875"
+                <Value type="unsigned" unit="mm" slope="0.3515625"
                        intercept="0.0" min="0.0" max="500"/>
             </Signal>
             <Signal name="SetPoint" offset="13" length="11">
-                <Value type="unsigned" unit="mm" slope="0.296875"
+                <Value type="unsigned" unit="mm" slope="0.3515625"
                        intercept="0.0" min="0.0" max="500"/>
             </Signal>
         </Message>
