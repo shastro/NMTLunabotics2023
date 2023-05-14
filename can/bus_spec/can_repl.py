@@ -1,7 +1,13 @@
 import can
 import cantools
+import sys
 
-db = cantools.database.load_file('david.kcd')
+if (len(sys.argv) != 2):
+    print('Error must specify the path to the kcd file')
+    exit(1)
+
+
+db = cantools.database.load_file(sys.argv[1])
 bus_name = input("Enter bus name: ")
 
 if (bus_name not in ["can0", 'vcan0']):

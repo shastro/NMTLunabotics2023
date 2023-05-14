@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+cd "$(dirname "$0")"
+ipython3 -i ../bus_spec/can_repl.py ../bus_spec/david.kcd

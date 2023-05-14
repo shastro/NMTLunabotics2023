@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+cd "$(dirname "$0")"
+python3 -m cantools monitor -c can0 ../bus_spec/david.kcd
