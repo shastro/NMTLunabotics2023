@@ -77,3 +77,4 @@ RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
 
 # Add /catkin_ws to the ROS environment.
 COPY ros/ros_entrypoint.sh /ros_entrypoint.sh
+COPY pointcloud.launch /opt/ros/noetic/share/realsense2_camera/launch/pointcloud.launch
