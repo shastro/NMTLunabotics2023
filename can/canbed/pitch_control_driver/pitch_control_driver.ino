@@ -112,8 +112,6 @@ struct PitchController {
     PitchController(double tolerance_) : left_m(0x59), right_m(0x58) {
         left_position = 0.0;
         right_position = 0.0;
-
-
         home_done = false;
     }
 
@@ -149,23 +147,60 @@ struct PitchController {
         data.right_direction = (uint8_t)right_m.direction;
         david_pitch_driver_telem_pack(buf, &data, 8);
     }
+    bool home() {
+        if (!home_done) {
+            left_m.setDirection(Dir::Extend);
+            right_m.setDirection(Dir::Extend);
+            return true;
+        } else {
+            stop();
+            command.home = false;
+            return false;
+        }
+    }
+
+    // Cycle function for testing
+    void cycle(int tick) {
+        int tickmod = tick % 1000;
+        if(tickmod < 500) {
+            left_m.setDirection(Dir::Retract);
+            right_m.setDirection(Dir::Retract);
+        } else {
+         left_m.setDirection(Dir::Extend);
+         right_m.setDirection(Dir::Extend);
+        }
+        delay(10);
+    }
 
     void stop() {
         left_m.setDirection(Dir::Stop);
         right_m.setDirection(Dir::Stop);
+        command.home = false;
     }
-    void loop(){
-        int ticks = 100;
-        while(ticks > 0){
+
+    void loop(MCP_CAN can){
+        int ticks = 0;
+        while(ticks < 10){
+            if (command.home) {
+                break;
+            }
             // Left
             left_m.setDirection(choose_direction(left_position, command.set_point, command.left_offset));
             right_m.setDirection(choose_direction(right_position, command.set_point, command.right_offset));
-            ticks--;
+
+            if (ticks % 3 == 0) {
+                CANPacket driver_telemetry(DAVID_PITCH_DRIVER_TELEM_FRAME_ID);
+                pack_telemetry(driver_telemetry.buf);
+                can_send(can, driver_telemetry);
+            }
+
+            ticks++;
             delay(1);
         }
     }
 
 };
+
 
 
 void setup()
@@ -179,18 +214,22 @@ void setup()
     double tolerance = 1.0; // 1 mm
     PitchController control(tolerance);
 
-    bool home_state = false;
+    bool have_gotten_a_home_done = false;
     bool e_stopped = false;
 
     int command_interval = 100;
     int telem_freq = 5;
-    int tick = 0;
+    long tick = 0;
     for(;;){
         CANPacket packet = can_read_blocking(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
                 e_stopped = frame.stop;
             }
+        }
+        if (packet.id == 0xFFFFFFFF) {
+            delay(5);
+            continue;
         }
 
         if (tick % telem_freq == 0) {
@@ -199,30 +238,20 @@ void setup()
             can_send(can, driver_telemetry);
         }
 
-        // int tickmod = tick % 1000;
-        // if(tickmod < 500) {
-        //     control.left_m.setDirection(Dir::Retract);
-        //     control.right_m.setDirection(Dir::Retract);
-        // } else {
-        //  control.left_m.setDirection(Dir::Extend);
-        //  control.right_m.setDirection(Dir::Extend);
-        // }
-        // delay(10);
 
-        if (e_stopped)
+        if (e_stopped) {
             control.stop();
             continue;
+        }
 
 
         switch (packet.id) {
             FRAME_CASE(DAVID_PITCH_CTRL, david_pitch_ctrl) {
-
                 ControlCommand command;
                 command.set_point = david_pitch_ctrl_set_point_decode(frame.set_point);
                 command.left_offset = david_pitch_ctrl_left_offset_decode(frame.left_offset);
                 command.right_offset = david_pitch_ctrl_right_offset_decode(frame.right_offset);
                 command.home = frame.home;
-                home_state = frame.home;
                 control.setCommand(command);
 
             }
@@ -233,13 +262,21 @@ void setup()
             }
         }
 
-        if (home_state) {
-            // if (!control.home_done) {
-            control.left_m.setDirection(Dir::Extend);
-            control.right_m.setDirection(Dir::Extend);
-            // }
+
+        if (control.home_done) {
+            have_gotten_a_home_done = true;
+        }
+        
+        if (control.command.home) {
+            Serial.println("Homing");
+            control.home();
+            control.command.set_point = 151;
         } else {
-            control.loop();
+            Serial.println("Not Homing");
+            if (have_gotten_a_home_done) {
+                Serial.println("Looping");
+                control.loop(can);
+            }
         }
 
         tick++;

@@ -62,7 +62,7 @@ bool home_done = false;
 
 const int required_num_duplicates = 10;
 void home(MCP_CAN &can) {
-    delay(300);
+    delay(1500);
     int prev_count_l = 0xFFFFFFFF;
     int prev_count_r = 0xFFFFFFFF;
     int left_duplicates = 0;
@@ -75,10 +75,17 @@ void home(MCP_CAN &can) {
     for (;;) {
         if (left_motor.count == prev_count_l) {
             left_duplicates++;
+        } else {
+            left_duplicates = 0;
         }
         if (right_motor.count == prev_count_l) {
             right_duplicates++;
+        } else {
+            right_duplicates = 0;
         }
+        // Serial.print("Left dups: ");
+        // Serial.println(left_duplicates);
+        // Serial.println(left_motor.count);
         prev_count_l = left_motor.count;
         prev_count_r = right_motor.count;
 
@@ -88,16 +95,17 @@ void home(MCP_CAN &can) {
             can_send(can, position_telemetry);
         }
 
-        delay(10);
-        if ((left_duplicates > required_num_duplicates) || (right_duplicates > required_num_duplicates)) {
+        delay(30);
+        if ((left_duplicates > required_num_duplicates) && (right_duplicates > required_num_duplicates)) {
             current_command.home = false;
             home_done = true;
-            left_motor.count = 152.0 / MM_PER_COUNT;
-            right_motor.count = 152.0 / MM_PER_COUNT;
+            left_motor.count = 151.5 / MM_PER_COUNT;
+            right_motor.count = 151.5 / MM_PER_COUNT;
             break;
         }
         loop_count++;
     }
+
 }
 
 void setup()
@@ -111,10 +119,11 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(HALL_PIN_L), left_hall_handler, FALLING);
     attachInterrupt(digitalPinToInterrupt(HALL_PIN_R), right_hall_handler, FALLING);
 
-    bool home_state = false;
+    bool has_recieved_home_command = false;
     bool e_stopped = false;
     long loop_count = 0;
     int telem_freq = 2;
+
     for(;;){
         CANPacket packet = can_read_blocking(can);
         if (packet.id == 0xFFFFFFFF) {
@@ -154,9 +163,19 @@ void setup()
         }
 
         if (current_command.home) {
+            has_recieved_home_command = true;
+            left_motor.direction = Dir::Extend;
+            right_motor.direction = Dir::Extend;
             home(can);
+        } 
+
+        // Clear home_done flag after awhile
+        if (has_recieved_home_command && home_done && (loop_count % 50 == 0)){
+            has_recieved_home_command = false;
+            home_done = false;
         }
-        
+
+      
         loop_count++;
     }
 }
