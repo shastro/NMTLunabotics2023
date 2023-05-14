@@ -26,6 +26,7 @@ RUN apt-get install -y \
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws /ros/catkin_ws
 COPY can /can
+COPY test.rviz /test.rviz
 
 # Add /catkin_ws to the ROS environment.
 COPY ros/ros_entrypoint.sh /ros_entrypoint.sh
