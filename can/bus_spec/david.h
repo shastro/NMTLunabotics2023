@@ -110,22 +110,22 @@ struct david_e_stop_t {
  */
 struct david_pitch_ctrl_t {
     /**
-     * Range: 0..515.3684210526315789473684211 (0.0..153 mm)
-     * Scale: 0.296875
+     * Range: 0..512 (0.0..180 mm)
+     * Scale: 0.3515625
      * Offset: 0.0
      */
     uint16_t set_point;
 
     /**
-     * Range: 0..515.3684210526315789473684211 (-76.5..76.5 mm)
-     * Scale: 0.296875
+     * Range: 0..435.2 (-76.5..76.5 mm)
+     * Scale: 0.3515625
      * Offset: -76.5
      */
     uint16_t left_offset;
 
     /**
-     * Range: 0..515.3684210526315789473684211 (-76.5..76.5 mm)
-     * Scale: 0.296875
+     * Range: 0..435.2 (-76.5..76.5 mm)
+     * Scale: 0.3515625
      * Offset: -76.5
      */
     uint16_t right_offset;
@@ -145,15 +145,15 @@ struct david_pitch_ctrl_t {
  */
 struct david_pitch_position_telem_t {
     /**
-     * Range: 0..515.3684210526315789473684211 (0.0..153 mm)
-     * Scale: 0.296875
+     * Range: 0..512 (0.0..180 mm)
+     * Scale: 0.3515625
      * Offset: 0.0
      */
     uint16_t left_position;
 
     /**
-     * Range: 0..515.3684210526315789473684211 (0.0..153 mm)
-     * Scale: 0.296875
+     * Range: 0..512 (0.0..180 mm)
+     * Scale: 0.3515625
      * Offset: 0.0
      */
     uint16_t right_position;
@@ -291,8 +291,8 @@ struct david_stepper_ctrl_t {
     uint8_t home;
 
     /**
-     * Range: 0..1684.210526315789473684210526 (0.0..500 mm)
-     * Scale: 0.296875
+     * Range: 0..1422.222222222222222222222222 (0.0..500 mm)
+     * Scale: 0.3515625
      * Offset: 0.0
      */
     uint16_t set_point;
@@ -324,15 +324,15 @@ struct david_stepper_telem_t {
     uint8_t at_max_stop;
 
     /**
-     * Range: 0..1684.210526315789473684210526 (0.0..500 mm)
-     * Scale: 0.296875
+     * Range: 0..1422.222222222222222222222222 (0.0..500 mm)
+     * Scale: 0.3515625
      * Offset: 0.0
      */
     uint16_t position;
 
     /**
-     * Range: 0..1684.210526315789473684210526 (0.0..500 mm)
-     * Scale: 0.296875
+     * Range: 0..1422.222222222222222222222222 (0.0..500 mm)
+     * Scale: 0.3515625
      * Offset: 0.0
      */
     uint16_t set_point;

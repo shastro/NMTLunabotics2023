@@ -142,47 +142,47 @@ int david_pitch_ctrl_unpack(
 
 uint16_t david_pitch_ctrl_set_point_encode(double value)
 {
-    return (uint16_t)(value / 0.296875);
+    return (uint16_t)(value / 0.3515625);
 }
 
 double david_pitch_ctrl_set_point_decode(uint16_t value)
 {
-    return ((double)value * 0.296875);
+    return ((double)value * 0.3515625);
 }
 
 bool david_pitch_ctrl_set_point_is_in_range(uint16_t value)
 {
-    return (value <= 515u);
+    return (value <= 512u);
 }
 
 uint16_t david_pitch_ctrl_left_offset_encode(double value)
 {
-    return (uint16_t)((value - -76.5) / 0.296875);
+    return (uint16_t)((value - -76.5) / 0.3515625);
 }
 
 double david_pitch_ctrl_left_offset_decode(uint16_t value)
 {
-    return (((double)value * 0.296875) + -76.5);
+    return (((double)value * 0.3515625) + -76.5);
 }
 
 bool david_pitch_ctrl_left_offset_is_in_range(uint16_t value)
 {
-    return (value <= 515u);
+    return (value <= 435u);
 }
 
 uint16_t david_pitch_ctrl_right_offset_encode(double value)
 {
-    return (uint16_t)((value - -76.5) / 0.296875);
+    return (uint16_t)((value - -76.5) / 0.3515625);
 }
 
 double david_pitch_ctrl_right_offset_decode(uint16_t value)
 {
-    return (((double)value * 0.296875) + -76.5);
+    return (((double)value * 0.3515625) + -76.5);
 }
 
 bool david_pitch_ctrl_right_offset_is_in_range(uint16_t value)
 {
-    return (value <= 515u);
+    return (value <= 435u);
 }
 
 uint8_t david_pitch_ctrl_home_encode(double value)
@@ -244,32 +244,32 @@ int david_pitch_position_telem_unpack(
 
 uint16_t david_pitch_position_telem_left_position_encode(double value)
 {
-    return (uint16_t)(value / 0.296875);
+    return (uint16_t)(value / 0.3515625);
 }
 
 double david_pitch_position_telem_left_position_decode(uint16_t value)
 {
-    return ((double)value * 0.296875);
+    return ((double)value * 0.3515625);
 }
 
 bool david_pitch_position_telem_left_position_is_in_range(uint16_t value)
 {
-    return (value <= 515u);
+    return (value <= 512u);
 }
 
 uint16_t david_pitch_position_telem_right_position_encode(double value)
 {
-    return (uint16_t)(value / 0.296875);
+    return (uint16_t)(value / 0.3515625);
 }
 
 double david_pitch_position_telem_right_position_decode(uint16_t value)
 {
-    return ((double)value * 0.296875);
+    return ((double)value * 0.3515625);
 }
 
 bool david_pitch_position_telem_right_position_is_in_range(uint16_t value)
 {
-    return (value <= 515u);
+    return (value <= 512u);
 }
 
 uint8_t david_pitch_position_telem_home_done_encode(double value)
@@ -621,17 +621,17 @@ bool david_stepper_ctrl_home_is_in_range(uint8_t value)
 
 uint16_t david_stepper_ctrl_set_point_encode(double value)
 {
-    return (uint16_t)(value / 0.296875);
+    return (uint16_t)(value / 0.3515625);
 }
 
 double david_stepper_ctrl_set_point_decode(uint16_t value)
 {
-    return ((double)value * 0.296875);
+    return ((double)value * 0.3515625);
 }
 
 bool david_stepper_ctrl_set_point_is_in_range(uint16_t value)
 {
-    return (value <= 1684u);
+    return (value <= 1422u);
 }
 
 int david_stepper_telem_pack(
@@ -706,32 +706,32 @@ bool david_stepper_telem_at_max_stop_is_in_range(uint8_t value)
 
 uint16_t david_stepper_telem_position_encode(double value)
 {
-    return (uint16_t)(value / 0.296875);
+    return (uint16_t)(value / 0.3515625);
 }
 
 double david_stepper_telem_position_decode(uint16_t value)
 {
-    return ((double)value * 0.296875);
+    return ((double)value * 0.3515625);
 }
 
 bool david_stepper_telem_position_is_in_range(uint16_t value)
 {
-    return (value <= 1684u);
+    return (value <= 1422u);
 }
 
 uint16_t david_stepper_telem_set_point_encode(double value)
 {
-    return (uint16_t)(value / 0.296875);
+    return (uint16_t)(value / 0.3515625);
 }
 
 double david_stepper_telem_set_point_decode(uint16_t value)
 {
-    return ((double)value * 0.296875);
+    return ((double)value * 0.3515625);
 }
 
 bool david_stepper_telem_set_point_is_in_range(uint16_t value)
 {
-    return (value <= 1684u);
+    return (value <= 1422u);
 }
 
 int david_mast_ctrl_pack(
