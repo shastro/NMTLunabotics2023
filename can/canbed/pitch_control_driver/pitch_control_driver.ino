@@ -87,15 +87,6 @@ struct ControlCommand {
 
 };
 
-inline Dir choose_direction(double position, double set_point, double offset) {
-    if (position < (set_point + offset)) {
-        return Dir::Extend;
-    } else if (position > (set_point + offset)){
-        return Dir::Retract;
-    } else {
-        return Dir::Stop;
-    }
-}
 
 struct PitchController {
 
@@ -105,6 +96,8 @@ struct PitchController {
     double left_position;
     double right_position;
 
+    double tolerance;
+
     bool home_done;
 
     ControlCommand command;
@@ -113,6 +106,21 @@ struct PitchController {
         left_position = 0.0;
         right_position = 0.0;
         home_done = false;
+        tolerance = tolerance_;
+    }
+
+    inline bool in_range(double x, double set_point, double offset) {
+        return ((x > (set_point + offset - tolerance)) && (x < (set_point + offset + tolerance)));
+    }
+
+    inline Dir choose_direction(double position, double set_point, double offset) {
+        if (in_range(position, set_point, offset)) {
+            return Dir::Stop;
+        } else if (position < (set_point + offset - tolerance)) {
+            return Dir::Extend;
+        } else {
+            return Dir::Retract;
+        }
     }
 
     void setCommand(ControlCommand command_) {
@@ -180,23 +188,11 @@ struct PitchController {
 
     void loop(MCP_CAN can){
         int ticks = 0;
-        while(ticks < 10){
-            if (command.home) {
-                break;
-            }
-            // Left
-            left_m.setDirection(choose_direction(left_position, command.set_point, command.left_offset));
-            right_m.setDirection(choose_direction(right_position, command.set_point, command.right_offset));
+        // Left
+        left_m.setDirection(choose_direction(left_position, command.set_point, command.left_offset));
+        right_m.setDirection(choose_direction(right_position, command.set_point, command.right_offset));
 
-            if (ticks % 3 == 0) {
-                CANPacket driver_telemetry(DAVID_PITCH_DRIVER_TELEM_FRAME_ID);
-                pack_telemetry(driver_telemetry.buf);
-                can_send(can, driver_telemetry);
-            }
-
-            ticks++;
-            delay(1);
-        }
+        // Serial.println((int)left_m.direction);
     }
 
 };
@@ -211,7 +207,7 @@ void setup()
     Wire.begin();
     delay(100);
 
-    double tolerance = 1.0; // 1 mm
+    double tolerance = 5.0; // 1 mm
     PitchController control(tolerance);
 
     bool have_gotten_a_home_done = false;
@@ -221,16 +217,16 @@ void setup()
     int telem_freq = 5;
     long tick = 0;
     for(;;){
-        CANPacket packet = can_read_blocking(can);
+        CANPacket packet = can_read_nonblocking(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
                 e_stopped = frame.stop;
             }
         }
-        if (packet.id == 0xFFFFFFFF) {
-            delay(5);
-            continue;
-        }
+        // if (packet.id == 0xFFFFFFFF) {
+        //     delay(5);
+        //     continue;
+        // }
 
         if (tick % telem_freq == 0) {
             CANPacket driver_telemetry(DAVID_PITCH_DRIVER_TELEM_FRAME_ID);
@@ -268,13 +264,13 @@ void setup()
         }
         
         if (control.command.home) {
-            Serial.println("Homing");
+            // Serial.println("Homing");
             control.home();
-            control.command.set_point = 151;
+            control.command.set_point = 151.5;
         } else {
-            Serial.println("Not Homing");
+            // Serial.print("Control CMD: ");
+            Serial.println(control.command.set_point);
             if (have_gotten_a_home_done) {
-                Serial.println("Looping");
                 control.loop(can);
             }
         }

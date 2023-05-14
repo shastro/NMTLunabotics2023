@@ -11,10 +11,9 @@
 #define HALL_PIN_L 2
 #define HALL_PIN_R 3
 
-// static const int64_t trig_delay  = 22500; // Microsecond delay
-static const int64_t trig_delay  = 16000; // Microsecond delay
+static const int64_t trig_delay  = 22500; // Microsecond delay
+// static const int64_t trig_delay  = 16000; // Microsecond delay
 // Period is 15k mus so we wait 1.5 times the period
-static const int64_t DEFAULT_HOMING_DELAY = 300;
 static const double MM_PER_COUNT = 0.17896;
 
 
@@ -58,9 +57,8 @@ void pack_telemetry(unsigned char buf[8], bool home_done) {
 
 
 
-bool home_done = false;
 
-const int required_num_duplicates = 10;
+bool home_done = false;
 void home(MCP_CAN &can) {
     delay(1500);
     int prev_count_l = 0xFFFFFFFF;
@@ -68,6 +66,7 @@ void home(MCP_CAN &can) {
     int left_duplicates = 0;
     int right_duplicates = 0;
 
+    const int required_num_duplicates = 5;
     home_done = false;
 
     int loop_count = 0;
@@ -95,7 +94,7 @@ void home(MCP_CAN &can) {
             can_send(can, position_telemetry);
         }
 
-        delay(30);
+        delay(10);
         if ((left_duplicates > required_num_duplicates) && (right_duplicates > required_num_duplicates)) {
             current_command.home = false;
             home_done = true;
@@ -119,11 +118,10 @@ void setup()
     attachInterrupt(digitalPinToInterrupt(HALL_PIN_L), left_hall_handler, FALLING);
     attachInterrupt(digitalPinToInterrupt(HALL_PIN_R), right_hall_handler, FALLING);
 
-    bool has_recieved_home_command = false;
     bool e_stopped = false;
     long loop_count = 0;
     int telem_freq = 2;
-
+    int home_check_count = 0;
     for(;;){
         CANPacket packet = can_read_blocking(can);
         if (packet.id == 0xFFFFFFFF) {
@@ -163,16 +161,16 @@ void setup()
         }
 
         if (current_command.home) {
-            has_recieved_home_command = true;
             left_motor.direction = Dir::Extend;
             right_motor.direction = Dir::Extend;
             home(can);
         } 
 
         // Clear home_done flag after awhile
-        if (has_recieved_home_command && home_done && (loop_count % 50 == 0)){
-            has_recieved_home_command = false;
+        if (home_done && (home_check_count % 50 == 0)){
             home_done = false;
+        } else {
+            home_check_count++;
         }
 
       
