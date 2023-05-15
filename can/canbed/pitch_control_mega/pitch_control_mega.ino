@@ -11,8 +11,9 @@
 #define HALL_PIN_L 2
 #define HALL_PIN_R 3
 
-static const int64_t trig_delay  = 22500; // Microsecond delay
-// static const int64_t trig_delay  = 16000; // Microsecond delay
+// static const int64_t trig_delay  = 22500; // Microsecond delay
+static const int64_t trig_delay_retract  = 22500; // Microsecond delay
+static const int64_t trig_delay_extend  = 8000; // Microsecond delay
 // Period is 15k mus so we wait 1.5 times the period
 static const double MM_PER_COUNT = 0.17896;
 
@@ -41,6 +42,7 @@ struct MotorState {
 ControlCommand current_command;
 MotorState left_motor;
 MotorState right_motor;
+bool in_home_state = false;
 
 void pack_telemetry(unsigned char buf[8], bool home_done) {
     david_pitch_position_telem_t data = {0};
@@ -50,6 +52,7 @@ void pack_telemetry(unsigned char buf[8], bool home_done) {
     data.left_direction = (int)left_motor.direction;
     data.right_direction = (int)right_motor.direction;
     data.home_done = david_pitch_position_telem_home_done_encode(home_done);
+    data.in_home_state= david_pitch_position_telem_in_home_state_encode(in_home_state);
 
     david_pitch_position_telem_pack(buf, &data, 8);
 }
@@ -60,7 +63,8 @@ void pack_telemetry(unsigned char buf[8], bool home_done) {
 
 bool home_done = false;
 void home(MCP_CAN &can) {
-    delay(1500);
+    in_home_state = true;
+    delay(50);
     int prev_count_l = 0xFFFFFFFF;
     int prev_count_r = 0xFFFFFFFF;
     int left_duplicates = 0;
@@ -94,7 +98,7 @@ void home(MCP_CAN &can) {
             can_send(can, position_telemetry);
         }
 
-        delay(10);
+        delay(30);
         if ((left_duplicates > required_num_duplicates) && (right_duplicates > required_num_duplicates)) {
             current_command.home = false;
             home_done = true;
@@ -134,7 +138,6 @@ void setup()
             }
         }
 
-
         if (e_stopped) {
             continue;
         }
@@ -149,7 +152,6 @@ void setup()
                 current_command.left_offset = david_pitch_ctrl_left_offset_decode(frame.left_offset);
                 current_command.right_offset = david_pitch_ctrl_right_offset_decode(frame.right_offset);
                 current_command.home = david_pitch_ctrl_home_decode(frame.home);
-
             }
             
         }
@@ -164,6 +166,12 @@ void setup()
             left_motor.direction = Dir::Extend;
             right_motor.direction = Dir::Extend;
             home(can);
+            for (int i=0; i<5; i++){
+                CANPacket position_telemetry(DAVID_PITCH_POSITION_TELEM_FRAME_ID);
+                pack_telemetry(position_telemetry.buf, home_done);
+                can_send(can, position_telemetry);
+            }
+            in_home_state = false;
         } 
 
         // Clear home_done flag after awhile
@@ -172,40 +180,45 @@ void setup()
         } else {
             home_check_count++;
         }
-
-      
+        
         loop_count++;
+      
     }
 }
 
 void left_hall_handler(){
     int64_t timestamp = micros();
-    if ((timestamp - left_motor.last_trigger) > trig_delay) {
-        left_motor.last_trigger = timestamp;
-        switch (left_motor.direction) {
-        case Dir::Retract:
+    switch (left_motor.direction) {
+    case Dir::Retract:
+        if ((timestamp - left_motor.last_trigger) > trig_delay_retract) {
+            left_motor.last_trigger = timestamp;
             left_motor.count -= 1;
-            break;
-        case Dir::Extend: 
-            left_motor.count += 1;
-            break;
-        }
-    } 
+            }
+        break;
+    case Dir::Extend: 
+        if ((timestamp - left_motor.last_trigger) > trig_delay_extend) {
+                left_motor.last_trigger = timestamp;
+                left_motor.count += 1;
+            }
+        break;
+    }
 }
-
 void right_hall_handler(){
     int64_t timestamp = micros();
-    if ((timestamp - right_motor.last_trigger) > trig_delay) {
-        right_motor.last_trigger = timestamp;
-        switch (right_motor.direction) {
-        case Dir::Retract:
+    switch (right_motor.direction) {
+    case Dir::Retract:
+        if ((timestamp - right_motor.last_trigger) > trig_delay_retract) {
+            right_motor.last_trigger = timestamp;
             right_motor.count -= 1;
-            break;
-        case Dir::Extend: 
-            right_motor.count += 1;
-            break;
-        }
-    } 
+            }
+        break;
+    case Dir::Extend: 
+        if ((timestamp - right_motor.last_trigger) > trig_delay_extend) {
+                right_motor.last_trigger = timestamp;
+                right_motor.count += 1;
+            }
+        break;
+    }
 }
 
 

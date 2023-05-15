@@ -23,7 +23,7 @@ enum class Dir {
     Retract = 2,
 };
 
-#define ACC 0x0A
+#define ACC 0x00
 #define SPEED 100
 
 struct MD04Driver {
@@ -217,7 +217,7 @@ void setup()
     int telem_freq = 5;
     long tick = 0;
     for(;;){
-        CANPacket packet = can_read_nonblocking(can);
+        CANPacket packet = can_read_blocking(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
                 e_stopped = frame.stop;
