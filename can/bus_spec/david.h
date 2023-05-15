@@ -68,6 +68,9 @@ extern "C" {
 #define DAVID_PITCH_POSITION_TELEM_RIGHT_DIRECTION_EXTEND_CHOICE (1u)
 #define DAVID_PITCH_POSITION_TELEM_RIGHT_DIRECTION_RETRACT_CHOICE (2u)
 
+#define DAVID_PITCH_POSITION_TELEM_IN_HOME_STATE_FALSE_CHOICE (0u)
+#define DAVID_PITCH_POSITION_TELEM_IN_HOME_STATE_TRUE_CHOICE (1u)
+
 #define DAVID_PITCH_DRIVER_TELEM_LEFT_DIRECTION_STOP_CHOICE (0u)
 #define DAVID_PITCH_DRIVER_TELEM_LEFT_DIRECTION_EXTEND_CHOICE (1u)
 #define DAVID_PITCH_DRIVER_TELEM_LEFT_DIRECTION_RETRACT_CHOICE (2u)
@@ -178,6 +181,13 @@ struct david_pitch_position_telem_t {
      * Offset: 0
      */
     uint8_t right_direction;
+
+    /**
+     * Range: -
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t in_home_state;
 };
 
 /**
@@ -723,6 +733,33 @@ double david_pitch_position_telem_right_direction_decode(uint8_t value);
  * @return true if in range, false otherwise.
  */
 bool david_pitch_position_telem_right_direction_is_in_range(uint8_t value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t david_pitch_position_telem_in_home_state_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double david_pitch_position_telem_in_home_state_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool david_pitch_position_telem_in_home_state_is_in_range(uint8_t value);
 
 /**
  * Pack message PitchDriverTelem.

@@ -36,6 +36,7 @@ int pack_msg(const motor_bridge::PitchPositionTelem& msg, uint8_t* buff) {
         .home_done = david_pitch_position_telem_home_done_encode(msg.home_done),
         .left_direction = david_pitch_position_telem_left_direction_encode(msg.left_direction),
         .right_direction = david_pitch_position_telem_right_direction_encode(msg.right_direction),
+        .in_home_state = david_pitch_position_telem_in_home_state_encode(msg.in_home_state),
     };
 
     david_pitch_position_telem_pack(buff, &t, sizeof(t));
@@ -139,6 +140,7 @@ std::string printable(const motor_bridge::PitchPositionTelem& msg) {
     s << "home_done: " << (int)msg.home_done << ", ";
     s << "left_direction: " << (int)msg.left_direction << ", ";
     s << "right_direction: " << (int)msg.right_direction << ", ";
+    s << "in_home_state: " << (int)msg.in_home_state << ", ";
     s << std::endl;
     return s.str();
 }
