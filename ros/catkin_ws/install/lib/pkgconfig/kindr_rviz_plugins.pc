@@ -1,8 +1,0 @@
-prefix=/home/ndev/Documents/NMTLunabotics2023/ros/catkin_ws/install
-
-Name: kindr_rviz_plugins
-Description: Description of kindr_rviz_plugins
-Version: 0.3.11
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib -lkindr_rviz_plugins
-Requires: rviz kindr_msgs

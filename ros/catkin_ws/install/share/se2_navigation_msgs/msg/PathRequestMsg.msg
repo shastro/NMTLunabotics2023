@@ -1,2 +1,0 @@
-geometry_msgs/Pose startingPose
-geometry_msgs/Pose goalPose

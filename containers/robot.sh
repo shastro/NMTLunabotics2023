@@ -67,10 +67,11 @@ docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun \
 
 # Run cameras
 docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
-    realsense2_camera rs_t265.launch
+    realsense2_camera rs_t265.launch camera:=t265
 
 docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
-    realsense2_camera rs_camera.launch filters:=pointcloud \
+    realsense2_camera rs_camera.launch \
+    camera:=d455_1 serial_no:=213522250920 filters:=pointcloud \
     depth_fps:=30 depth_width:=640 depth_height:=480 \
     enable_color:=false pointcloud_texture_stream:=RS2_STREAM_ANY
 

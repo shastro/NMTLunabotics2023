@@ -1,8 +1,0 @@
-prefix=/home/ndev/Documents/NMTLunabotics2023/ros/catkin_ws/install
-
-Name: kindr_msgs
-Description: Description of kindr_msgs
-Version: 0.3.11
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib 
-Requires: geometry_msgs message_runtime std_msgs

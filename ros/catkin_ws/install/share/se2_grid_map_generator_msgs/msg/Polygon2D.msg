@@ -1,1 +1,0 @@
-se2_grid_map_generator_msgs/Position2D[] vertices

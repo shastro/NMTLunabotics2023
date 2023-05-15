@@ -1,8 +1,0 @@
-prefix=/home/ndev/Documents/NMTLunabotics2023/ros/catkin_ws/install
-
-Name: motor_bridge
-Description: Description of motor_bridge
-Version: 0.1.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib 
-Requires: std_msgs std_srvs message_runtime
