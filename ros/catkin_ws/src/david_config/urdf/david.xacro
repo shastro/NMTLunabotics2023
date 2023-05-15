@@ -1,3 +1,4 @@
+<?xml version="1.0" ?>
 <robot name="david" xmlns:xacro="http://www.ros.org/wiki/xacro" >
   <!-- Base Properties -->
   <xacro:property name="base_link_x" value="0.28" />
