@@ -23,7 +23,7 @@ enum class Dir {
     Retract = 2,
 };
 
-#define ACC 0x00
+#define ACC 0x03
 #define SPEED 100
 
 struct MD04Driver {
@@ -138,10 +138,10 @@ struct PitchController {
     void pack_telemetry(unsigned char buf[8]){
         
         david_pitch_driver_telem_t data = {0};
-        byte left_current = left_m.getCurrent();
-        byte right_current = right_m.getCurrent();
-        byte left_temperature = left_m.getTemperature();
-        byte right_temperature = right_m.getTemperature();
+        byte left_current = 2.0; // left_m.getCurrent(); // 
+        byte right_current = 2.0; // right_m.getCurrent(); // 
+        byte left_temperature = 2.0; // left_m.getTemperature(); // 
+        byte right_temperature = 2.0; // right_m.getTemperature(); // 
         // Temperature
         data.left_temperature = david_pitch_driver_telem_left_temperature_encode((double)left_temperature);
         data.right_temperature = david_pitch_driver_telem_right_temperature_encode((double)right_temperature);
@@ -187,12 +187,10 @@ struct PitchController {
     }
 
     void loop(MCP_CAN can){
-        int ticks = 0;
         // Left
         left_m.setDirection(choose_direction(left_position, command.set_point, command.left_offset));
         right_m.setDirection(choose_direction(right_position, command.set_point, command.right_offset));
 
-        // Serial.println((int)left_m.direction);
     }
 
 };
@@ -264,12 +262,9 @@ void setup()
         }
         
         if (control.command.home) {
-            // Serial.println("Homing");
             control.home();
             control.command.set_point = 151.5;
         } else {
-            // Serial.print("Control CMD: ");
-            Serial.println(control.command.set_point);
             if (have_gotten_a_home_done) {
                 control.loop(can);
             }

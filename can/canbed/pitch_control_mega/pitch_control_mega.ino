@@ -12,8 +12,9 @@
 #define HALL_PIN_R 3
 
 // static const int64_t trig_delay  = 22500; // Microsecond delay
-static const int64_t trig_delay_retract  = 22500; // Microsecond delay
-static const int64_t trig_delay_extend  = 8000; // Microsecond delay
+// static const int64_t trig_delay_retract  = 22500; // Microsecond delay
+static const int64_t trig_delay_retract  = 20000; // Microsecond delay
+static const int64_t trig_delay_extend  = 7000; // Microsecond delay
 // Period is 15k mus so we wait 1.5 times the period
 static const double MM_PER_COUNT = 0.17896;
 
@@ -70,10 +71,10 @@ void home(MCP_CAN &can) {
     int left_duplicates = 0;
     int right_duplicates = 0;
 
-    const int required_num_duplicates = 5;
+    const int required_num_duplicates = 80;
     home_done = false;
 
-    int loop_count = 0;
+    long loop_count = 0;
     int telem_freq = 3;
     for (;;) {
         if (left_motor.count == prev_count_l) {
@@ -81,14 +82,11 @@ void home(MCP_CAN &can) {
         } else {
             left_duplicates = 0;
         }
-        if (right_motor.count == prev_count_l) {
+        if (right_motor.count == prev_count_r) {
             right_duplicates++;
         } else {
             right_duplicates = 0;
         }
-        // Serial.print("Left dups: ");
-        // Serial.println(left_duplicates);
-        // Serial.println(left_motor.count);
         prev_count_l = left_motor.count;
         prev_count_r = right_motor.count;
 
@@ -98,7 +96,7 @@ void home(MCP_CAN &can) {
             can_send(can, position_telemetry);
         }
 
-        delay(30);
+        delay(50);
         if ((left_duplicates > required_num_duplicates) && (right_duplicates > required_num_duplicates)) {
             current_command.home = false;
             home_done = true;
@@ -166,12 +164,15 @@ void setup()
             left_motor.direction = Dir::Extend;
             right_motor.direction = Dir::Extend;
             home(can);
+            in_home_state = false;
+            left_motor.direction = Dir::Stop;
+            right_motor.direction = Dir::Stop;
             for (int i=0; i<5; i++){
                 CANPacket position_telemetry(DAVID_PITCH_POSITION_TELEM_FRAME_ID);
-                pack_telemetry(position_telemetry.buf, home_done);
+                pack_telemetry(position_telemetry.buf, true);
                 can_send(can, position_telemetry);
+                delay(10);
             }
-            in_home_state = false;
         } 
 
         // Clear home_done flag after awhile
