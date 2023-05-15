@@ -88,6 +88,12 @@
                     <Label name='Retract' value="2"/> 
                 </LabelSet> 
             </Signal>
+            <Signal name="InHomeState" offset="23" length="1">
+                <LabelSet>
+                    <Label name='False' value="0"/>
+                    <Label name='True' value="1"/>
+                </LabelSet>
+            </Signal>
         </Message>
 
         <Message id="0x111" name="PitchDriverTelem">
