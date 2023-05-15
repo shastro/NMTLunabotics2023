@@ -1,6 +1,7 @@
 import can
 import cantools
 import sys
+from typing import Optional
 
 if (len(sys.argv) != 2):
     print('Error must specify the path to the kcd file')
@@ -20,8 +21,24 @@ print("To use call the send(name, data) function with a message name and diction
 print("Example:")
 print(r"send('PitchCtrl', {'SetPoint': 0.0, 'LeftOffset':0.0, 'RightOffset':0.0})'")
 
+
 def send(name: str, data: dict):
+    """Send a message."""
     msg = db.get_message_by_name(name)
-    can_bus.send(can.Message(arbitration_id=msg.frame_id, data=msg.encode(data)))
+    can_bus.send(can.Message(
+        arbitration_id=msg.frame_id,
+        data=msg.encode(data)
+    ))
 
 
+def msg(name: Optional[str] = None):
+    """Print info about a message type."""
+    if name is None:
+        print('Messages are:')
+        for m in db.messages:
+            print(f'  * {m.name}')
+    else:
+        msg_type = db.get_message_by_name(name)
+        print(f'{msg_type.name}:')
+        for sig in msg_type.signals:
+            print(f'  * {sig.name}')
