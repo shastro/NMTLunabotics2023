@@ -19,6 +19,6 @@ input_sources:
         topic: /l5152/depth/color/points
         queue_size: 5
         publish_on_update: true
- map_frame_id: "map"
- robot_base_frame_id: "david"
- robot_pose_with_covariance: ""
+map_frame_id: "map"
+robot_base_frame_id: "david"
+robot_pose_with_covariance: ""
