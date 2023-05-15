@@ -278,4 +278,93 @@ struct MidwestMotorController {
     }
 };
 
+// Experimental scheduler type for Arduino. The idea is that you
+// should be able to chain together functions like so:
+// scheduler()
+//     .schedule(100, [&]() {
+//         // Every 100ms print "hello"
+//         Serial.println("hello");
+//     })
+//     .schedule(150, [&]() {
+//         // Every 150ms print "world"
+//         Serial.println("world");
+//     })
+//     .run();
+// The lambda functions will be run periodically on simultaneous
+// timers, without dynamic memory allocation occurring.
+template <typename Fn, typename Rest> class Schedule {
+    // Delay between now and the next occurrence of the event.
+    double delay;
+
+    // Delay between occurrences of the event.
+    double period;
+
+    // Function to run when the `delay` reaches zero.
+    Fn function;
+
+    // The rest of the events.
+    Rest rest;
+
+  public:
+    Schedule(Fn function, Rest rest, double period)
+        : delay(period), period(period), function(function), rest(rest) {}
+
+    // Add a new function to the schedule.
+    template <typename NextFn>
+    Schedule<NextFn, Schedule<Fn, Rest>> schedule(double period,
+                                                    NextFn function) {
+        return Schedule<NextFn, Schedule<Fn, Rest>>(function, *this, period);
+    }
+
+    // Calculate the delay between now and the next event that will
+    // occur.
+    double min_delay() { return min(delay, rest.min_delay()); }
+
+    // Run any events whose delays have reached zero.
+    void run_event() {
+        if (delay < 0.000001) {
+            function();
+            delay = period;
+        }
+
+        rest.run_event();
+    }
+
+    // Subtracts `amount` from the delays on the schedule.
+    void tick(double amount) {
+        delay -= amount;
+        rest.tick(amount);
+    }
+
+    // Runs the schedule forever.
+    void run() {
+        while (true) {
+            double m_delay = min_delay();
+            ::delay(m_delay);
+            tick(m_delay);
+            run_event();
+        }
+    }
+};
+
+// A schedule that does nothing ever.
+class NullSchedule {
+  public:
+    NullSchedule();
+
+    template <typename NextFn>
+    Schedule<NextFn, NullSchedule> schedule(double period, NextFn function) {
+        return Schedule<NextFn, NullSchedule>(function, *this, period);
+    }
+
+    double min_delay() { return 1000000; }
+
+    void run_event() {}
+
+    void tick(double amount) {}
+};
+
+// Creates a new empty schedule.
+inline NullSchedule scheduler(void) { return NullSchedule(); }
+
 #endif // ARDUINO_LIB_H
