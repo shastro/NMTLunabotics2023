@@ -1,11 +1,28 @@
 <?xml version="1.0" ?>
 <robot name="david" xmlns:xacro="http://www.ros.org/wiki/xacro" >
-  <link name="base_link" />
-  <link name="map" />
-  <joint name="d455_2_link" type="fixed">
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-    <parent link="map" />
-    <child link="base_link" />
-    <axis xyz="0 0 0" />
-  </joint>
+    <link name="base_link" />
+    <link name="map" />
+    <joint name="stationary_robot" type="fixed">
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <parent link="map" />
+        <child link="base_link" />
+        <axis xyz="0 0 0" />
+    </joint>
+
+    <link name="d455_2_link" />
+    <link name="t265_link" />
+
+    <joint name="d455_2_joint" type="fixed">
+        <origin rpy="0 0 0" xyz="0 0.199 0" />
+        <parent link="base_link" />
+        <child link="d455_2_link" />
+        <axis xyz="0 0 0" />
+    </joint>
+
+    <joint name="t265_joint" type="fixed">
+        <origin rpy="0 0 0" xyz="0.0131 0.068 0" />
+        <parent link="base_link" />
+        <child link="t265_link" />
+        <axis xyz="0 0 0" />
+    </joint>
 </robot>
