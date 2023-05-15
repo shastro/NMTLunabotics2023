@@ -1,12 +1,14 @@
 // Shared library code for Arduinos.
-// Valid Analog Write Pins: 3 5 6 9 10 11
 #ifndef ARDUINO_LIB_H
 #define ARDUINO_LIB_H
 
+#include "pins_arduino.h"
 #include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
 #include <mcp_can.h>
+
+#include <wiring_private.h>
 
 #define sign(i) (((i) > 0) - ((i) < 0))
 
@@ -312,7 +314,7 @@ template <typename Fn, typename Rest> class Schedule {
     // Add a new function to the schedule.
     template <typename NextFn>
     Schedule<NextFn, Schedule<Fn, Rest>> schedule(double period,
-                                                    NextFn function) {
+                                                  NextFn function) {
         return Schedule<NextFn, Schedule<Fn, Rest>>(function, *this, period);
     }
 
@@ -366,5 +368,28 @@ class NullSchedule {
 
 // Creates a new empty schedule.
 inline NullSchedule scheduler(void) { return NullSchedule(); }
+
+// Captured data to be sent to interrupt handlers.
+static void *interrupt_data[EXTERNAL_NUM_INTERRUPTS];
+
+// Interrupt callback for a particular interrupt number and handler
+// function.
+template <uint8_t num, typename Func> inline void callback_interrupt() {
+    Func &f = *(Func *)interrupt_data[digitalPinToInterrupt(num)];
+    f();
+}
+
+// Attach an interrupt function to a particular pin. Use e.g.
+// attach_interrupt<8>([&]() { count++; }, FALLING) to count how many
+// times digital pin 8 falls.
+template <uint8_t num, typename Func>
+inline void attach_interrupt_lambda(const Func &func, int mode) {
+    if (digitalPinToInterrupt(num) == NOT_AN_INTERRUPT)
+        panic("attempt to set up interrupts on a non-interrupt pin");
+
+    interrupt_data[digitalPinToInterrupt(num)] = (void *)&func;
+    attachInterrupt(digitalPinToInterrupt(num), callback_interrupt<num, Func>,
+                    mode);
+}
 
 #endif // ARDUINO_LIB_H
