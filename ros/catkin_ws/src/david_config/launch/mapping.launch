@@ -5,7 +5,7 @@
     </node>
 
     <!-- Pose publisher -->
-    <node pkg="david_config" name="pose_pub" type="pose_pub"/>
+    <node pkg="david_config" name="pose_pub" type="pose_pub" ></node>
 
     <!-- Elevation mapping node -->
     <node pkg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
