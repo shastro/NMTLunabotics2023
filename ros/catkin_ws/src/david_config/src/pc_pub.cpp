@@ -1,11 +1,12 @@
 #include <ros/param.h>
 #include <ros/ros.h>
 #include <sensor_msgs/point_cloud_conversion.h>
+#include <iostream>
 
 class PosePub {
     ros::Publisher pub;
 
-  public:
+    public:
     PosePub(ros::NodeHandle &nh, std::string topic)
         : pub(nh.advertise<sensor_msgs::PointCloud>(topic, 10)) {}
 
@@ -26,14 +27,16 @@ int main(int argc, char **argv) {
     // Hey beanie check out this fucked shit
     std::vector<std::pair<ros::Subscriber, std::unique_ptr<PosePub>>> subs;
     for (auto &name : names) {
-        std::string t_sub;
-        ros::param::get(name, t_sub);
-        std::string t_pub = t_sub.substr(0, t_sub.find('/')) + "/pointcloud";
+        if (name.find("pc_pub") != std::string::npos) {
+            std::string t_sub;
+            ros::param::get(name, t_sub);
+            std::string t_pub = t_sub.substr(0, t_sub.find('/')) + "/pointcloud";
 
-        std::unique_ptr<PosePub> pub(new PosePub(nh, t_pub));
-        subs.push_back(
-            std::make_pair(nh.subscribe(t_sub, 10, &PosePub::callback, &*pub),
-                           std::move(pub)));
+            std::unique_ptr<PosePub> pub(new PosePub(nh, t_pub));
+            subs.push_back(
+                    std::make_pair(nh.subscribe(t_sub, 10, &PosePub::callback, &*pub),
+                        std::move(pub)));
+        }
     }
 
     ros::spin();
