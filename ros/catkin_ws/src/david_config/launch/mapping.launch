@@ -1,3 +1,4 @@
+<?xml version="1.0" ?>
 <launch>
     <node pkg="rosservice" type="rosservice" name="set_move_base_log_level" args="call --wait /move_base/set_logger_level 'ros.move_base' 'debug'" />
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">
@@ -18,10 +19,10 @@
 
     <param name="david_description" textfile="$(find david_config)/urdf/test.urdf" />
 
-        <!-- Pose publisher -->
+    <!-- Pose publisher -->
     <node pkg="david_config" name="pose_pub" type="pose_pub" />
 
-        <!-- Transform publisher -->
+    <!-- Transform publisher -->
     <node pkg="robot_state_publisher"  name="state_publisher" type="robot_state_publisher">
         <remap from="robot_description" to="david_description" />
     </node>

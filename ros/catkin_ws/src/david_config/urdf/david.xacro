@@ -1,194 +1,194 @@
 <?xml version="1.0" ?>
 <robot name="david" xmlns:xacro="http://www.ros.org/wiki/xacro" >
-  <!-- Base Properties -->
-  <xacro:property name="base_link_x" value="0.28" />
-  <xacro:property name="base_link_y" value="0.18" />
-  <xacro:property name="base_link_z" value="0" />
+    <!-- Base Properties -->
+    <xacro:property name="base_link_x" value="0.28" />
+    <xacro:property name="base_link_y" value="0.18" />
+    <xacro:property name="base_link_z" value="0" />
 
-  <xacro:macro name="origin_rel" params="xraw yraw zraw rx ry rz">
-  <origin  xyz="${ -base_link_x + xraw } ${ -base_link_y + yraw } ${ -base_link_z + zraw }" rpy="${ rx } ${ ry } ${ rz }" />
-  </xacro:macro>
-  <!-- Basic setup -->
-  <link name="base_link" />
-  <link name="laser" />
-  <!-- For testing only -->
-  <link name="map" />
-  <joint name="maptestingjoint" type="fixed">
-    <origin xyz="0 0 0" rpy = "0 0 0" />
-    <child link="base_link" />
-    <parent link="map" />
-    <axis xyz="0 0 0"/>
-  </joint>
-  <!-- Dump motors -->
-  <link name="DUL_motor" />
-  <link name="DUL_block" />
-  <link name="DUR_motor" />
-  <link name="DUR_block" />
-  <!-- <!-\- Depth motors -\-> -->
-  <link name="DEL_motor" />
-  <link name="DEL_block" />
-  <link name="DER_motor" />
-  <link name="DER_block" />
-  <!-- Pitch components -->
-  <xacro:property name="pitch_pivot_attachment_length" value="0.37" />
-  <xacro:property name="min_pitch_length" value="0.36" />
-  <xacro:property name="pitch_pivot_attachment_length" value="0.37" />
-  <link name="left_pitch_hinge" />
-  <!-- <link name="left_rear_pitch_pivot" /> -->
- <!-- <link nameright="left_pitch_attachment" /> -->
-  <link name="right_pitch_hinge" />
-  <link name="right_rear_pitch_pivot" />
-  <link name="right_pitch_attachment" />
-  <!-- Auger components -->
-  <xacro:property name="auger_length" value="0.71" />
-  <link name="auger_tip" />
-  <link name="auger_hole"/>
+    <xacro:macro name="origin_rel" params="xraw yraw zraw rx ry rz">
+        <origin  xyz="${ -base_link_x + xraw } ${ -base_link_y + yraw } ${ -base_link_z + zraw }" rpy="${ rx } ${ ry } ${ rz }" />
+    </xacro:macro>
+    <!-- Basic setup -->
+    <link name="base_link" />
+    <link name="laser" />
+    <!-- For testing only -->
+    <link name="map" />
+    <joint name="maptestingjoint" type="fixed">
+        <origin xyz="0 0 0" rpy = "0 0 0" />
+        <child link="base_link" />
+        <parent link="map" />
+        <axis xyz="0 0 0"/>
+    </joint>
+    <!-- Dump motors -->
+    <link name="DUL_motor" />
+    <link name="DUL_block" />
+    <link name="DUR_motor" />
+    <link name="DUR_block" />
+    <!-- <!-\- Depth motors -\-> -->
+    <link name="DEL_motor" />
+    <link name="DEL_block" />
+    <link name="DER_motor" />
+    <link name="DER_block" />
+    <!-- Pitch components -->
+    <xacro:property name="pitch_pivot_attachment_length" value="0.37" />
+    <xacro:property name="min_pitch_length" value="0.36" />
+    <xacro:property name="pitch_pivot_attachment_length" value="0.37" />
+    <link name="left_pitch_hinge" />
+    <!-- <link name="left_rear_pitch_pivot" /> -->
+    <!-- <link nameright="left_pitch_attachment" /> -->
+    <link name="right_pitch_hinge" />
+    <link name="right_rear_pitch_pivot" />
+    <link name="right_pitch_attachment" />
+    <!-- Auger components -->
+    <xacro:property name="auger_length" value="0.71" />
+    <link name="auger_tip" />
+    <link name="auger_hole"/>
 
-  <!-- Locomotion component -->
-  <link name="left_loco_axle" />
-  <link name="right_loco_axle" />
-
-
-  <!-- Joints -->
-  <joint name="base2laser" type="fixed">
-    <xacro:origin_rel xraw="-0.045" yraw="0.175" zraw="0.025" rx="0" ry="0" rz="0" />
-    <parent link="base_link" />
-    <child link="laser" />
-    <axis xyz="0 0 0"/>
-  </joint>
-
-  <!-- 2.5 up 4.5 -x 17.5 y -->
-  <!-- Locomotion joints -->
-  <joint name="loco_right" type="continuous">
-    <limit effort="0.95" velocity="1000" />
-    <parent link="base_link" />
-    <child link="right_loco_axle"/>
-    <xacro:origin_rel xraw="-0.065" yraw="-0.09" zraw="0.07" rx="0" ry="0" rz="0" />
-    <axis xyz="0 1 0" />
-  </joint>
-
-  <joint name="loco_left" type="continuous">
-    <limit effort="0.95" velocity="1000" />
-    <parent link="base_link" />
-    <child link="left_loco_axle"/>
-    <xacro:origin_rel xraw="-0.065" yraw="0.45" zraw="0.07" rx="0" ry="0" rz="0" />
-    <axis xyz="0 1 0" />
-  </joint>
-
-  <!-- Dump joints -->
-
-  <joint name="R_base_link_2_block_base" type="fixed">
-    <parent link="base_link" />
-    <child link="DUR_motor"/>
-    <xacro:origin_rel xraw="0.56" yraw="0.05" zraw="0.05" rx="0" ry="-2.600540585471551" rz="0" />
-    <axis xyz="1 0 0" />
-  </joint>
-
-  <joint name="right_dump" type="prismatic">
-    <limit lower="0.0" upper="0.75" effort="95" velocity="400" />
-    <parent link="DUR_motor" />
-    <child link="DUR_block"/>
-    <origin xyz="0.07 0 0" rpy="0 0 0"/>
-    <axis xyz="1 0 0" />
-  </joint>
-
-  <joint name="L_base_link_2_block_base" type="fixed">
-    <parent link="base_link" />
-    <child link="DUL_motor"/>
-    <xacro:origin_rel xraw="0.56" yraw="${0.05 + 0.265}" zraw="0.05" rx="0" ry="-2.600540585471551" rz="0" />
-    <axis xyz="1 0 0" />
-  </joint>
-
-  <joint name="left_dump" type="prismatic">
-    <limit lower="0.0" upper="0.75" effort="95" velocity="400" />
-    <parent link="DUL_motor" />
-    <child link="DUL_block"/>
-    <origin xyz="0.07 0 0" rpy="0 0 0"/>
-    <axis xyz="1 0 0" />
-  </joint>
+    <!-- Locomotion component -->
+    <link name="left_loco_axle" />
+    <link name="right_loco_axle" />
 
 
-  <!-- Pitch links -->
-  <joint name="R_base_2_rear_pivot" type="fixed">
-    <parent link="base_link" />
-    <child link="right_rear_pitch_pivot"/>
-    <xacro:origin_rel xraw="-0.10" yraw="-0.02" zraw="0.28" rx="0" ry="0" rz="0" />
-    <axis xyz="0 0 0" />
-  </joint>
+    <!-- Joints -->
+    <joint name="base2laser" type="fixed">
+        <xacro:origin_rel xraw="-0.045" yraw="0.175" zraw="0.025" rx="0" ry="0" rz="0" />
+        <parent link="base_link" />
+        <child link="laser" />
+        <axis xyz="0 0 0"/>
+    </joint>
 
-  <xacro:property name="hinge_max" value="-1.7126933813990604" />
-  <xacro:property name="hinge_min" value="-2.600540585471551" />
-  <joint name="R_pitch" type="revolute">
-    <limit lower="${hinge_min}" upper="${hinge_max}" effort="95" velocity="400" />
-    <parent link="base_link" />
-    <child link="right_pitch_hinge"/>
-    <xacro:origin_rel xraw="0.615" yraw="-0.02" zraw="0.165" rx="0" ry="0" rz="0" />
-    <axis xyz="0 1 0" />
-  </joint>
+    <!-- 2.5 up 4.5 -x 17.5 y -->
+    <!-- Locomotion joints -->
+    <joint name="loco_right" type="continuous">
+        <limit effort="0.95" velocity="1000" />
+        <parent link="base_link" />
+        <child link="right_loco_axle"/>
+        <xacro:origin_rel xraw="-0.065" yraw="-0.09" zraw="0.07" rx="0" ry="0" rz="0" />
+        <axis xyz="0 1 0" />
+    </joint>
 
-  <!-- If you change the pitch lengths please adjust the action server as well -->
-  <joint name="L_pitch" type="revolute">
-    <mimic joint="R_pitch" />
-    <limit lower="${hinge_min}" upper="${hinge_max}" effort="95" velocity="400" />
-    <parent link="base_link" />
-    <child link="left_pitch_hinge"/>
-    <xacro:origin_rel xraw="0.615" yraw="0.36" zraw="0.165" rx="0" ry="0" rz="0" />
-    <axis xyz="0 1 0" />
-  </joint>
+    <joint name="loco_left" type="continuous">
+        <limit effort="0.95" velocity="1000" />
+        <parent link="base_link" />
+        <child link="left_loco_axle"/>
+        <xacro:origin_rel xraw="-0.065" yraw="0.45" zraw="0.07" rx="0" ry="0" rz="0" />
+        <axis xyz="0 1 0" />
+    </joint>
 
-  <joint name="L_hinge_2_DEL_motor" type="fixed" >
-    <parent link="left_pitch_hinge" />
-    <child link="DEL_motor"/>
-    <origin xyz="0 -0.085 0"  rpy="0 0 0" />
-    <axis xyz="0 0 0" />
-  </joint>
+    <!-- Dump joints -->
 
-  <joint name="L_depth" type="prismatic" >
-    <limit lower="0.0" upper="0.48" effort="95" velocity="400" />
-    <parent link="DEL_motor" />
-    <child link="DEL_block"/>
-    <origin xyz="0.07 0 0" rpy="0 0 0"/>
-    <axis xyz="1 0 0" />
-  </joint>
+    <joint name="R_base_link_2_block_base" type="fixed">
+        <parent link="base_link" />
+        <child link="DUR_motor"/>
+        <xacro:origin_rel xraw="0.56" yraw="0.05" zraw="0.05" rx="0" ry="-2.600540585471551" rz="0" />
+        <axis xyz="1 0 0" />
+    </joint>
 
-  <joint name="R_hinge_2_attachment" type="fixed">
-    <parent link="right_pitch_hinge" />
-    <child link="right_pitch_attachment"/>
-    <origin xyz="0.38 0 0"  rpy="0 0 0" />
-    <axis xyz="0 1 0" />
-  </joint>
+    <joint name="right_dump" type="prismatic">
+        <limit lower="0.0" upper="0.75" effort="95" velocity="400" />
+        <parent link="DUR_motor" />
+        <child link="DUR_block"/>
+        <origin xyz="0.07 0 0" rpy="0 0 0"/>
+        <axis xyz="1 0 0" />
+    </joint>
 
-  <!-- Depth joints -->
-  <joint name="R_hinge_2_DER_motor" type="fixed" >
-    <parent link="right_pitch_hinge" />
-    <child link="DER_motor"/>
-    <origin xyz="0 0.085 0"  rpy="0 0 0" />
-    <axis xyz="0 0 0" />
-  </joint>
+    <joint name="L_base_link_2_block_base" type="fixed">
+        <parent link="base_link" />
+        <child link="DUL_motor"/>
+        <xacro:origin_rel xraw="0.56" yraw="${0.05 + 0.265}" zraw="0.05" rx="0" ry="-2.600540585471551" rz="0" />
+        <axis xyz="1 0 0" />
+    </joint>
 
-  <joint name="R_depth" type="prismatic" >
-    <limit lower="0.0" upper="0.48" effort="95" velocity="400" />
-    <parent link="DER_motor" />
-    <child link="DER_block"/>
-    <origin xyz="0.07 0 0" rpy="0 0 0"/>
-    <axis xyz="1 0 0" />
-  </joint>
+    <joint name="left_dump" type="prismatic">
+        <limit lower="0.0" upper="0.75" effort="95" velocity="400" />
+        <parent link="DUL_motor" />
+        <child link="DUL_block"/>
+        <origin xyz="0.07 0 0" rpy="0 0 0"/>
+        <axis xyz="1 0 0" />
+    </joint>
 
-  <!-- Auger joints -->
-  <joint name="auger_rotation" type="continuous" >
-    <limit effort="0.95" velocity="4000" />
-    <parent link="DER_block" />
-    <child link="auger_hole"/>
-    <origin xyz="-0.11 0.11 0"  rpy="0 0 0" />
-    <axis xyz="1 0 0" />
-  </joint>
 
-  <joint name="R_auger_hole_2_auger_tip" type="fixed" >
-    <parent link="auger_hole" />
-    <child link="auger_tip"/>
-    <origin xyz="-0.71 0 0"  rpy="0 0 0" />
-    <axis xyz="0 0 0" />
-  </joint>
+    <!-- Pitch links -->
+    <joint name="R_base_2_rear_pivot" type="fixed">
+        <parent link="base_link" />
+        <child link="right_rear_pitch_pivot"/>
+        <xacro:origin_rel xraw="-0.10" yraw="-0.02" zraw="0.28" rx="0" ry="0" rz="0" />
+        <axis xyz="0 0 0" />
+    </joint>
+
+    <xacro:property name="hinge_max" value="-1.7126933813990604" />
+    <xacro:property name="hinge_min" value="-2.600540585471551" />
+    <joint name="R_pitch" type="revolute">
+        <limit lower="${hinge_min}" upper="${hinge_max}" effort="95" velocity="400" />
+        <parent link="base_link" />
+        <child link="right_pitch_hinge"/>
+        <xacro:origin_rel xraw="0.615" yraw="-0.02" zraw="0.165" rx="0" ry="0" rz="0" />
+        <axis xyz="0 1 0" />
+    </joint>
+
+    <!-- If you change the pitch lengths please adjust the action server as well -->
+    <joint name="L_pitch" type="revolute">
+        <mimic joint="R_pitch" />
+        <limit lower="${hinge_min}" upper="${hinge_max}" effort="95" velocity="400" />
+        <parent link="base_link" />
+        <child link="left_pitch_hinge"/>
+        <xacro:origin_rel xraw="0.615" yraw="0.36" zraw="0.165" rx="0" ry="0" rz="0" />
+        <axis xyz="0 1 0" />
+    </joint>
+
+    <joint name="L_hinge_2_DEL_motor" type="fixed" >
+        <parent link="left_pitch_hinge" />
+        <child link="DEL_motor"/>
+        <origin xyz="0 -0.085 0"  rpy="0 0 0" />
+        <axis xyz="0 0 0" />
+    </joint>
+
+    <joint name="L_depth" type="prismatic" >
+        <limit lower="0.0" upper="0.48" effort="95" velocity="400" />
+        <parent link="DEL_motor" />
+        <child link="DEL_block"/>
+        <origin xyz="0.07 0 0" rpy="0 0 0"/>
+        <axis xyz="1 0 0" />
+    </joint>
+
+    <joint name="R_hinge_2_attachment" type="fixed">
+        <parent link="right_pitch_hinge" />
+        <child link="right_pitch_attachment"/>
+        <origin xyz="0.38 0 0"  rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+    </joint>
+
+    <!-- Depth joints -->
+    <joint name="R_hinge_2_DER_motor" type="fixed" >
+        <parent link="right_pitch_hinge" />
+        <child link="DER_motor"/>
+        <origin xyz="0 0.085 0"  rpy="0 0 0" />
+        <axis xyz="0 0 0" />
+    </joint>
+
+    <joint name="R_depth" type="prismatic" >
+        <limit lower="0.0" upper="0.48" effort="95" velocity="400" />
+        <parent link="DER_motor" />
+        <child link="DER_block"/>
+        <origin xyz="0.07 0 0" rpy="0 0 0"/>
+        <axis xyz="1 0 0" />
+    </joint>
+
+    <!-- Auger joints -->
+    <joint name="auger_rotation" type="continuous" >
+        <limit effort="0.95" velocity="4000" />
+        <parent link="DER_block" />
+        <child link="auger_hole"/>
+        <origin xyz="-0.11 0.11 0"  rpy="0 0 0" />
+        <axis xyz="1 0 0" />
+    </joint>
+
+    <joint name="R_auger_hole_2_auger_tip" type="fixed" >
+        <parent link="auger_hole" />
+        <child link="auger_tip"/>
+        <origin xyz="-0.71 0 0"  rpy="0 0 0" />
+        <axis xyz="0 0 0" />
+    </joint>
 
 
 </robot>

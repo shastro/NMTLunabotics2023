@@ -1,11 +1,11 @@
 input_sources:
-    d455_2:
-        type: pointcloud
-        topic: /d455_2/depth/color/points
-        queue_size: 5
-        publish_on_update: true
-        sensor_processor:
-            type: perfect
+  d455_2:
+    type: pointcloud
+    topic: /d455_2/depth/color/points
+    queue_size: 5
+    publish_on_update: true
+    sensor_processor:
+      type: perfect
 
 map_frame_id: "map"
 robot_base_frame_id: "base_link"
