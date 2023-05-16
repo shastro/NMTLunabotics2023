@@ -4,12 +4,14 @@ input_sources:
         topic: /d455_2/depth/color/points
         queue_size: 5
         publish_on_update: true
+        sensor_processor:
+            type: perfect
 
 map_frame_id: map
 robot_base_frame_id: base_link
 
 #TODO everything below here needs work
-robot_pose_topic: /pose
+robot_pose_with_covariance_topic: /pose_with_covariance
 track_point_frame_id:                       base_link
 track_point_x:                              0.0
 track_point_y:                              0.0

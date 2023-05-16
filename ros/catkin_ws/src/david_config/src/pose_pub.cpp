@@ -3,7 +3,6 @@
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 ros::Publisher pose_pub;
-ros::NodeHandle nh;
 
 void Callback(const nav_msgs::Odometry::ConstPtr& msg)
 {
@@ -16,9 +15,10 @@ void Callback(const nav_msgs::Odometry::ConstPtr& msg)
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "pose_pub");
+    ros::NodeHandle nh;
 
     ros::Subscriber odom_sub = nh.subscribe("/camera/odom/sample", 10, Callback);
-    pose_pub = nh.advertise<geometry_msgs::Pose>("/pose", 10);
+    pose_pub = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/pose_with_covariance", 10);
     ros::spin();
 
     return 0;

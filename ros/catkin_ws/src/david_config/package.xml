@@ -1,16 +1,17 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>pose_pub</name>
-  <version>0.0.0</version>
-  <description>The pose_pub package</description>
+    <name>david_config</name>
+    <version>0.0.0</version>
+    <description>The david_config package</description>
 
-  <maintainer email="niallcdevlin@gmail.com">Niall Devlin</maintainer>
-  <license>GPLv3</license>
+    <maintainer email="niallcdevlin@gmail.com">Niall Devlin</maintainer>
+    <license>GPLv3</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <depend>roscpp</depend>
-  <depend>std_msgs</depend>
-  <depend>nav_msgs</depend>
-  <depend>geometry_msgs</depend>
+    <buildtool_depend>catkin</buildtool_depend>
+    <build_depend>roslaunch</build_depend>
+    <depend>roscpp</depend>
+    <depend>std_msgs</depend>
+    <depend>nav_msgs</depend>
+    <depend>geometry_msgs</depend>
 
 </package>

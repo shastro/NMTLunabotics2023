@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(pose_pub)
+project(david_config)
 
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     std_msgs
     nav_msgs
     geometry_msgs
+    roslaunch
 )
+roslaunch_add_file_check(launch)
 
 catkin_package(CATKIN_DEPENDS std_msgs roscpp nav_msgs geometry_msgs)
 

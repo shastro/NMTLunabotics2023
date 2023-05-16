@@ -1,15 +1,15 @@
 <launch>
     <!-- Transform publisher -->
-    <node pkg="robot_state_publisher"  name="state_publisher">
+    <node pkg="robot_state_publisher"  name="state_publisher" type="robot_state_publisher">
         <param name="robot_description" value="$(find david_config)/urdf/test.urdf" />
     </node>
 
     <!-- Pose publisher -->
-    <node pkg="david_config" name="pose_pub"/>
+    <node pkg="david_config" name="pose_pub" type="pose_pub"/>
 
     <!-- Elevation mapping node -->
-    <node pckg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
-        <rosparam command="load" file="$(find david_config)/config/mapping.yaml" />
+    <node pkg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
+        <rosparam command="load" file="$(find david_config)/config/test_map.yaml" />
         <rosparam command="load" file="$(find david_config)/config/postprocessing.yaml" />
     </node>
 </launch>
