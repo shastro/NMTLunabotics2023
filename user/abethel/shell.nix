@@ -43,6 +43,8 @@ let
     "view_frames"
 
     "catkin_create_pkg"
+    "catkin"
+    "xacro"
   ];
   entrypoint = writeScript "entrypoint" ''
     #!/bin/bash

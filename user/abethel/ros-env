@@ -21,3 +21,10 @@ RUN apt-get install -y \
     ros-noetic-grid-map-ros \
     ros-noetic-eigen-conversions \
     ros-noetic-gazebo-ros
+
+RUN apt-get install -y ros-noetic-xacro
+RUN apt-get install -y python3-catkin-tools
+RUN DEBIAN_FRONTEND='noninteractive' apt-get install -y ros-noetic-pcl-ros
+RUN apt-get install -y ros-noetic-tf-conversions
+RUN apt-get install -y ros-noetic-grid-map-filters
+RUN apt-get install -y ros-noetic-grid-map-rviz-plugin
