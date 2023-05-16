@@ -1,4 +1,17 @@
 <launch>
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+        <arg name="camera" value="d455_2"/>
+        <arg name="serial_no" value="213522253528"/>
+        <arg name="filters" value="pointcloud"/>
+        <arg name="depth_fps" value="30"/>
+        <arg name="depth_width" value="640"/>
+        <arg name="depth_height" value="480"/>
+        <arg name="enable_color" value="false"/>
+        <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY"/>
+    </include>
+
+    <include file="$(find realsense2_camera)/launch/rs_t265.launch"/>
+
     <param name="david_description" textfile="$(find david_config)/urdf/test.urdf" />
 
     <!-- Pose publisher -->
