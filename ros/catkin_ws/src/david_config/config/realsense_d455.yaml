@@ -4,9 +4,3 @@ sensor_processor:
   type: structured_light
   cutoff_min_depth: 0.6
   cutoff_max_depth: 6
-  normal_factor_a: 0.000611
-  normal_factor_b:  0.003587
-  normal_factor_c: 0.3515
-  normal_factor_d: 0
-  normal_factor_e: 1
-  lateral_factor: 0.01576

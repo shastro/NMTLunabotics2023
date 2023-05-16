@@ -6,11 +6,17 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     nav_msgs
     geometry_msgs
+    sensor_msgs
     roslaunch
 )
 roslaunch_add_file_check(launch)
 
-catkin_package(CATKIN_DEPENDS std_msgs roscpp nav_msgs geometry_msgs)
+catkin_package(CATKIN_DEPENDS
+    std_msgs
+    roscpp
+    nav_msgs
+    geometry_msgs
+    sensor_msgs)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
@@ -18,6 +24,13 @@ add_executable(pose_pub src/pose_pub.cpp)
 add_dependencies(pose_pub
     ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(pose_pub ${catkin_LIBRARIES})
+
+add_executable(pc_pub src/pc_pub.cpp)
+add_dependencies(pc_pub
+    ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(pc_pub ${catkin_LIBRARIES})
+
 install(TARGETS
     pose_pub
+    pc_pub
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

@@ -1,7 +1,7 @@
 input_sources:
     d455_2:
-        type: pointcloud2
-        topic: /d455_2/depth/color/points
+        type: pointcloud
+        topic: /d455_2/pointcloud
         queue_size: 5
         publish_on_update: true
         sensor_processor:

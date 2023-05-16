@@ -1,14 +1,16 @@
 <launch>
-    <!-- Transform publisher -->
-    <node pkg="robot_state_publisher"  name="state_publisher" type="robot_state_publisher">
-        <param name="robot_description" value="$(find david_config)/urdf/test.urdf" />
-    </node>
+    <param name="david_description" textfile="$(find david_config)/urdf/test.urdf" />
 
     <!-- Pose publisher -->
     <node pkg="david_config" name="pose_pub" type="pose_pub" ></node>
 
+    <!-- Transform publisher -->
+    <node pkg="robot_state_publisher"  name="state_publisher" type="robot_state_publisher">
+        <remap from="robot_description" to="david_description" />
+    </node>
+
     <!-- Pointcloud converter -->
-    <node pkg="david_config" name="pcl_pub" type="pcl_pub">
+    <node pkg="david_config" name="pc_pub" type="pc_pub">
         <param name="d4552_topic" value="/d455_2/depth/color/points"/>
     </node>
 
@@ -16,5 +18,6 @@
     <node pkg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
         <rosparam command="load" file="$(find david_config)/config/test_map.yaml" />
         <rosparam command="load" file="$(find david_config)/config/postprocessing.yaml" />
+        <rosparam command="load" file="$(find david_config)/config/realsense_d455.yaml" />
     </node>
 </launch>
