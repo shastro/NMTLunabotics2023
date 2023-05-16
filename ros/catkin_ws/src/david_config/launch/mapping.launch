@@ -1,15 +1,15 @@
 <launch>
+    <!-- Transform publisher -->
+    <node pkg="robot_state_publisher"  name="state_publisher">
+        <param name="robot_description" value="$(find david_config)/urdf/test.urdf" />
+    </node>
 
-  <!-- Elevation mapping node -->
-  <node pkg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
-    <rosparam command="load" file="$(find david_config)/config/mapping.yaml" />
-    <rosparam command="load" file="$(find david_config)/config/postprocessing.yaml" />
-  </node>
+    <!-- Pose publisher -->
+    <node pkg="david_config" name="pose_pub"/>
 
-  <!-- Launch visualizations for the resulting elevation map -->
-  <include file="$(find elevation_mapping_demos)/launch/visualization.launch" />
-
-  <!-- Launch RViz with the demo configuration -->
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find elevation_mapping_demos)/rviz/elevation_map_visualization_pointcloud.rviz" />
-
+    <!-- Elevation mapping node -->
+    <node pckg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
+        <rosparam command="load" file="$(find david_config)/config/mapping.yaml" />
+        <rosparam command="load" file="$(find david_config)/config/postprocessing.yaml" />
+    </node>
 </launch>

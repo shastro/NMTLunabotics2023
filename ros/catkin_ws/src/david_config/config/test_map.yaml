@@ -1,0 +1,24 @@
+input_sources:
+    d455_2:
+        type: pointcloud2
+        topic: /d455_2/depth/color/points
+        queue_size: 5
+        publish_on_update: true
+
+map_frame_id: map
+robot_base_frame_id: base_link
+
+#TODO everything below here needs work
+robot_pose_topic: /pose
+track_point_frame_id:                       base_link
+track_point_x:                              0.0
+track_point_y:                              0.0
+track_point_z:                              0.0
+
+# Map.
+length_in_x:                                50.0
+length_in_y:                                50.0
+position_x:                                 0.0
+position_y:                                 0.0
+resolution:                                 0.1
+

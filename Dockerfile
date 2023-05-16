@@ -28,6 +28,7 @@ RUN apt-get install -y ros-noetic-pcl-ros
 RUN apt-get install -y ros-noetic-tf-conversions
 RUN apt-get install -y ros-noetic-grid-map-filters 
 RUN apt-get install -y ros-noetic-grid-map-rviz-plugin
+RUN apt-get install -y ros-noetic-xacro
 
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws /ros/catkin_ws
