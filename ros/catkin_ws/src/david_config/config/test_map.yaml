@@ -5,21 +5,23 @@ input_sources:
     queue_size: 5
     publish_on_update: true
     sensor_processor:
-      type: perfect
+      type: structured_light
+      ignore_points_above: 1
+      ignore_points_below: -2
 
-map_frame_id: "map"
-robot_base_frame_id: "base_link"
+map_frame_id: "t265_odom_frame"
+robot_base_frame_id: "t265_pose_frame"
 
 robot_pose_with_covariance_topic: "/pose_with_covariance"
-track_point_frame_id:                       "base_link"
+track_point_frame_id:                       "t265_pose_frame"
 track_point_x:                              0.0
 track_point_y:                              0.0
 track_point_z:                              0.0
 
 # Map.
-length_in_x:                                5.0
-length_in_y:                                5.0
+length_in_x:                                15.0
+length_in_y:                                15.0
 position_x:                                 0.0
 position_y:                                 0.0
-resolution:                                 0.1
+resolution:                                 0.01
 

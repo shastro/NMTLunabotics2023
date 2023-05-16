@@ -1,6 +1,8 @@
 <?xml version="1.0" ?>
 <launch>
-    <node pkg="rosservice" type="rosservice" name="set_move_base_log_level" args="call --wait /move_base/set_logger_level 'ros.move_base' 'debug'" />
+    <node pkg="rosservice" type="rosservice" name="set_move_base_log_level"
+        args="call --wait /move_base/set_logger_level 'ros.move_base' 'debug'" />
+
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">
         <arg name="camera" value="d455_2" />
         <arg name="serial_no" value="213522253528" />
@@ -16,24 +18,24 @@
         <arg name="camera" value="t265" />
     </include>
 
-
-    <param name="david_description" textfile="$(find david_config)/urdf/test.urdf" />
-
     <!-- Pose publisher -->
     <node pkg="david_config" name="pose_pub" type="pose_pub" />
 
     <!-- Transform publisher -->
-    <node pkg="robot_state_publisher"  name="state_publisher" type="robot_state_publisher">
+    <param name="david_description"
+        textfile="$(find david_config)/urdf/test.urdf" />
+    <node pkg="robot_state_publisher"  name="state_publisher"
+        type="robot_state_publisher" output="screen">
         <remap from="robot_description" to="david_description" />
     </node>
+    <!-- node pkg="tf2_ros" type="static_transform_publisher"
+        name="static_transform_publisheri"
+        args="0 0 0 0 0 0 map t265_odom_frame" respawn="true" /-->
 
-    <!-- Pointcloud converter -->
-    <node pkg="david_config" name="pc_pub" type="pc_pub" output="screen">
-        <param name="d4552_topic" value="/d455_2/depth/color/points"/>
-    </node>
 
     <!-- Elevation mapping node -->
     <node pkg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
         <rosparam command="load" file="$(find david_config)/config/test_map.yaml" />
+        <rosparam command="load" file="$(find david_config)/config/postprocessing.yaml" />
     </node>
 </launch>
