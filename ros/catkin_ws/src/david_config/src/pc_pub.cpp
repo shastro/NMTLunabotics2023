@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
             std::string t_sub;
             ros::param::get(name, t_sub);
             std::string t_pub = t_sub.substr(0, t_sub.find('/')) + "/pointcloud";
+            std::cout << ">> " << t_pub << std::endl;
 
             std::unique_ptr<PosePub> pub(new PosePub(nh, t_pub));
             subs.push_back(

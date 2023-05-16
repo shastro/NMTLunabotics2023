@@ -24,9 +24,9 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "pose_pub");
     ros::NodeHandle nh;
 
-    ros::Subscriber odom_sub = nh.subscribe("/camera/odom/sample", 10, Callback);
+    ros::Subscriber odom_sub = nh.subscribe("/t265/odom/sample", 10, Callback);
     pose_pub = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/pose_with_covariance", 10);
-    joint_pub = nh.advertise<sensor_msgs::JointState>("/joint_state", 10);
+    joint_pub = nh.advertise<sensor_msgs::JointState>("/joint_states", 10);
     ros::spin();
 
     return 0;
