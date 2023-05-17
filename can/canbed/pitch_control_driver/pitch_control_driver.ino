@@ -29,6 +29,7 @@ struct MD04Driver {
         direction = Dir::Stop;
     }
 
+    // I strongly suspect these functions crash the driver ~~Alex
     byte getTemperature() { return getData(TEMPREG); }
 
     byte getCurrent() { return getData(CURRENTREG); }
@@ -91,6 +92,7 @@ class PitchController {
         };
 
         CANPacket pkt(DAVID_PITCH_DRIVER_TELEM_FRAME_ID);
+        pkt.len = 8;
         david_pitch_driver_telem_pack(pkt.buf, &data, 8);
 
         return pkt;
