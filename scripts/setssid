@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+# I feel like enumerating all the reasons this is fucked:
+#  - The access point has no mutable storage for some reason. As such
+#    we can't write any permanent configuration changes to it, and it
+#    will always start up a network called `lunabotics` with password
+#    `artemisNMT`, regardless of specification or what we want.
+#  - The access point's SCP server is broken, so we need to use `ssh`
+#    and `cat` instead.
+#  - The access point's SSH implementation is outdated, so we need to
+#    use `-oHostKeyAlgorithms=+ssh-dss` to allow using obsolete
+#    algorithms to even talk to it.
+#  - We can't even write anything to the `authorized_keys` of the
+#    access point, therefore we need to use sshpass to connect to it.
+# Ideally we would have the router automatically ssh into the access
+# point and do this initialization.
+#  - The router is running a version of Debian with an obscure (as of
+#    yet unidentified by me) init system, so it's not even obvious how
+#    to get it to do anything at startup. It has a /etc/systemd/system
+#    directory like a systemd machine, but as far as I can tell that
+#    directory simply *doesn't work*, and the machine doesn't have
+#    systemctl installed. After quite a lot of trial and error I've
+#    learned it's possible to get a script to run at startup by
+#    putting it in /config somewhere.
+#  - The router doesn't have any package management installed, so
+#    getting sshpass working on it would be quite difficult.
+# Anyway, so in summary every time the network is set up you need to
+# use sshpass with the opaque router password to execute `cat` to
+# overwrite /etc/hostapd/ath0.cfg and ath2.cfg, then restart hostapd
+# on the access point.
+
+sshpass -p'@rt3m!$NMT' \
+        ssh -oHostKeyAlgorithms=+ssh-dss \
+        admin@192.168.1.40 \
+        'cat <<EOF > /etc/hostapd/ath0.cfg
+interface=ath0
+ctrl_interface=/var/run/hostapd
+driver=atheros
+nas_identifier=$bssid
+ssid=Team_08
+wpa_group_rekey=0
+wpa_group_update_count=4
+wpa_gmk_rekey=86400
+wpa_passphrase=artemisNMT
+bridge=br0
+wpa=2
+eapol_version=2
+wpa_pairwise=CCMP
+wpa_key_mgmt=WPA-PSK
+disable_pmksa_caching=1
+logger_syslog=-1
+logger_syslog_level=1
+wlan_id=e925
+own_ip_addr=192.168.1.40
+EOF'
+sshpass -p'@rt3m!$NMT' \
+        ssh -oHostKeyAlgorithms=+ssh-dss \
+        admin@192.168.1.40 \
+        'cat <<EOF > /etc/hostapd/ath2.cfg
+interface=ath2
+ctrl_interface=/var/run/hostapd
+driver=atheros
+nas_identifier=$bssid
+ssid=Team_08
+wpa_group_rekey=0
+wpa_group_update_count=4
+wpa_gmk_rekey=86400
+wpa_passphrase=artemisNMT
+bridge=br0
+wpa=2
+eapol_version=2
+wpa_pairwise=CCMP
+wpa_key_mgmt=WPA-PSK
+disable_pmksa_caching=1
+logger_syslog=-1
+logger_syslog_level=1
+wlan_id=e925
+own_ip_addr=192.168.1.40
+EOF'
+
+sshpass -p'@rt3m!$NMT' \
+        ssh -oHostKeyAlgorithms=+ssh-dss admin@192.168.1.40 \
+        killall hostapd
+
+echo 'ok'
