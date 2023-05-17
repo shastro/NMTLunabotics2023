@@ -1,11 +1,6 @@
-// receive a frame from can bus
 #include "arduino_lib.hpp"
 
-// Import CAN message constants
 #include "david.h"
-// Interrupt pins for the MEGA
-// 2, 3, 18, 19, 20, 21 (pins 20 & 21 are not available to use for interrupts
-// while they are used for I2C communication)
 
 // I2C Registers
 #define SOFTREG 0x07    // Byte to read software
@@ -45,22 +40,19 @@ struct MD04Driver {
         sendData(CMDREG, (byte)dir);
     }
 
-    byte getData(byte reg) { // function for getting data from MD03
+    byte getData(byte reg) { // Function for getting data from MD04
         Wire.beginTransmission(addr);
         Wire.write(reg);
         Wire.endTransmission();
 
-        Wire.requestFrom(addr, 1); // Requests byte from MD03
-        // while(Wire.available() < 1) {
-        //     Serial.println("Waiting for i2c");
-        // };       // Waits for byte to become available
+        Wire.requestFrom(addr, 1); // Requests byte from MD04
         byte data = Wire.read();
 
         return (data);
     }
 
-    void sendData(byte reg, byte val) { // Function for sending data to MD03
-        Wire.beginTransmission(addr);   // Send data to MD03
+    void sendData(byte reg, byte val) { // Function for sending data to MD04
+        Wire.beginTransmission(addr);   // Send data to MD04
         Wire.write(reg);                // Command like Direction, Speed
         Wire.write(val);                // Value for the command
         int error = Wire.endTransmission();
