@@ -426,7 +426,7 @@ template <uint8_t num, typename Func> inline void callback_interrupt() {
 // attach_interrupt<8>([&]() { count++; }, FALLING) to count how many
 // times digital pin 8 falls.
 template <uint8_t num, typename Func>
-inline void attach_interrupt_lambda(const Func &func, int mode) {
+inline void attach_interrupt_lambda(Func &func, int mode) {
     if (digitalPinToInterrupt(num) == NOT_AN_INTERRUPT)
         panic("attempt to set up interrupts on a non-interrupt pin");
 
