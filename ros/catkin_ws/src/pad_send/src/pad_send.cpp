@@ -1,35 +1,30 @@
-#include <iostream>
 #include <algorithm>
-#include <sys/stat.h>
-#include <ncurses.h>
+#include <iostream>
 #include <motor_bridge/System.h>
+#include <ncurses.h>
 #include <ros/ros.h>
-#include "joystick/gamepad.hpp"
+#include <sys/stat.h>
+
 #include "can/limits.hpp"
+#include "joystick/gamepad.hpp"
 
 // The Adjustables
 int max = 98;   // Max value for sticks/triggers
 int min = -max; // Min val ... well yeah
 int dead = 20;  // Can't be too touchy. < dead = 0
-int rate = 100; //in hertz
+int rate = 100; // in hertz
 
-double pitch_delta = 8.0 / rate; // in mm/s
 double stepper_delta = 20.0 / rate; // in mm/s
 
 double min_max_mod = 0.999;
-double pitch_max = PITCH_CTRL_SET_POINT_MAX * min_max_mod;
-double pitch_min = PITCH_CTRL_SET_POINT_MIN * min_max_mod;
 double stepper_max = STEPPER_CTRL_SET_POINT_MAX * min_max_mod;
 double stepper_min = STEPPER_CTRL_SET_POINT_MIN * min_max_mod;
 
-enum class mode {
-    normal,
-    adjust,
-    home,
-    stop
-};
+enum class PitchSignal { Stop = 0, Extend = 1, Retract = 2 };
 
-mode m = mode::normal;
+enum class Mode { Normal, Adjust, Home, Stop };
+
+Mode m = Mode::Normal;
 
 int main(int argc, char *argv[]) {
     // Set up ros
@@ -65,14 +60,11 @@ int main(int argc, char *argv[]) {
     // Message loop
     motor_bridge::System s;
 
-    double pitch = (PITCH_CTRL_SET_POINT_MAX -
-            PITCH_CTRL_SET_POINT_MIN) / 2;
-    double pitch_left_offset = 0;
-    double pitch_right_offset = 0;
+    PitchSignal pitch_left = PitchSignal::Stop;
+    PitchSignal pitch_right = PitchSignal::Stop;
 
     double stepper = 0;
 
-    bool pitch_home = false;
     bool stepper_home = false;
 
     bool lastX = false;
@@ -105,156 +97,144 @@ int main(int argc, char *argv[]) {
         out << "X - Resume, Y - Estop, A - Adjust, B - Home, XBOX - quit\n";
         out << "Cannot Adjust or Home when Estopped\n\n";
 
-        //std::cout << g << std::endl;
+        // std::cout << g << std::endl;
 
         // Estop
         if (g.buttons.Y) {
-            m = mode::stop;
+            m = Mode::Stop;
         }
 
         // Adjust
-        if (g.buttons.A && m != mode::stop) {
-            m = mode::adjust;
+        if (g.buttons.A && m != Mode::Stop) {
+            m = Mode::Adjust;
         }
 
         // Homing
-        if (g.buttons.B && m != mode::stop) {
-            m = mode::home;
+        if (g.buttons.B && m != Mode::Stop) {
+            m = Mode::Home;
         }
 
         // Normal
         if (g.buttons.X) {
-            m = mode::normal;
+            m = Mode::Normal;
         }
 
-        switch(m) {
-            case mode::normal:
-                // Controls
-                out << "Normal Operation\n\n";
-                out << "Drive: Sticks\n";
-                out << "Excavate: Triggers\n";
-                out << "Pitch: Dpad Up/Down\n";
-                out << "Extend/Retract: Dpad Left/Right\n";
-                out << "Mast: Bumpers\n";
-                out << "\n";
+        switch (m) {
+        case Mode::Normal:
+            // Controls
+            out << "Normal Operation\n\n";
+            out << "Drive: Sticks\n";
+            out << "Excavate: Triggers\n";
+            out << "Pitch: Dpad Up/Down\n";
+            out << "Extend/Retract: Dpad Left/Right\n";
+            out << "Mast: Bumpers\n";
+            out << "\n";
 
-                // Un home everyting
-                pitch_home = false;
-                stepper_home = false;
-                s.e_stop.stop = false;
+            // Un home everyting
+            // pitch_home = false;
+            stepper_home = false;
+            s.e_stop.stop = false;
 
-                // Pitch control with dpad
-                if (g.dpad.up) {
-                    pitch += pitch_delta;
-                    pitch = std::min(pitch, pitch_max);
-                    out << "Pitch Up: " << pitch << "\n";
-                } else if (g.dpad.down) {
-                    pitch -= pitch_delta;
-                    pitch = std::max(pitch, pitch_min);
-                    out << "Pitch Down: " << pitch << "\n";
-                }
-                s.pitch_ctrl.set_point = pitch;
+            // Pitch control with dpad
+            if (g.dpad.up) {
+                pitch_left = pitch_right = PitchSignal::Extend;
+                out << "Pitch up\n";
+            } else if (g.dpad.down) {
+                pitch_left = pitch_right = PitchSignal::Retract;
+                out << "Pitch down\n";
+            }
+            s.pitch_ctrl.left = (uint8_t)pitch_left;
+            s.pitch_ctrl.right = (uint8_t)pitch_right;
 
-                // Viagra bumpers
-                if (g.buttons.left_bumper) {
-                    out << "david's shaft left\n";
-                    s.mast_ctrl.direction = 0;
-                } else if (g.buttons.right_bumper) {
-                    out << "david's shaft right\n";
-                    s.mast_ctrl.direction = 2;
-                } else {
-                    s.mast_ctrl.direction = 1;
-                }
+            // Viagra bumpers
+            if (g.buttons.left_bumper) {
+                out << "david's shaft left\n";
+                s.mast_ctrl.direction = 0;
+            } else if (g.buttons.right_bumper) {
+                out << "david's shaft right\n";
+                s.mast_ctrl.direction = 2;
+            } else {
+                s.mast_ctrl.direction = 1;
+            }
 
-                // Drive with both sticks
-                s.loco_ctrl.left_vel = g.left_stick.y;
-                s.loco_ctrl.right_vel = g.right_stick.y;
-                if (s.loco_ctrl.left_vel != 0 || s.loco_ctrl.right_vel != 0) {
-                    out << "Driving - L: " << s.loco_ctrl.left_vel
-                        << ", R: " << s.loco_ctrl.right_vel << "\n";
-                }
+            // Drive with both sticks
+            s.loco_ctrl.left_vel = g.left_stick.y;
+            s.loco_ctrl.right_vel = g.right_stick.y;
+            if (s.loco_ctrl.left_vel != 0 || s.loco_ctrl.right_vel != 0) {
+                out << "Driving - L: " << s.loco_ctrl.left_vel
+                    << ", R: " << s.loco_ctrl.right_vel << "\n";
+            }
 
-                // Extend dpad
-                if (g.dpad.left) {
-                    stepper += stepper_delta;
-                    stepper = std::min(stepper, stepper_max);
-                    out << "Arm Extend: " << stepper << "\n";
-                } else if (g.dpad.right) {
-                    stepper -= stepper_delta;
-                    stepper = std::max(stepper, stepper_min);
-                    out << "Arm Retract: " << stepper << "\n";
-                }
+            // Extend dpad
+            if (g.dpad.left) {
+                stepper += stepper_delta;
+                stepper = std::min(stepper, stepper_max);
+                out << "Arm Extend: " << stepper << "\n";
+            } else if (g.dpad.right) {
+                stepper -= stepper_delta;
+                stepper = std::max(stepper, stepper_min);
+                out << "Arm Retract: " << stepper << "\n";
+            }
+            s.stepper_ctrl.set_point = stepper;
+
+            // Digger triggers
+            if (g.left_trigger > 0) {
+                s.excav_ctrl.vel = -g.left_trigger;
+                out << "Dig Forward: " << s.excav_ctrl.vel << "\n";
+            } else if (g.right_trigger > 0) {
+                s.excav_ctrl.vel = g.right_trigger;
+                out << "Dig Backward: " << s.excav_ctrl.vel << "\n";
+            } else {
+                s.excav_ctrl.vel = 0;
+            }
+            break;
+
+        case Mode::Adjust:
+            out << "Adjusting\n\n";
+            out << "Left Stick - Left Pitch Arm\n";
+            out << "Right Stick - Right Pitch Arm\n";
+            out << "\n";
+
+            // Pitch
+            if (abs(g.left_stick.y) > dead) {
+                s.pitch_ctrl.left =
+                    (uint8_t)(g.left_stick.y > 0 ? PitchSignal::Extend
+                                                 : PitchSignal::Retract);
+                out << "Pitch left: " << s.pitch_ctrl.left;
+            }
+
+            if (abs(g.right_stick.y) > dead) {
+                s.pitch_ctrl.right =
+                    (uint8_t)(g.right_stick.y > 0 ? PitchSignal::Extend
+                                                  : PitchSignal::Retract);
+                out << "Pitch right: " << s.pitch_ctrl.left;
+            }
+            break;
+
+        case Mode::Home:
+            out << "Homing\n\n";
+            out << "Extend: Dpad Left or Right\n";
+            out << "\n";
+
+            if (g.dpad.left || g.dpad.right) {
+                out << "Extend Home\n";
+                stepper_home = true;
+                stepper = stepper_min;
                 s.stepper_ctrl.set_point = stepper;
+            }
 
-                // Digger triggers
-                if (g.left_trigger > 0) {
-                    s.excav_ctrl.vel = -g.left_trigger;
-                    out << "Dig Forward: " << s.excav_ctrl.vel << "\n";
-                } else if (g.right_trigger > 0) {
-                    s.excav_ctrl.vel = g.right_trigger;
-                    out << "Dig Backward: " << s.excav_ctrl.vel << "\n";
-                } else {
-                    s.excav_ctrl.vel = 0;
-                }
-                break;
+            break;
 
-            case mode::adjust:
-                out << "Adjusting\n\n";
-                out << "Left Stick - Left Pitch Arm\n";
-                out << "Right Stick - Right Pitch Arm\n";
-                out << "\n";
+        case Mode::Stop:
+            out << "Contemplating Life\n";
+            s.e_stop.stop = true;
+            break;
 
-                // Pitch
-                pitch_left_offset += pitch_delta * g.left_stick.y / max;
-                pitch_left_offset = std::min(pitch_left_offset,
-                        PITCH_CTRL_LEFT_OFFSET_MAX);
-                pitch_left_offset = std::max(pitch_left_offset,
-                        PITCH_CTRL_LEFT_OFFSET_MIN);
-                s.pitch_ctrl.left_offset = pitch_left_offset;
-                out << "Pitch Left Offset: " << pitch_left_offset << "\n";
-
-                pitch_right_offset += pitch_delta * g.right_stick.y / max;
-                pitch_right_offset = std::min(pitch_right_offset,
-                        PITCH_CTRL_RIGHT_OFFSET_MAX);
-                pitch_right_offset = std::max(pitch_right_offset,
-                        PITCH_CTRL_RIGHT_OFFSET_MIN);
-                s.pitch_ctrl.right_offset = pitch_right_offset;
-                out << "Pitch right Offset: " << pitch_right_offset << "\n";
-                break;
-
-            case mode::home:
-                out << "Homing\n\n";
-                out << "Pitch: Dpad Up or Down\n";
-                out << "Extend: Dpad Left or Right\n";
-                out << "\n";
-
-                if (g.dpad.up || g.dpad.down) {
-                    out << "Pitch Home\n";
-                    pitch_home = true;
-                    pitch = pitch_max;
-                    s.pitch_ctrl.set_point = pitch;
-                }
-
-                if (g.dpad.left || g.dpad.right) {
-                    out << "Extend Home\n";
-                    stepper_home = true;
-                    stepper = stepper_min;
-                    s.stepper_ctrl.set_point = stepper;
-                }
-
-                break;
-
-            case mode::stop:
-                out << "Contemplating Life\n";
-                s.e_stop.stop = true;
-                break;
-
-            default:
-                break;
+        default:
+            break;
         }
 
         // Sending homing messages
-        s.pitch_ctrl.home = pitch_home;
         s.stepper_ctrl.home = stepper_home;
 
         // Update last state
@@ -264,7 +244,7 @@ int main(int argc, char *argv[]) {
         lastB = g.buttons.B;
 
         // Print
-        printw(out.str().c_str());
+        printw("%s", out.str().c_str());
         refresh();
 
         pub.publish(s);
