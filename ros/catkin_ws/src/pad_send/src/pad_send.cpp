@@ -27,7 +27,7 @@ enum class Mode { Normal, Adjust, Home, Stop };
 Mode m = Mode::Normal;
 
 class NcursesBuf : public std::streambuf {
-protected:
+  protected:
     virtual int_type overflow(int_type c) {
         printw("%c", static_cast<char>(c));
         return c;
