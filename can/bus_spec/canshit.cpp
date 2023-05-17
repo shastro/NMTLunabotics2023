@@ -19,10 +19,8 @@ int pack_msg(const motor_bridge::EStop& msg, uint8_t* buff) {
 
 int pack_msg(const motor_bridge::PitchCtrl& msg, uint8_t* buff) {
     david_pitch_ctrl_t t = {
-        .set_point = david_pitch_ctrl_set_point_encode(msg.set_point),
-        .left_offset = david_pitch_ctrl_left_offset_encode(msg.left_offset),
-        .right_offset = david_pitch_ctrl_right_offset_encode(msg.right_offset),
-        .home = david_pitch_ctrl_home_encode(msg.home),
+        .left = david_pitch_ctrl_left_encode(msg.left),
+        .right = david_pitch_ctrl_right_encode(msg.right),
     };
 
     david_pitch_ctrl_pack(buff, &t, sizeof(t));
@@ -33,10 +31,8 @@ int pack_msg(const motor_bridge::PitchPositionTelem& msg, uint8_t* buff) {
     david_pitch_position_telem_t t = {
         .left_position = david_pitch_position_telem_left_position_encode(msg.left_position),
         .right_position = david_pitch_position_telem_right_position_encode(msg.right_position),
-        .home_done = david_pitch_position_telem_home_done_encode(msg.home_done),
         .left_direction = david_pitch_position_telem_left_direction_encode(msg.left_direction),
         .right_direction = david_pitch_position_telem_right_direction_encode(msg.right_direction),
-        .in_home_state = david_pitch_position_telem_in_home_state_encode(msg.in_home_state),
     };
 
     david_pitch_position_telem_pack(buff, &t, sizeof(t));
@@ -125,10 +121,8 @@ std::string printable(const motor_bridge::EStop& msg) {
 
 std::string printable(const motor_bridge::PitchCtrl& msg) {
     std::stringstream s;    s << "PitchCtrl - ";
-    s << "set_point: " << (int)msg.set_point << ", ";
-    s << "left_offset: " << (int)msg.left_offset << ", ";
-    s << "right_offset: " << (int)msg.right_offset << ", ";
-    s << "home: " << (int)msg.home << ", ";
+    s << "left: " << (int)msg.left << ", ";
+    s << "right: " << (int)msg.right << ", ";
     s << std::endl;
     return s.str();
 }
@@ -137,10 +131,8 @@ std::string printable(const motor_bridge::PitchPositionTelem& msg) {
     std::stringstream s;    s << "PitchPositionTelem - ";
     s << "left_position: " << (int)msg.left_position << ", ";
     s << "right_position: " << (int)msg.right_position << ", ";
-    s << "home_done: " << (int)msg.home_done << ", ";
     s << "left_direction: " << (int)msg.left_direction << ", ";
     s << "right_direction: " << (int)msg.right_direction << ", ";
-    s << "in_home_state: " << (int)msg.in_home_state << ", ";
     s << std::endl;
     return s.str();
 }

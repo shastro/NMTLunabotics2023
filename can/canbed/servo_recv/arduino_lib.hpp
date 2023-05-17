@@ -338,11 +338,14 @@ template <typename Fn, typename Rest> class Schedule {
         rest.tick(amount);
     }
 
+    // Waits for some number of milliseconds.
+    void sleep(int ms) { rest.sleep(ms); }
+
     // Runs the schedule forever.
     void run() {
         while (true) {
             double m_delay = min_delay();
-            ::delay(m_delay);
+            sleep(m_delay);
             tick(m_delay);
             run_event();
         }
@@ -363,11 +366,51 @@ class NullSchedule {
 
     void run_event() {}
 
+    void sleep(int ms) { delay(ms); }
+
+    void tick(double amount) {}
+};
+
+// A schedule that does something as often as possible between other
+// tasks.
+template <typename Fn> class DenseSchedule {
+    Fn function;
+
+  public:
+    DenseSchedule(Fn function) : function(function) {}
+
+    template <typename NextFn>
+    Schedule<NextFn, DenseSchedule<Fn>> schedule(double period,
+                                                 NextFn function) {
+        return Schedule<NextFn, DenseSchedule<Fn>>(function, *this, period);
+    }
+
+    double min_delay() { return 1000000; }
+
+    void run_event() {}
+
+    void sleep(int ms) {
+        uint32_t start = micros();
+
+        while (ms > 0) {
+            function();
+            while (ms > 0 && (micros() - start) >= 1000) {
+                ms--;
+                start += 1000;
+            }
+        }
+    }
+
     void tick(double amount) {}
 };
 
 // Creates a new empty schedule.
 inline NullSchedule scheduler(void) { return NullSchedule(); }
+
+// Creates a new dense schedule.
+template <typename Fn> inline DenseSchedule<Fn> scheduler_dense(Fn function) {
+    return DenseSchedule<Fn>(function);
+}
 
 // Captured data to be sent to interrupt handlers.
 static void *interrupt_data[EXTERNAL_NUM_INTERRUPTS];

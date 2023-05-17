@@ -72,200 +72,74 @@ struct MD04Driver {
     }
 };
 
-struct ControlCommand {
-    double set_point = 0.0;
-    double left_offset = 0.0;
-    double right_offset = 0.0;
-    bool home = false;
-};
-
-struct PitchController {
-
+class PitchController {
+  public:
     MD04Driver left_m;
     MD04Driver right_m;
 
-    double left_position;
-    double right_position;
+    PitchController(MD04Driver left_m, MD04Driver right_m)
+        : left_m(left_m), right_m(right_m) {}
 
-    double tolerance;
+    CANPacket pack_telemetry() {
+        david_pitch_driver_telem_t data = {
+            .left_current = david_pitch_driver_telem_left_current_encode(
+                left_m.getCurrent()),
+            .right_current = david_pitch_driver_telem_right_current_encode(
+                right_m.getCurrent()),
 
-    bool home_done;
+            .left_temperature =
+                david_pitch_driver_telem_left_temperature_encode(
+                    left_m.getTemperature()),
+            .right_temperature =
+                david_pitch_driver_telem_right_temperature_encode(
+                    right_m.getTemperature()),
 
-    ControlCommand command;
+            .left_direction = (uint8_t)left_m.direction,
+            .right_direction = (uint8_t)right_m.direction,
+        };
 
-    PitchController(double tolerance_) : left_m(0x59), right_m(0x58) {
-        left_position = 0.0;
-        right_position = 0.0;
-        home_done = false;
-        tolerance = tolerance_;
+        CANPacket pkt(DAVID_PITCH_DRIVER_TELEM_FRAME_ID);
+        david_pitch_driver_telem_pack(pkt.buf, &data, 8);
+
+        return pkt;
     }
 
-    inline bool in_range(double x, double set_point, double offset) {
-        return ((x > (set_point + offset - tolerance)) &&
-                (x < (set_point + offset + tolerance)));
-    }
-
-    inline Dir choose_direction(double position, double set_point,
-                                double offset) {
-        if (in_range(position, set_point, offset)) {
-            return Dir::Stop;
-        } else if (position < (set_point + offset - tolerance)) {
-            return Dir::Extend;
-        } else {
-            return Dir::Retract;
-        }
-    }
-
-    void setCommand(ControlCommand command_) { command = command_; }
-
-    void setLeftPosition(double left_position_) {
-        left_position = left_position_;
-    }
-
-    void setRightPosition(double right_position_) {
-        right_position = right_position_;
-    }
-
-    void pack_telemetry(unsigned char buf[8]) {
-
-        david_pitch_driver_telem_t data = {0};
-        byte left_current = 2.0;      // left_m.getCurrent(); //
-        byte right_current = 2.0;     // right_m.getCurrent(); //
-        byte left_temperature = 2.0;  // left_m.getTemperature(); //
-        byte right_temperature = 2.0; // right_m.getTemperature(); //
-        // Temperature
-        data.left_temperature =
-            david_pitch_driver_telem_left_temperature_encode(
-                (double)left_temperature);
-        data.right_temperature =
-            david_pitch_driver_telem_right_temperature_encode(
-                (double)right_temperature);
-
-        double conversion_factor = 20.0 / 186.0;
-        // Current
-        data.left_current =
-            david_pitch_driver_telem_left_current_encode((double)left_current);
-        data.right_current = david_pitch_driver_telem_right_current_encode(
-            (double)right_current);
-        // Direction
-        data.left_direction = (uint8_t)left_m.direction;
-        data.right_direction = (uint8_t)right_m.direction;
-        david_pitch_driver_telem_pack(buf, &data, 8);
-    }
-    bool home() {
-        if (!home_done) {
-            left_m.setDirection(Dir::Extend);
-            right_m.setDirection(Dir::Extend);
-            return true;
-        } else {
-            stop();
-            command.home = false;
-            return false;
-        }
-    }
-
-    // Cycle function for testing
-    void cycle(int tick) {
-        int tickmod = tick % 1000;
-        if (tickmod < 500) {
-            left_m.setDirection(Dir::Retract);
-            right_m.setDirection(Dir::Retract);
-        } else {
-            left_m.setDirection(Dir::Extend);
-            right_m.setDirection(Dir::Extend);
-        }
-        delay(10);
-    }
-
-    void stop() {
-        left_m.setDirection(Dir::Stop);
-        right_m.setDirection(Dir::Stop);
-        command.home = false;
-    }
-
-    void loop(MCP_CAN can) {
-        // Left
-        left_m.setDirection(choose_direction(left_position, command.set_point,
-                                             command.left_offset));
-        right_m.setDirection(choose_direction(right_position, command.set_point,
-                                              command.right_offset));
+    void set_directions(Dir left, Dir right) {
+        left_m.setDirection(left);
+        right_m.setDirection(right);
     }
 };
 
 void setup() {
     MCP_CAN can = setup_can();
-    // PinModes
 
     Wire.begin();
     delay(100);
 
-    double tolerance = 5.0; // 1 mm
-    PitchController control(tolerance);
-
-    bool have_gotten_a_home_done = false;
+    PitchController control(0x59, 0x59);
     bool e_stopped = false;
 
-    int command_interval = 100;
-    int telem_freq = 5;
-    long tick = 0;
-    for (;;) {
-        CANPacket packet = can_read_blocking(can);
+    scheduler_dense([&]() {
+        CANPacket packet = can_read_nonblocking(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) { e_stopped = frame.stop; }
         }
-        // if (packet.id == 0xFFFFFFFF) {
-        //     delay(5);
-        //     continue;
-        // }
-
-        if (tick % telem_freq == 0) {
-            CANPacket driver_telemetry(DAVID_PITCH_DRIVER_TELEM_FRAME_ID);
-            control.pack_telemetry(driver_telemetry.buf);
-            can_send(can, driver_telemetry);
-        }
 
         if (e_stopped) {
-            control.stop();
-            continue;
+            control.set_directions(Dir::Stop, Dir::Stop);
+            return;
         }
 
         switch (packet.id) {
             FRAME_CASE(DAVID_PITCH_CTRL, david_pitch_ctrl) {
-                ControlCommand command;
-                command.set_point =
-                    david_pitch_ctrl_set_point_decode(frame.set_point);
-                command.left_offset =
-                    david_pitch_ctrl_left_offset_decode(frame.left_offset);
-                command.right_offset =
-                    david_pitch_ctrl_right_offset_decode(frame.right_offset);
-                command.home = frame.home;
-                control.setCommand(command);
-            }
-            FRAME_CASE(DAVID_PITCH_POSITION_TELEM, david_pitch_position_telem) {
-                control.setLeftPosition(
-                    david_pitch_position_telem_left_position_decode(
-                        frame.left_position));
-                control.setRightPosition(
-                    david_pitch_position_telem_right_position_decode(
-                        frame.right_position));
-                control.home_done = david_pitch_position_telem_home_done_decode(
-                    frame.home_done);
+                control.set_directions((Dir)frame.left, (Dir)frame.right);
             }
         }
-
-        if (control.home_done) {
-            have_gotten_a_home_done = true;
-        }
-
-        if (control.command.home) {
-            control.home();
-            control.command.set_point = 151.5;
-        } else {
-            if (have_gotten_a_home_done) {
-                control.loop(can);
-            }
-        }
-
-        tick++;
-    }
+    })
+        .schedule(100,
+                  [&]() {
+                      // Sent telemetry every 100ms.
+                      can_send(can, control.pack_telemetry());
+                  })
+        .run();
 }

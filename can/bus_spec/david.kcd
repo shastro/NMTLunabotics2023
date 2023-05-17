@@ -26,72 +26,48 @@
             <Producer>
                 <NodeRef id="2"/>
             </Producer>
-            <Signal name="SetPoint" offset="0" length="9">
-                <!--Slope should be the max value in the units you
-                     want divided by the max value of the region (eg
-                     153/2^9) -->
-                <Value type="unsigned" unit="mm" slope="0.3515625"
-                       intercept="0.0" min="0.0" max="180"/>
-            </Signal>
-            <Signal name="LeftOffset" offset="9" length="9">
-                <!--Slope should be the max value in the units you
-                     want divided by the max value of the region (eg
-                     153/2^9) -->
-                <Value type="unsigned" unit="mm" slope="0.3515625"
-                       intercept="-76.5" min="-76.5" max="76.5"/>
-            </Signal>
-            <Signal name="RightOffset" offset="18" length="9">
-                <!--Slope should be the max value in the units you
-                     want divided by the max value of the region (eg
-                     153/2^9) -->
-                <Value type="unsigned" unit="mm" slope="0.3515625"
-                       intercept="-76.5" min="-76.5" max="76.5"/>
-            </Signal>
-            <Signal name="Home" offset="27" length="1">
+            <Signal name="Left" offset="0" length="2">
                 <LabelSet>
-                    <Label name='False' value="0"/>
-                    <Label name='True' value="1"/>
+                    <Label name="Stop" value="0" />
+                    <Label name="Extend" value="1" />
+                    <Label name="Retract" value="2" />
+                </LabelSet>
+            </Signal>
+            <Signal name="Right" offset="2" length="2">
+                <LabelSet>
+                    <Label name="Stop" value="0" />
+                    <Label name="Extend" value="1" />
+                    <Label name="Retract" value="2" />
                 </LabelSet>
             </Signal>
         </Message>
+
         <Message id="0x110" name="PitchPositionTelem">
             <Producer>
                 <NodeRef id="2"/>
             </Producer>
+            <!-- Position telemetry relative to any arbitrary starting point. -->
             <Signal name="LeftPosition" offset="0" length="9">
-                <Value type="unsigned" unit="mm" slope="0.3515625"
-                       intercept="0.0" min="0.0" max="180"/>
+                <Value type="unsigned" unit="mm" slope="0.703125"
+                       intercept="-180.0" min="-180.0" max="180" />
             </Signal>
             <Signal name="RightPosition" offset="9" length="9">
-                <Value type="unsigned" unit="mm" slope="0.3515625"
-                       intercept="0.0" min="0.0" max="180"/>
+                <Value type="unsigned" unit="mm" slope="0.703125"
+                       intercept="-180.0" min="-180.0" max="180" />
             </Signal>
-            <Signal name="HomeDone" offset="18" length="1">
+            <!-- TODO: do we still need these? -->
+            <Signal name="LeftDirection" offset="19" length="2">
                 <LabelSet>
-                    <Label name='False' value="0"/>
-                    <Label name='True' value="1"/>
+                    <Label name='Stop' value="0"/>
+                    <Label name='Extend' value="1"/>
+                    <Label name='Retract' value="2"/>
                 </LabelSet>
             </Signal>
-            <Signal name="LeftDirection" offset="19" length="2">
-                <!--slope = (125+40)/255-->
-                <LabelSet> 
-                    <Label name='Stop' value="0"/> 
-                    <Label name='Extend' value="1"/> 
-                    <Label name='Retract' value="2"/> 
-                </LabelSet> 
-            </Signal>
             <Signal name="RightDirection" offset="21" length="2">
-                <!--slope = (125+40)/255-->
-                <LabelSet> 
-                    <Label name='Stop' value="0"/> 
-                    <Label name='Extend' value="1"/> 
-                    <Label name='Retract' value="2"/> 
-                </LabelSet> 
-            </Signal>
-            <Signal name="InHomeState" offset="23" length="1">
                 <LabelSet>
-                    <Label name='False' value="0"/>
-                    <Label name='True' value="1"/>
+                    <Label name='Stop' value="0"/>
+                    <Label name='Extend' value="1"/>
+                    <Label name='Retract' value="2"/>
                 </LabelSet>
             </Signal>
         </Message>
@@ -123,21 +99,20 @@
             </Signal>
             <Signal name="LeftDirection" offset="32" length="2">
                 <!--slope = (125+40)/255-->
-                <LabelSet> 
-                    <Label name='Stop' value="0"/> 
-                    <Label name='Extend' value="1"/> 
-                    <Label name='Retract' value="2"/> 
-                </LabelSet> 
+                <LabelSet>
+                    <Label name='Stop' value="0"/>
+                    <Label name='Extend' value="1"/>
+                    <Label name='Retract' value="2"/>
+                </LabelSet>
             </Signal>
             <Signal name="RightDirection" offset="34" length="2">
                 <!--slope = (125+40)/255-->
-                <LabelSet> 
-                    <Label name='Stop' value="0"/> 
-                    <Label name='Extend' value="1"/> 
-                    <Label name='Retract' value="2"/> 
-                </LabelSet> 
+                <LabelSet>
+                    <Label name='Stop' value="0"/>
+                    <Label name='Extend' value="1"/>
+                    <Label name='Retract' value="2"/>
+                </LabelSet>
             </Signal>
-
         </Message>
 
         <Message id="0x200" name="LocoCtrl">
@@ -187,6 +162,7 @@
                        intercept="0.0" min="0.0" max="500"/>
             </Signal>
         </Message>
+
         <Message id="0x311" name="StepperTelem">
             <Notes>
                 Min and Max stop refer to if we are currently at a
@@ -213,6 +189,7 @@
                        intercept="0.0" min="0.0" max="500"/>
             </Signal>
         </Message>
+
         <Message id="0x400" name="MastCtrl">
             <Signal name="Direction" offset="0" length="2">
                 <LabelSet>
@@ -222,10 +199,11 @@
                 </LabelSet>
             </Signal>
         </Message>
+
         <Message id="0x401" name="MastTelem">
-          <Notes>
-            Will print rotation angle. Min is -360, Max is 360 and Home is 0
-          </Notes>
+            <Notes>
+                Will print rotation angle. Min is -360, Max is 360 and Home is 0
+            </Notes>
             <Signal name="Angle" offset="0" length="16">
                 <Value type="unsigned" slope="0.010986328125" intercept="-360" min="-360.5" max="360.5"/>
             </Signal>

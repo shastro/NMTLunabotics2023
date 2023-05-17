@@ -28,7 +28,7 @@ extern "C" {
 
 /* Frame lengths in bytes. */
 #define DAVID_E_STOP_LENGTH (1u)
-#define DAVID_PITCH_CTRL_LENGTH (4u)
+#define DAVID_PITCH_CTRL_LENGTH (1u)
 #define DAVID_PITCH_POSITION_TELEM_LENGTH (3u)
 #define DAVID_PITCH_DRIVER_TELEM_LENGTH (5u)
 #define DAVID_LOCO_CTRL_LENGTH (4u)
@@ -54,11 +54,13 @@ extern "C" {
 
 
 /* Signal choices. */
-#define DAVID_PITCH_CTRL_HOME_FALSE_CHOICE (0u)
-#define DAVID_PITCH_CTRL_HOME_TRUE_CHOICE (1u)
+#define DAVID_PITCH_CTRL_LEFT_STOP_CHOICE (0u)
+#define DAVID_PITCH_CTRL_LEFT_EXTEND_CHOICE (1u)
+#define DAVID_PITCH_CTRL_LEFT_RETRACT_CHOICE (2u)
 
-#define DAVID_PITCH_POSITION_TELEM_HOME_DONE_FALSE_CHOICE (0u)
-#define DAVID_PITCH_POSITION_TELEM_HOME_DONE_TRUE_CHOICE (1u)
+#define DAVID_PITCH_CTRL_RIGHT_STOP_CHOICE (0u)
+#define DAVID_PITCH_CTRL_RIGHT_EXTEND_CHOICE (1u)
+#define DAVID_PITCH_CTRL_RIGHT_RETRACT_CHOICE (2u)
 
 #define DAVID_PITCH_POSITION_TELEM_LEFT_DIRECTION_STOP_CHOICE (0u)
 #define DAVID_PITCH_POSITION_TELEM_LEFT_DIRECTION_EXTEND_CHOICE (1u)
@@ -67,9 +69,6 @@ extern "C" {
 #define DAVID_PITCH_POSITION_TELEM_RIGHT_DIRECTION_STOP_CHOICE (0u)
 #define DAVID_PITCH_POSITION_TELEM_RIGHT_DIRECTION_EXTEND_CHOICE (1u)
 #define DAVID_PITCH_POSITION_TELEM_RIGHT_DIRECTION_RETRACT_CHOICE (2u)
-
-#define DAVID_PITCH_POSITION_TELEM_IN_HOME_STATE_FALSE_CHOICE (0u)
-#define DAVID_PITCH_POSITION_TELEM_IN_HOME_STATE_TRUE_CHOICE (1u)
 
 #define DAVID_PITCH_DRIVER_TELEM_LEFT_DIRECTION_STOP_CHOICE (0u)
 #define DAVID_PITCH_DRIVER_TELEM_LEFT_DIRECTION_EXTEND_CHOICE (1u)
@@ -113,32 +112,18 @@ struct david_e_stop_t {
  */
 struct david_pitch_ctrl_t {
     /**
-     * Range: 0..512 (0.0..180 mm)
-     * Scale: 0.3515625
-     * Offset: 0.0
+     * Range: -
+     * Scale: 1
+     * Offset: 0
      */
-    uint16_t set_point;
-
-    /**
-     * Range: 0..435.2 (-76.5..76.5 mm)
-     * Scale: 0.3515625
-     * Offset: -76.5
-     */
-    uint16_t left_offset;
-
-    /**
-     * Range: 0..435.2 (-76.5..76.5 mm)
-     * Scale: 0.3515625
-     * Offset: -76.5
-     */
-    uint16_t right_offset;
+    uint8_t left;
 
     /**
      * Range: -
      * Scale: 1
      * Offset: 0
      */
-    uint8_t home;
+    uint8_t right;
 };
 
 /**
@@ -148,25 +133,18 @@ struct david_pitch_ctrl_t {
  */
 struct david_pitch_position_telem_t {
     /**
-     * Range: 0..512 (0.0..180 mm)
-     * Scale: 0.3515625
-     * Offset: 0.0
+     * Range: 0..512 (-180.0..180 mm)
+     * Scale: 0.703125
+     * Offset: -180.0
      */
     uint16_t left_position;
 
     /**
-     * Range: 0..512 (0.0..180 mm)
-     * Scale: 0.3515625
-     * Offset: 0.0
+     * Range: 0..512 (-180.0..180 mm)
+     * Scale: 0.703125
+     * Offset: -180.0
      */
     uint16_t right_position;
-
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint8_t home_done;
 
     /**
      * Range: -
@@ -181,13 +159,6 @@ struct david_pitch_position_telem_t {
      * Offset: 0
      */
     uint8_t right_direction;
-
-    /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint8_t in_home_state;
 };
 
 /**
@@ -366,8 +337,8 @@ struct david_mast_ctrl_t {
  * Signals in message MastTelem.
  *
  * 
-            Will print rotation angle. Min is -360, Max is 360 and Home is 0
-          
+                Will print rotation angle. Min is -360, Max is 360 and Home is 0
+            
  *
  * All signal values are as on the CAN bus.
  */
@@ -470,7 +441,7 @@ int david_pitch_ctrl_unpack(
  *
  * @return Encoded signal.
  */
-uint16_t david_pitch_ctrl_set_point_encode(double value);
+uint8_t david_pitch_ctrl_left_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -479,7 +450,7 @@ uint16_t david_pitch_ctrl_set_point_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_pitch_ctrl_set_point_decode(uint16_t value);
+double david_pitch_ctrl_left_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -488,7 +459,7 @@ double david_pitch_ctrl_set_point_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_pitch_ctrl_set_point_is_in_range(uint16_t value);
+bool david_pitch_ctrl_left_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -497,7 +468,7 @@ bool david_pitch_ctrl_set_point_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint16_t david_pitch_ctrl_left_offset_encode(double value);
+uint8_t david_pitch_ctrl_right_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -506,7 +477,7 @@ uint16_t david_pitch_ctrl_left_offset_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_pitch_ctrl_left_offset_decode(uint16_t value);
+double david_pitch_ctrl_right_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -515,61 +486,7 @@ double david_pitch_ctrl_left_offset_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_pitch_ctrl_left_offset_is_in_range(uint16_t value);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint16_t david_pitch_ctrl_right_offset_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_pitch_ctrl_right_offset_decode(uint16_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_pitch_ctrl_right_offset_is_in_range(uint16_t value);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint8_t david_pitch_ctrl_home_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_pitch_ctrl_home_decode(uint8_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_pitch_ctrl_home_is_in_range(uint8_t value);
+bool david_pitch_ctrl_right_is_in_range(uint8_t value);
 
 /**
  * Pack message PitchPositionTelem.
@@ -660,33 +577,6 @@ bool david_pitch_position_telem_right_position_is_in_range(uint16_t value);
  *
  * @return Encoded signal.
  */
-uint8_t david_pitch_position_telem_home_done_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_pitch_position_telem_home_done_decode(uint8_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_pitch_position_telem_home_done_is_in_range(uint8_t value);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
 uint8_t david_pitch_position_telem_left_direction_encode(double value);
 
 /**
@@ -733,33 +623,6 @@ double david_pitch_position_telem_right_direction_decode(uint8_t value);
  * @return true if in range, false otherwise.
  */
 bool david_pitch_position_telem_right_direction_is_in_range(uint8_t value);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint8_t david_pitch_position_telem_in_home_state_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_pitch_position_telem_in_home_state_decode(uint8_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_pitch_position_telem_in_home_state_is_in_range(uint8_t value);
 
 /**
  * Pack message PitchDriverTelem.
