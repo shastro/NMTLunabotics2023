@@ -25,6 +25,8 @@ RUN apt-get install -y \
     ros-noetic-usb-cam \
     ros-noetic-compressed-image-transport
 
+RUN apt-get install -y python3-catkin-tools
+
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
 COPY can /can
