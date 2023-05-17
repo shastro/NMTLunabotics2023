@@ -1,5 +1,0 @@
-
-int8 START_TRACKING=0
-int8 STOP_TRACKING=1
-
-int8 command

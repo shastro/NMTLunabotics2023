@@ -1,0 +1,49 @@
+plugins:
+    - {name: static_map, type: "costmap_2d::StaticLayer"}
+    - {name: obstacles, type: "costmap_2d::ObstacleLayer"}
+global_frame: map
+robot_base_frame: base_link
+update_frequency: 1.0 # update
+publish_frequency: 1.0
+footprint: [[0.5, 0.5], [0.5, -0.5], [-0.5, 0.5], [-0.5, -0.5]] # size of david
+map_topic: occupancy_grid
+first_map_only: true
+track_unknown_space: true
+obstacles:
+    observation_sources: d455_1, d455_2, l515_1, l515_2
+    max_obstacle_height: 1.0
+    obstacle_range: 4
+    raytrace_range: 5
+    track_unknown_space: true
+    footprint_clearing_enabled: true
+    d455_1:
+        sensor_frame: d455_1_link
+        expected_update_rate: 0.0 # more than pointcloud hz
+        data_type: PointCloud2
+        clearing: true
+        marking: true
+        inf_is_valid: false
+    d455_2:
+        sensor_frame: d455_2_link
+        expected_update_rate: 0.0
+        data_type: PointCloud2
+        clearing: true
+        marking: true
+        inf_is_valid: false
+    l515_1:
+        sensor_frame: d455_2_link
+        expected_update_rate: 0.0
+        data_type: PointCloud2
+        clearing: true
+        marking: true
+        inf_is_valid: false
+    l515_2:
+        sensor_frame: d455_2_link
+        expected_update_rate: 0.0
+        data_type: PointCloud2
+        clearing: true
+        marking: true
+        inf_is_valid: false
+inflation:
+    inflation_radius: 0.5 # Radius of david
+    cost_scaling_factor: 1

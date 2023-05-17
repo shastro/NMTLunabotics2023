@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>pad_send</name>
+  <name>navigation</name>
   <version>0.0.0</version>
-  <description>The pad_send package</description>
+  <description>The navigation package</description>
 
   <maintainer email="niallcdevlin@gmail.com">Niall Devlin</maintainer>
   <license>GPLv3</license>
@@ -14,7 +14,7 @@
   <depend>roscpp_serializion</depend>
   <depend>roslib</depend>
   <depend>rostime</depend>
-  <depend>motor_bridge</depend>
+  <depend>david_config</depend>
 
   <export>
   </export>
