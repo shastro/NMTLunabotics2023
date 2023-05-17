@@ -116,7 +116,7 @@ void setup() {
     Wire.begin();
     delay(100);
 
-    PitchController control(0x59, 0x59);
+    PitchController control(0x58, 0x59);
     bool e_stopped = false;
 
     scheduler_dense([&]() {
