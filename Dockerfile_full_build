@@ -33,47 +33,47 @@ COPY can /can
 # from least to most often changed.
 # Uncomment the ones to be compiled
 #COPY ros/catkin_ws/src/kindr /ros/catkin_ws/src/kindr_ros
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
+#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 #COPY ros/catkin_ws/src/kindr_ros /ros/catkin_ws/src/kindr_ros
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
+#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 COPY ros/catkin_ws/src/message_logger /ros/catkin_ws/src/message_logger
-RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 #COPY ros/catkin_ws/src/realsense-ros /ros/catkin_ws/src/realsense-ros
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
+#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 #COPY ros/catkin_ws/src/se2_grid_map_generator_msgs /ros/catkin_ws/src/se2_grid_map_generator_msgs
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
+#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 #COPY ros/catkin_ws/src/se2_grid_map_generator /ros/catkin_ws/src/se2_grid_map_generator
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
+#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 #COPY ros/catkin_ws/src/se2_navigation_msgs /ros/catkin_ws/src/se2_navigation_msgs
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
+#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 #COPY ros/catkin_ws/src/se2_planning /ros/catkin_ws/src/se2_planning
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
+#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 #COPY ros/catkin_ws/src/se2_planning_ros /ros/catkin_ws/src/se2_planning_ros
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
+#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 #COPY ros/catkin_ws/src/david_tui /ros/catkin_ws/src/david_tui
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
+#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 COPY ros/catkin_ws/src/motor_bridge /ros/catkin_ws/src/motor_bridge
-RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/pad_send
-RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 # Now copy all the source code in to make sure everything is up to
 # date. I'm fairly confident this will work but not 100% sure it won't
 # rebuild everything ~~Alex
 # RUN rm -rf /ros/catkin_ws/src
 # COPY ros/catkin_ws/src /ros/catkin_ws/src
-# RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin_make
+# RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 # Add /catkin_ws to the ROS environment.
 COPY ros/ros_entrypoint.sh /ros_entrypoint.sh
