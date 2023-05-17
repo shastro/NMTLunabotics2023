@@ -26,6 +26,14 @@ enum class Mode { Normal, Adjust, Home, Stop };
 
 Mode m = Mode::Normal;
 
+class NcursesBuf : public std::streambuf {
+protected:
+    virtual int_type overflow(int_type c) {
+        printw("%c", static_cast<char>(c));
+        return c;
+    }
+};
+
 int main(int argc, char *argv[]) {
     // Set up ros
     ros::init(argc, argv, "pad_send");
@@ -74,6 +82,10 @@ int main(int argc, char *argv[]) {
 
     int count = 0;
 
+    // Create a stream for printing to ncurses.
+    NcursesBuf out_buf;
+    std::ostream out(&out_buf);
+
     while (true) {
         g.update();
         erase();
@@ -90,8 +102,6 @@ int main(int argc, char *argv[]) {
             endwin();
             return 0;
         }
-
-        std::stringstream out;
 
         // Control scheme TODO update
         out << "X - Resume, Y - Estop, A - Adjust, B - Home, XBOX - quit\n";
@@ -244,7 +254,6 @@ int main(int argc, char *argv[]) {
         lastB = g.buttons.B;
 
         // Print
-        printw("%s", out.str().c_str());
         refresh();
 
         pub.publish(s);
