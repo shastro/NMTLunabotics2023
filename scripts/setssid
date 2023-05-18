@@ -57,7 +57,8 @@ logger_syslog=-1
 logger_syslog_level=1
 wlan_id=e925
 own_ip_addr=192.168.1.40
-EOF"
+EOF
+"
 sshpass -p'@rt3m!$NMT' \
         ssh -oHostKeyAlgorithms=+ssh-dss \
         admin@192.168.1.40 \
@@ -81,7 +82,8 @@ logger_syslog=-1
 logger_syslog_level=1
 wlan_id=e925
 own_ip_addr=192.168.1.40
-EOF"
+EOF
+"
 
 sshpass -p'@rt3m!$NMT' \
         ssh -oHostKeyAlgorithms=+ssh-dss admin@192.168.1.40 \
