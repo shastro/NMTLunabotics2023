@@ -21,7 +21,9 @@ RUN apt-get install -y \
     ros-noetic-rosmon \
     ros-noetic-rviz \
     ros-noetic-tf2-tools \
-    ros-noetic-usb-cam
+    ros-noetic-usb-cam \
+    ros-noetic-compressed-image-transport \
+    ros-noetic-rosmon 
 
 RUN apt-get install -y python3-catkin-tools
 RUN apt-get install -y ros-noetic-pcl-ros
