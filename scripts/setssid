@@ -31,19 +31,22 @@ IFS=$'\n\t'
 # overwrite /etc/hostapd/ath0.cfg and ath2.cfg, then restart hostapd
 # on the access point.
 
+SSID=Team_49
+PSK=lunabotics
+
 sshpass -p'@rt3m!$NMT' \
         ssh -oHostKeyAlgorithms=+ssh-dss \
         admin@192.168.1.40 \
-        'cat <<EOF > /etc/hostapd/ath0.cfg
+        "cat <<EOF > /etc/hostapd/ath0.cfg
 interface=ath0
 ctrl_interface=/var/run/hostapd
 driver=atheros
 nas_identifier=$bssid
-ssid=Team_08
+ssid=$SSID
 wpa_group_rekey=0
 wpa_group_update_count=4
 wpa_gmk_rekey=86400
-wpa_passphrase=artemisNMT
+wpa_passphrase=$PSK
 bridge=br0
 wpa=2
 eapol_version=2
@@ -54,20 +57,20 @@ logger_syslog=-1
 logger_syslog_level=1
 wlan_id=e925
 own_ip_addr=192.168.1.40
-EOF'
+EOF"
 sshpass -p'@rt3m!$NMT' \
         ssh -oHostKeyAlgorithms=+ssh-dss \
         admin@192.168.1.40 \
-        'cat <<EOF > /etc/hostapd/ath2.cfg
+        "cat <<EOF > /etc/hostapd/ath2.cfg
 interface=ath2
 ctrl_interface=/var/run/hostapd
 driver=atheros
 nas_identifier=$bssid
-ssid=Team_08
+ssid=$SSID
 wpa_group_rekey=0
 wpa_group_update_count=4
 wpa_gmk_rekey=86400
-wpa_passphrase=artemisNMT
+wpa_passphrase=$PSK
 bridge=br0
 wpa=2
 eapol_version=2
@@ -78,7 +81,7 @@ logger_syslog=-1
 logger_syslog_level=1
 wlan_id=e925
 own_ip_addr=192.168.1.40
-EOF'
+EOF"
 
 sshpass -p'@rt3m!$NMT' \
         ssh -oHostKeyAlgorithms=+ssh-dss admin@192.168.1.40 \
