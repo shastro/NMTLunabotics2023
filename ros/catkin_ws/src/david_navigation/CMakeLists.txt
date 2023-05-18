@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(david_navigation)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -10,16 +10,21 @@ find_package(catkin REQUIRED COMPONENTS
     roslib
     rostime
     david_config
+    motor_bridge
 )
 
 catkin_package(CATKIN_DEPENDS std_msgs roscpp david_config)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-#add_executable(costmap_cvt src/costmap_cvt.cpp)
-#add_dependencies(costmap_cvt david_config
-#    ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(costmap_cvt ${catkin_LIBRARIES})
-#install(TARGETS
-#    costmap_cvt
-#    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+add_executable(base_controller
+  src/base_controller.cpp
+)
+add_dependencies(base_controller
+  # motor_bridge
+  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(base_controller ${catkin_LIBRARIES})
+link_directories(${catkin_LIBRARY_DIRS})
+install(TARGETS
+   base_controller
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
