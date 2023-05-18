@@ -7,15 +7,28 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
       output_layer: elevation_inpainted
       radius: 0.1
 
-  # Compute Surface normals
+  # Compute surface normals.
   - name: surface_normals
     type: gridMapFilters/NormalVectorsFilter
     params:
       input_layer: elevation_inpainted
       output_layers_prefix: normal_vectors_
-      radius: 0.1
+      radius: 0.05
       normal_vector_positive_axis: z
 
+  # Compute slope from surface normal.
+  - name: slope
+    type: gridMapFilters/MathExpressionFilter
+    params:
+      output_layer: slope
+      expression: acos(normal_vectors_z)
+
+  # Compute roughness as absolute difference from map to smoothened map.
+  - name: roughness
+    type: gridMapFilters/MathExpressionFilter
+    params:
+      output_layer: roughness
+      expression: abs(elevation_inpainted - elevation_smooth)
 
   - name: traversability
     type: gridMapFilters/MathExpressionFilter
