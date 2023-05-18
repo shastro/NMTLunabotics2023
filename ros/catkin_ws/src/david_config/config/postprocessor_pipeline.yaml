@@ -60,5 +60,5 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
     params:
       condition_layer: traversability
       output_layer: traversability
-      upper_threshold: 1.0
+      upper_threshold: 0.8
       set_to: 1.0 # Other uses: .nan, .inf

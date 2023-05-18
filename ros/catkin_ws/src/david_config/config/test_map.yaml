@@ -29,12 +29,12 @@ position_x:                                 0.0
 position_y:                                 0.0
 resolution:                                 0.05
 
-#grid_map_topic: "/grid_map"
-#grid_map_visualization:
-#  # Setup occupancy grid
-#  - name: traversability_grid
-#    type: occupancy_grid
-#    params:
-#     layer: traversability
-#     data_min: -0.15
-#     data_max: 0.15
+grid_map_topic: "/elevation_mapping/elevation_mapping_raw"
+grid_map_visualization:
+  # Setup occupancy grid
+  - name: traversability_grid
+    type: occupancy_grid
+    params:
+     layer: traversability
+     data_min: -0.15
+     data_max: 0.15

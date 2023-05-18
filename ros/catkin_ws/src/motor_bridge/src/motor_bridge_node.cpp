@@ -14,22 +14,23 @@
 
 #define CAN_BUS "can0"
 static SocketCAN can;
-
 bool debug = false;
 
-motor_bridge::System lastMsg;
-struct sigaction sigIntHandler;
+motor_bridge::Estop last_stop;
+motor_bridge::PitchCtrl last_pitch;
+motor_bridge::LocoCtrl last_loco;
+motor_bridge::ExcavCtrl last_excav;
+motor_bridge::StepperCtrl last_stepper;
+motor_bridge::MastCtrl last_mast;
 
-void callback(const motor_bridge::System::ConstPtr &msg);
+void stop(const motor_bridge::EStop::ConstPtr &msg);
+void pitch(const motor_bridge::PitchCtrl::ConstPtr &msg);
+void loco(const motor_bridge::LocoCtrl::ConstPtr &msg);
+void excav(const motor_bridge::ExcavCtrl::ConstPtr &msg);
+void stepper(const motor_bridge::StepperCtrl::ConstPtr &msg);
+void mast(const motor_bridge::MastCtrl::ConstPtr &msg);
+
 void send(uint8_t* buff, int id, const char* name, std::string print);
-void stop(const motor_bridge::System::ConstPtr &msg);
-void pitch(const motor_bridge::System::ConstPtr &msg);
-void loco(const motor_bridge::System::ConstPtr &msg);
-void excav(const motor_bridge::System::ConstPtr &msg);
-void stepper(const motor_bridge::System::ConstPtr &msg);
-void mast(const motor_bridge::System::ConstPtr &msg);
-
-void exit(int s);
 
 int main(int argc, char **argv) {
     // Setup ncurses
@@ -42,10 +43,6 @@ int main(int argc, char **argv) {
         start_color();
         init_pair(1, COLOR_WHITE, COLOR_BLACK);
         init_pair(2, COLOR_YELLOW, COLOR_BLACK);
-
-        sigIntHandler.sa_handler = exit;
-        sigemptyset(&sigIntHandler.sa_mask);
-        sigIntHandler.sa_flags = 0;
     }
 
     try {
@@ -53,8 +50,12 @@ int main(int argc, char **argv) {
 
         ros::init(argc, argv, "motor_bridge");
         ros::NodeHandle nh;
-        ros::Subscriber sub =
-            nh.subscribe("system", 5, callback);
+        ros::Subscriber stop_sub = nh.subscribe("system/stop", 5, stop);
+        ros::Subscriber pitch_sub = nh.subscribe("system/pitch_ctrl", 5, pitch);
+        ros::Subscriber loco_sub = nh.subscribe("system/loco_ctrl", 5, loco);
+        ros::Subscriber excav_sub = nh.subscribe("system/excav_ctrl", 5, excav);
+        ros::Subscriber stepper_sub = nh.subscribe("system/stepper_ctrl", 5, stepper);
+        ros::Subscriber mast_sub = nh.subscribe("system/mast_ctrl", 5, mast);
 
         // Callback event loop
         ros::spin();
@@ -64,65 +65,52 @@ int main(int argc, char **argv) {
     }
 }
 
-void callback(const motor_bridge::System::ConstPtr &msg) {
-    if (lastMsg == *msg) { return; }
-    erase();
-    move(0, 0);
-
-    stop(msg);
-    pitch(msg);
-    loco(msg);
-    excav(msg);
-    stepper(msg);
-    mast(msg);
-
-    lastMsg = *msg;
-
-    if (debug) {
-        sigaction(SIGINT, &sigIntHandler, NULL);
-    }
-}
-
-void stop(const motor_bridge::System::ConstPtr &msg) {
+void stop(const motor_bridge::EStop::ConstPtr &msg) {
+    if (*msg == last_stop) { return; }
     uint8_t buff[8];
     int can_id;
-    can_id = pack_msg(msg->e_stop, buff);
-    send(buff, can_id, "EStop", printable(msg->e_stop));
+    can_id = pack_msg(*msg, buff);
+    send(buff, can_id, "EStop", printable(*e_stop));
 }
 
-void pitch(const motor_bridge::System::ConstPtr &msg) {
+void pitch(const motor_bridge::PitchCtrl::ConstPtr &msg) {
+    if (*msg == last_pitch) { return; }
     uint8_t buff[8];
     int can_id;
-    can_id = pack_msg(msg->pitch_ctrl, buff);
-    send(buff, can_id, "Pitch", printable(msg->pitch_ctrl));
+    can_id = pack_msg(*pitch_ctrl, buff);
+    send(buff, can_id, "Pitch", printable(*pitch_ctrl));
 }
 
-void loco(const motor_bridge::System::ConstPtr &msg) {
+void loco(const motor_bridge::LocoCtrl::ConstPtr &msg) {
+    if (*msg == last_loco) { return; }
     uint8_t buff[8];
     int can_id;
-    can_id = pack_msg(msg->loco_ctrl, buff);
-    send(buff, can_id, "Loco", printable(msg->loco_ctrl));
+    can_id = pack_msg(*loco_ctrl, buff);
+    send(buff, can_id, "Loco", printable(*loco_ctrl));
 }
 
-void excav(const motor_bridge::System::ConstPtr &msg) {
+void excav(const motor_bridge::ExcavCtrl::ConstPtr &msg) {
+    if (*msg == last_excav) { return; }
     uint8_t buff[8];
     int can_id;
-    can_id = pack_msg(msg->excav_ctrl, buff);
-    send(buff, can_id, "Excav", printable(msg->excav_ctrl));
+    can_id = pack_msg(*excav_ctrl, buff);
+    send(buff, can_id, "Excav", printable(*excav_ctrl));
 }
 
-void stepper(const motor_bridge::System::ConstPtr &msg) {
+void stepper(const motor_bridge::StepperCtrl::ConstPtr &msg) {
+    if (*msg == last_stepper) { return; }
     uint8_t buff[8];
     int can_id;
-    can_id = pack_msg(msg->stepper_ctrl, buff);
-    send(buff, can_id, "Stepper", printable(msg->stepper_ctrl));
+    can_id = pack_msg(*stepper_ctrl, buff);
+    send(buff, can_id, "Stepper", printable(*stepper_ctrl));
 }
 
-void mast(const motor_bridge::System::ConstPtr &msg) {
+void mast(const motor_bridge::MastCtrl::ConstPtr &msg) {
+    if (*msg == last_mast) { return; }
     uint8_t buff[8];
     int can_id;
-    can_id = pack_msg(msg->mast_ctrl, buff);
-    send(buff, can_id, "Mast", printable(msg->mast_ctrl));
+    can_id = pack_msg(*mast_ctrl, buff);
+    send(buff, can_id, "Mast", printable(*mast_ctrl));
 }
 
 void send(uint8_t* buff, int id, const char* name, std::string print) {
@@ -146,7 +134,3 @@ void send(uint8_t* buff, int id, const char* name, std::string print) {
     if (debug) { refresh(); }
 }
 
-void exit(int s) {
-    endwin();
-    exit(1);
-}

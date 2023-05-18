@@ -22,9 +22,17 @@ double stepper_min = STEPPER_CTRL_SET_POINT_MIN * min_max_mod;
 
 enum class PitchSignal { Stop = 0, Extend = 1, Retract = 2 };
 
+// State handling
 enum class Mode { Normal, Adjust, Home, Stop };
-
 Mode m = Mode::Normal;
+
+//Publishers
+ros::Publisher stop_pub;
+ros::Publisher loco_pub;
+ros::Publisher pitch_pub;
+ros::Publisher stepper_pub;
+ros::Publisher excav_pub;
+ros::Publisher mast_pub;
 
 class NcursesBuf : public std::streambuf {
   protected:
@@ -38,7 +46,12 @@ int main(int argc, char *argv[]) {
     // Set up ros
     ros::init(argc, argv, "pad_send");
     ros::NodeHandle nh;
-    ros::Publisher pub = nh.advertise<motor_bridge::System>("/system", 5);
+    ros::Publisher stop_pub = nh.advertise<motor_bridge::EStop>("/system/stop", 5);
+    ros::Publisher pitch_pub = nh.advertise<motor_bridge::PitchCtrl>("/system/pitch_ctrl", 5);
+    ros::Publisher loco_pub = nh.advertise<motor_bridge::LocoCtrl>("/system/loco_ctrl", 5);
+    ros::Publisher stepper_pub = nh.advertise<motor_bridge::StepperCtrl>("/system/stepper_ctrl", 5);
+    ros::Publisher excav_pub = nh.advertise<motor_bridge::ExcavCtrl>("/system/excav_ctrl", 5);
+    ros::Publisher mast_pub = nh.advertise<motor_bridge::MastCtrl>("/system/mast_ctrl", 5);
     ros::Rate nyquil(rate);
 
     // Setup ncurses
