@@ -7,6 +7,14 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
       output_layer: elevation_inpainted
       radius: 0.1
 
+  # Create a smoothed filter
+  - name: mean_in_radius
+    type: gridMapFilters/MeanInRadiusFilter
+    params:
+      input_layer: elevation_inpainted
+      output_layer: elevation_smooth
+      radius: 0.06
+
   # Compute surface normals.
   - name: surface_normals
     type: gridMapFilters/NormalVectorsFilter
