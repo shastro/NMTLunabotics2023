@@ -9,7 +9,7 @@ input_sources:
       ignore_points_above: 1
       ignore_points_below: -2
 
-map_frame_id: "t265_odom_frame"
+map_frame_id: "map"
 robot_base_frame_id: "t265_pose_frame"
 
 robot_pose_with_covariance_topic: "/pose_with_covariance"
@@ -25,3 +25,12 @@ position_x:                                 0.0
 position_y:                                 0.0
 resolution:                                 0.01
 
+grid_map_topic: "elevation_mapping/elevation_map"
+grid_map_visualization:
+  # Setup occupancy grid
+  - name: traversability_grid
+    type: occupancy_grid
+    params:
+     layer: traversability
+     data_min: -0.15
+     data_max: 0.15
