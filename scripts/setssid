@@ -41,7 +41,7 @@ sshpass -p'@rt3m!$NMT' \
 interface=ath0
 ctrl_interface=/var/run/hostapd
 driver=atheros
-nas_identifier=$bssid
+nas_identifier=\$bssid
 ssid=$SSID
 wpa_group_rekey=0
 wpa_group_update_count=4
@@ -65,7 +65,7 @@ sshpass -p'@rt3m!$NMT' \
 interface=ath2
 ctrl_interface=/var/run/hostapd
 driver=atheros
-nas_identifier=$bssid
+nas_identifier=\$bssid
 ssid=$SSID
 wpa_group_rekey=0
 wpa_group_update_count=4
