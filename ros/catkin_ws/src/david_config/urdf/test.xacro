@@ -7,12 +7,6 @@
     <link name="t265_pose_frame" />
     <link name="t265_odom_frame" />
 
-    <joint name="map_joint">
-        <origin rpy="0 0 0" xyz="0 0 0" />
-        <parent link="map" />
-        <child link="t265_odom_frame" />
-    </joint>
-
     <!-- Base link should be center of robot -->
     <joint name="base_joint">
         <origin rpy="0 0 0" xyz="0 0 0" />
