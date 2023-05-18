@@ -8,6 +8,8 @@
   <license>GPLv3</license>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <depend>grid_map_core</depend>
+  <depend>grid_map_ros</depend>
   <depend>rosconsole</depend>
   <depend>roscpp</depend>
   <depend>std_msgs</depend>

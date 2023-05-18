@@ -34,6 +34,14 @@ ros::Publisher stepper_pub;
 ros::Publisher excav_pub;
 ros::Publisher mast_pub;
 
+//Messages
+motor_bridge::EStop e_stop;
+motor_bridge::PitchCtrl pitch_ctrl;
+motor_bridge::LocoCtrl loco_ctrl;
+motor_bridge::ExcavCtrl excav_ctrl;
+motor_bridge::StepperCtrl stepper_ctrl;
+motor_bridge::MastCtrl mast_ctrl;
+
 class NcursesBuf : public std::streambuf {
   protected:
     virtual int_type overflow(int_type c) {
@@ -79,15 +87,11 @@ int main(int argc, char *argv[]) {
     GamepadHandler g(controller_input, max, dead);
 
     // Message loop
-    motor_bridge::System s;
-
     PitchSignal pitch_left = PitchSignal::Stop;
     PitchSignal pitch_right = PitchSignal::Stop;
 
     double stepper = 0;
-
-    bool stepper_home = false;
-
+    
     bool lastX = false;
     bool lastY = false;
     bool lastA = false;
@@ -155,8 +159,8 @@ int main(int argc, char *argv[]) {
 
             // Un home everyting
             // pitch_home = false;
-            stepper_home = false;
-            s.e_stop.stop = false;
+            stepper.home = false;
+            e_stop.stop = false;
 
             // Pitch control with dpad
             if (g.dpad.up) {
@@ -269,7 +273,13 @@ int main(int argc, char *argv[]) {
         // Print
         refresh();
 
-        pub.publish(s);
+        stop_pub.publish(stop);
+        pitch_pub.publish(pitch);
+        loco_pub.publish(loco);
+        excav_pub.publish(excav);
+        stepper_pub.publish(stepper);
+        mast_pub.publish(mast);
+        
         nyquil.sleep();
     }
     endwin();

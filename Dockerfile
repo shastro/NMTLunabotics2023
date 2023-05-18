@@ -13,12 +13,14 @@ RUN apt-get install -y \
     net-tools \
     git \
     tmux \
-    python3-catkin-tools
+    python3-catkin-tools \
+    libeigen3-dev
 
 # 2. Install ROS packages from apt.
 RUN apt-get install -y \
     ros-noetic-eigen-conversions \
     ros-noetic-gazebo-ros \
+    ros-noetic-grid-map \
     ros-noetic-grid-map-core \
     ros-noetic-grid-map-ros \
     ros-noetic-joint-state-publisher \

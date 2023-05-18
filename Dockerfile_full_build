@@ -13,7 +13,8 @@ RUN apt-get install -y \
     net-tools \
     git \
     tmux \
-    python3-catkin-tools
+    python3-catkin-tools \
+    libeigen3-dev
 
 # 2. Install ROS packages from apt.
 RUN apt-get install -y \

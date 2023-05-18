@@ -16,7 +16,7 @@
 static SocketCAN can;
 bool debug = false;
 
-motor_bridge::Estop last_stop;
+motor_bridge::EStop last_stop;
 motor_bridge::PitchCtrl last_pitch;
 motor_bridge::LocoCtrl last_loco;
 motor_bridge::ExcavCtrl last_excav;
@@ -70,47 +70,47 @@ void stop(const motor_bridge::EStop::ConstPtr &msg) {
     uint8_t buff[8];
     int can_id;
     can_id = pack_msg(*msg, buff);
-    send(buff, can_id, "EStop", printable(*e_stop));
+    send(buff, can_id, "EStop", printable(*msg));
 }
 
 void pitch(const motor_bridge::PitchCtrl::ConstPtr &msg) {
     if (*msg == last_pitch) { return; }
     uint8_t buff[8];
     int can_id;
-    can_id = pack_msg(*pitch_ctrl, buff);
-    send(buff, can_id, "Pitch", printable(*pitch_ctrl));
+    can_id = pack_msg(*msg, buff);
+    send(buff, can_id, "Pitch", printable(*msg));
 }
 
 void loco(const motor_bridge::LocoCtrl::ConstPtr &msg) {
     if (*msg == last_loco) { return; }
     uint8_t buff[8];
     int can_id;
-    can_id = pack_msg(*loco_ctrl, buff);
-    send(buff, can_id, "Loco", printable(*loco_ctrl));
+    can_id = pack_msg(*msg, buff);
+    send(buff, can_id, "Loco", printable(*msg));
 }
 
 void excav(const motor_bridge::ExcavCtrl::ConstPtr &msg) {
     if (*msg == last_excav) { return; }
     uint8_t buff[8];
     int can_id;
-    can_id = pack_msg(*excav_ctrl, buff);
-    send(buff, can_id, "Excav", printable(*excav_ctrl));
+    can_id = pack_msg(*msg, buff);
+    send(buff, can_id, "Excav", printable(*msg));
 }
 
 void stepper(const motor_bridge::StepperCtrl::ConstPtr &msg) {
     if (*msg == last_stepper) { return; }
     uint8_t buff[8];
     int can_id;
-    can_id = pack_msg(*stepper_ctrl, buff);
-    send(buff, can_id, "Stepper", printable(*stepper_ctrl));
+    can_id = pack_msg(*msg, buff);
+    send(buff, can_id, "Stepper", printable(*msg));
 }
 
 void mast(const motor_bridge::MastCtrl::ConstPtr &msg) {
     if (*msg == last_mast) { return; }
     uint8_t buff[8];
     int can_id;
-    can_id = pack_msg(*mast_ctrl, buff);
-    send(buff, can_id, "Mast", printable(*mast_ctrl));
+    can_id = pack_msg(*msg, buff);
+    send(buff, can_id, "Mast", printable(*msg));
 }
 
 void send(uint8_t* buff, int id, const char* name, std::string print) {
