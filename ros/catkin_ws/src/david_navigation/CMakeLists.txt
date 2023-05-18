@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
     roslib
     rostime
     david_config
+    motor_bridge
 )
 
 catkin_package(CATKIN_DEPENDS std_msgs roscpp david_config)
@@ -23,3 +24,12 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 #install(TARGETS
 #    costmap_cvt
 #    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+add_executable(base_controller src/base_controller.cpp)
+include_directories(include ${catkin_INCLUDE_DIRS})
+target_link_libraries(base_controller ${catkin_LIBRARIES})
+add_dependencies(base_controller motor_bridge
+    ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+install(TARGETS
+   base_controller
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
