@@ -17,14 +17,6 @@ catkin_package(CATKIN_DEPENDS std_msgs roscpp david_config)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-#add_executable(costmap_cvt src/costmap_cvt.cpp)
-#add_dependencies(costmap_cvt david_config
-#    ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(costmap_cvt ${catkin_LIBRARIES})
-#install(TARGETS
-#    costmap_cvt
-#    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
 add_executable(base_controller src/base_controller.cpp)
 include_directories(include ${catkin_INCLUDE_DIRS})
 target_link_libraries(base_controller ${catkin_LIBRARIES})
