@@ -6,3 +6,38 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
       input_layer: elevation
       output_layer: elevation_inpainted
       radius: 0.1
+
+  # Compute Surface normals
+  - name: surface_normals
+    type: gridMapFilters/NormalVectorsFilter
+    params:
+      input_layer: elevation_inpainted
+      output_layers_prefix: normal_vectors_
+      radius: 0.1
+      normal_vector_positive_axis: z
+
+
+  - name: traversability
+    type: gridMapFilters/MathExpressionFilter
+    params:
+      input_layer: elevation_inpainted
+      output_layer: traversability
+      expression: 0.5 * (1.0 - (slope / 0.6)) + 0.5 * (1.0 - (roughness / 0.1))
+
+  # Set lower threshold on traversability.
+  - name: traversability_lower_threshold
+    type: gridMapFilters/ThresholdFilter
+    params:
+      condition_layer: traversability
+      output_layer: traversability
+      lower_threshold: 0.0
+      set_to: 0.0
+
+  # Set upper threshold on traversability.
+  - name: traversability_upper_threshold
+    type: gridMapFilters/ThresholdFilter
+    params:
+      condition_layer: traversability
+      output_layer: traversability
+      upper_threshold: 1.0
+      set_to: 1.0 # Other uses: .nan, .inf
