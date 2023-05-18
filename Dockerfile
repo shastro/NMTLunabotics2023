@@ -23,14 +23,13 @@ RUN apt-get install -y \
     ros-noetic-tf2-tools \
     ros-noetic-usb-cam \
     ros-noetic-compressed-image-transport \
-    ros-noetic-rosmon 
-
-RUN apt-get install -y python3-catkin-tools
-RUN apt-get install -y ros-noetic-pcl-ros
-RUN apt-get install -y ros-noetic-tf-conversions
-RUN apt-get install -y ros-noetic-grid-map-filters 
-RUN apt-get install -y ros-noetic-grid-map-rviz-plugin
-RUN apt-get install -y ros-noetic-xacro
+    ros-noetic-rosmon
+    python3-catkin-tools
+    ros-noetic-pcl-ros
+    ros-noetic-tf-conversions
+    ros-noetic-grid-map-filters 
+    ros-noetic-grid-map-rviz-plugin
+    ros-noetic-xacro
 
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws /ros/catkin_ws
