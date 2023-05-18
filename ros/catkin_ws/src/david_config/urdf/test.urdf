@@ -4,17 +4,24 @@
 <!-- |    EDITING THIS FILE BY HAND IS NOT RECOMMENDED                                 | -->
 <!-- =================================================================================== -->
 <robot name="david">
+  <link name="base_link"/>
   <link name="d455_2_link"/>
   <link name="t265_link"/>
   <link name="t265_pose_frame"/>
+  <!-- Base link should be center of robot -->
+  <joint name="base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="t265_pose_frame"/>
+    <child link="base_link"/>
+  </joint>
   <joint name="d455_2_joint" type="fixed">
     <origin rpy="3.14 0 0" xyz="0 0.199 0"/>
-    <parent link="t265_pose_frame"/>
+    <parent link="base_link"/>
     <child link="d455_2_link"/>
   </joint>
   <joint name="t265_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0.0131 0.068 0"/>
-    <parent link="t265_pose_frame"/>
+    <parent link="base_link"/>
     <child link="t265_link"/>
   </joint>
 </robot>

@@ -1,0 +1,8 @@
+postprocessor_pipeline: # set by postprocessor_pipeline_name
+  # Fill holes in the map with inpainting.
+  - name: inpaint
+    type: gridMapCv/InpaintFilter
+    params:
+      input_layer: elevation
+      output_layer: elevation_inpainted
+      radius: 0.1

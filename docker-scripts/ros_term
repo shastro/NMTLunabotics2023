@@ -85,11 +85,12 @@ sudo docker build "$DIR" -t lunabotics-2023-ros
 sudo docker run \
     "${params[@]}" \
     lunabotics-2023-ros \
-    sh -c "
+    bash -c "
         cd $PWD
         export HOME="$HOME"
         export PS1='\u@\h:\w\$ '
-        [ -e $DIR/ros/catkin_ws/devel/setup.sh ] && . $DIR/ros/catkin_ws/devel/setup.sh
+        . /opt/ros/noetic/setup.bash
+        [ -e $DIR/ros/catkin_ws/devel/setup.bash ] && . $DIR/ros/catkin_ws/devel/setup.bash
         bash
     "
 
