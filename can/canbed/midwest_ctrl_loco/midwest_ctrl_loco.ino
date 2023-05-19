@@ -31,7 +31,7 @@ void setup() {
 
         switch (packet.id) {
             FRAME_CASE(DAVID_LOCO_CTRL, david_loco_ctrl) {
-                left.setVel(david_loco_ctrl_left_vel_decode(frame.left_vel));
+                left.setVel(-david_loco_ctrl_left_vel_decode(frame.left_vel));
                 right.setVel(david_loco_ctrl_right_vel_decode(frame.right_vel));
                 Serial.print(david_loco_ctrl_left_vel_decode(frame.left_vel));
                 Serial.print(", ");
