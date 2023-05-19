@@ -19,6 +19,7 @@ catkin_package(CATKIN_DEPENDS
   std_msgs
   roscpp
   david_config
+  motor_bridge
   grid_map_core
   grid_map_ros
 )
@@ -29,7 +30,7 @@ add_executable(base_controller
   src/base_controller.cpp
 )
 add_dependencies(base_controller
-  # motor_bridge
+  motor_bridge
   ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(base_controller ${catkin_LIBRARIES})
 
@@ -37,8 +38,9 @@ add_executable(occupancy_grid
   src/occupancy_grid.cpp
 )
 add_dependencies(occupancy_grid
-  # motor_bridge
-  ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+    grid_map_core
+    grid_map_ros
+    ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(occupancy_grid ${catkin_LIBRARIES})
 
 link_directories(${catkin_LIBRARY_DIRS})
