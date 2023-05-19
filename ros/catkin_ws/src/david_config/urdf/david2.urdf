@@ -26,7 +26,7 @@
     </joint>
 
     <joint name="d455_2_joint" type="fixed">
-        <origin xyz="-0.01 0.02 0.16" rpy="0 0 0" />
+        <origin xyz="-0.01 0.02 0.16" rpy="0.261799387799 0 0" />
         <parent link="right_tread" />
         <child link="d455_2" />
         <axis xyz="0 0 0" />
@@ -62,14 +62,14 @@
     </joint>
 
     <joint name="d455_1_joint" type="fixed">
-        <origin xyz="-0.005 -0.02 0.16" />
+        <origin xyz="-0.005 -0.02 0.16" rpy="-0.261799387799 0 0" />
         <parent link="left_tread" />
         <child link="d455_1" />
         <axis xyz="0 0 0" />
     </joint>
 
     <joint name="l515_1_joint" type="fixed">
-        <origin xyz="0.45 -0.04 0.38" />
+        <origin xyz="0.45 -0.04 0.38" rpy="0 0.261799387799 0" />
         <parent link="left_tread" />
         <child link="l515_1" />
         <axis xyz="0 0 0" />
