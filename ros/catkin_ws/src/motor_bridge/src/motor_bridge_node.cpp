@@ -12,7 +12,7 @@
 #include "can_interface.hpp"
 #include <linux/can.h>
 
-#define CAN_BUS "vcan0"
+#define CAN_BUS "can0"
 static SocketCAN can;
 bool debug = true;
 
