@@ -58,6 +58,3 @@ trap cleanup INT
 
 # Set up the ROS core.
 docker run "${params[@]}" $IMAGE_NAME rosrun usb_cam usb_cam_node _image_width:=320 _image_height:=240 _framerate:=10
-docker exec $CONTAINER_NAME /ros_entrypoint.sh roslaunch raspicam_node camerav1_1280x720.launch
-
-
