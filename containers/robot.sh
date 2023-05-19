@@ -65,54 +65,5 @@ docker exec -d $CONTAINER_NAME /ros_entrypoint.sh /scripts/unfuck_realsense
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun \
     motor_bridge motor_bridge
 
-# Run cameras
-docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
-    realsense2_camera rs_t265.launch camera:=t265
-
-docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
-    realsense2_camera rs_camera.launch \
-    camera:=d455_1 serial_no:=213522250920 filters:=pointcloud \
-    depth_fps:=30 depth_width:=640 depth_height:=480 \
-    enable_color:=false pointcloud_texture_stream:=RS2_STREAM_ANY
-
-docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
-    realsense2_camera rs_camera.launch \
-    camera:=d455_2 serial_no:=213522253528 filters:=pointcloud \
-    depth_fps:=30 depth_width:=640 depth_height:=480 \
-    enable_color:=false pointcloud_texture_stream:=RS2_STREAM_ANY
-
-docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
-    realsense2_camera rs_camera.launch \
-    camera:=l515_1 serial_no:=f1381818 filters:=pointcloud \
-    depth_fps:=30 depth_width:=640 depth_height:=480 \
-    enable_color:=false pointcloud_texture_stream:=RS2_STREAM_ANY
-
-docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch --wait \
-    realsense2_camera rs_camera.launch \
-    camera:=l515_2 serial_no:=f0461308 filters:=pointcloud \
-    depth_fps:=30 depth_width:=640 depth_height:=480 \
-    enable_color:=false pointcloud_texture_stream:=RS2_STREAM_ANY
-
-# Temporary: transforms required by rviz.
-tf_frames=(
-    map
-    d455_1_color_frame
-    d455_1_color_optical_frame
-    d455_1_depth_frame
-    d455_1_link
-    d455_2_color_frame
-    d455_2_color_optical_frame
-    d455_2_depth_frame
-    d455_2_link
-    l515_1_depth_frame
-    l515_1_depth_optical_frame
-    l515_1_link
-    l515_2_depth_frame
-    l515_2_depth_optical_frame
-    l515_2_link
-)
-
-for frame in "${tf_frames[@]}"; do
-    docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh \
-           rosrun tf2_ros static_transform_publisher 0 0 0 0 0 0 world "$frame"
-done
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh roslaunch \
+    david_config mapping.launch
