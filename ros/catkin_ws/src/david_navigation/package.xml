@@ -17,6 +17,7 @@
   <depend>roslib</depend>
   <depend>rostime</depend>
   <depend>david_config</depend>
+  <depend>motor_bridge</depend>
 
   <export>
   </export>
