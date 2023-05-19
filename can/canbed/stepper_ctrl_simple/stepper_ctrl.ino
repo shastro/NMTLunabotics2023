@@ -6,6 +6,8 @@
 #include "arduino_lib.hpp"
 #include "david.h"
 
+enum Dirs { BACKWARD = -1, STOP = 0, FORWARD = 1 };
+
 #define RPUL 10
 #define RDIR 6
 #define LPUL 4
@@ -13,7 +15,33 @@
 #define MIN_LIMIT A0
 #define MAX_LIMIT A1
 
-enum Class Dirs { BACKWARD = -1, STOP = 0, FORWARD = 1 };
+struct StepperController {
+    Stepper right;
+    Stepper left;
+    InPin min_limit;
+    InPin max_limit;
+
+    long right_count;
+    long left_count;
+};
+
+
+struct StepperController {
+    Stepper right;
+    Stepper left;
+    InPin min_limit;
+    InPin max_limit;
+    enum States {
+        MOVE = 0, // Move to point
+        HOME = 1,
+    };
+    enum States state;
+    enum Dirs { BACKWARD = -1, STOP = 0, FORWARD = 1 };
+    unsigned long int pos;
+    unsigned long int point;
+    enum Dirs dir;
+    unsigned int homing_timer;
+
 
 Stepper right;
 Stepper left;
