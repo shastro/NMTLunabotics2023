@@ -12,8 +12,8 @@ void setup() {
 
     // PWM pins for leonardo
     // 3, 5, 6, 9, 10, 11, 13
-    MidwestMotorController left(A2, A1, 11, 6);
-    MidwestMotorController right(12, 4, 5, 10);
+    MidwestMotorController left(12, 4, 5, 10);
+    MidwestMotorController right(A2, A1, 11, 6);
 
     bool eStopped = false;
     for(;;) {
