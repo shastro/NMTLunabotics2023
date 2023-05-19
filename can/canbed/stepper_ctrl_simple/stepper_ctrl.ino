@@ -23,7 +23,7 @@ bool at_max = false;
 
 unsigned long pos = 0;
 unsigned long point = 0;
-unsigned long count = 0;
+unsigned long clock = 0;
 
 CANPacket packet;
 
@@ -39,7 +39,7 @@ void setup() {
 }
 
 void loop() {
-    count++;
+    clock = millis();
     
     packet = can_read_nonblocking(can);
     switch (packet.id) {
@@ -60,14 +60,14 @@ void loop() {
     }
     
     // Send Telemetry
-    if (count % 20 == 0) {
+    if (clock % 10 == 0) {
         CANPacket telemetry(DAVID_STEPPER_TELEM_FRAME_ID);
         pack_telemetry(telemetry.buf);
         can_send(can, telemetry);
     }
 
     // Get min swich
-    if (count % 200 == 0) {
+    if (clock % 5 == 0) {
         at_min = min_limit.read();
     }
 
@@ -76,10 +76,12 @@ void loop() {
     }
 
     // Handle point
-    if (pos < point) {
-        doStep(1);
-    } else if (pos > point) {
-        doStep(-1);
+    if (clock % 50 == 0) {
+        if (pos < point) {
+            doStep(1);
+        } else if (pos > point) {
+            doStep(-1);
+        }
     }
     
 }
