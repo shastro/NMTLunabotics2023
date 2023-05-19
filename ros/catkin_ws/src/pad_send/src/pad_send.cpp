@@ -150,10 +150,10 @@ int main(int argc, char *argv[]) {
 
             // Pitch control with dpad
             if (g.dpad.up) {
-                pitch_ctrl.left  = pitch_ctrl.right = 2;
+                pitch_ctrl.left  = pitch_ctrl.right = 1;
                 out << "Pitch up\n";
             } else if (g.dpad.down) {
-                pitch_ctrl.left  = pitch_ctrl.right = 1;
+                pitch_ctrl.left  = pitch_ctrl.right = 2;
                 out << "Pitch down\n";
             } else {
                 pitch_ctrl.left  = pitch_ctrl.right = 0;
