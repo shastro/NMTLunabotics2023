@@ -41,6 +41,6 @@
         <rosparam command="load" file="$(find david_config)/config/postprocessor_pipeline.yaml" />
     </node>
 
-    <!- Occupancy grid node -->
+    <!-- Occupancy grid node -->
     <node pkg="david_navigation" type="occupancy_grid" name="occupancy_grid" />
 </launch>

@@ -15,12 +15,9 @@ int dead = 20;  // Can't be too touchy. < dead = 0
 int rate = 100; // in hertz
 
 double stepper_delta = 20.0 / rate; // in mm/s
-
 double min_max_mod = 0.999;
 double stepper_max = STEPPER_CTRL_SET_POINT_MAX * min_max_mod;
 double stepper_min = STEPPER_CTRL_SET_POINT_MIN * min_max_mod;
-
-enum class PitchSignal { Stop = 0, Extend = 1, Retract = 2 };
 
 // State handling
 enum class Mode { Normal, Adjust, Home, Stop };
@@ -86,24 +83,12 @@ int main(int argc, char *argv[]) {
     sprintf(controller_input, "/dev/input/js%d", joynum);
     GamepadHandler g(controller_input, max, dead);
 
-    // Message loop
-    PitchSignal pitch_left = PitchSignal::Stop;
-    PitchSignal pitch_right = PitchSignal::Stop;
-
-    double stepper = 0;
-    
-    bool lastX = false;
-    bool lastY = false;
-    bool lastA = false;
-    bool lastB = false;
-
     int count = 0;
 
     // Create a stream for printing to ncurses.
     NcursesBuf out_buf;
-    std::ostream out(&out_buf);
-
     while (true) {
+        std::stringstream out;
         g.update();
         erase();
         move(0, 0);
@@ -114,8 +99,8 @@ int main(int argc, char *argv[]) {
 
         // Quit
         if (g.buttons.xbox) {
-            s.e_stop.stop = true;
-            pub.publish(s);
+           e_stop.stop = true;
+            stop_pub.publish(e_stop);
             endwin();
             return 0;
         }
@@ -145,7 +130,13 @@ int main(int argc, char *argv[]) {
         if (g.buttons.X) {
             m = Mode::Normal;
         }
-
+        
+        stepper_ctrl.home = false;
+        e_stop.stop = false;
+        loco_ctrl.left_vel = 0;
+        loco_ctrl.right_vel = 0;
+        pitch_ctrl.left = pitch_ctrl.right = 0;
+        
         switch (m) {
         case Mode::Normal:
             // Controls
@@ -157,62 +148,58 @@ int main(int argc, char *argv[]) {
             out << "Mast: Bumpers\n";
             out << "\n";
 
-            // Un home everyting
-            // pitch_home = false;
-            stepper.home = false;
-            e_stop.stop = false;
-
             // Pitch control with dpad
             if (g.dpad.up) {
-                pitch_left = pitch_right = PitchSignal::Extend;
+                pitch_ctrl.left  = pitch_ctrl.right = 2;
                 out << "Pitch up\n";
             } else if (g.dpad.down) {
-                pitch_left = pitch_right = PitchSignal::Retract;
+                pitch_ctrl.left  = pitch_ctrl.right = 1;
                 out << "Pitch down\n";
+            } else {
+                pitch_ctrl.left  = pitch_ctrl.right = 0;
             }
-            s.pitch_ctrl.left = (uint8_t)pitch_left;
-            s.pitch_ctrl.right = (uint8_t)pitch_right;
 
             // Viagra bumpers
             if (g.buttons.left_bumper) {
                 out << "david's shaft left\n";
-                s.mast_ctrl.direction = 0;
+               mast_ctrl.direction = 0;
             } else if (g.buttons.right_bumper) {
                 out << "david's shaft right\n";
-                s.mast_ctrl.direction = 2;
+               mast_ctrl.direction = 2;
             } else {
-                s.mast_ctrl.direction = 1;
+               mast_ctrl.direction = 1;
             }
 
             // Drive with both sticks
-            s.loco_ctrl.left_vel = g.left_stick.y;
-            s.loco_ctrl.right_vel = g.right_stick.y;
-            if (s.loco_ctrl.left_vel != 0 || s.loco_ctrl.right_vel != 0) {
-                out << "Driving - L: " << s.loco_ctrl.left_vel
-                    << ", R: " << s.loco_ctrl.right_vel << "\n";
+           loco_ctrl.left_vel = g.left_stick.y;
+           loco_ctrl.right_vel = g.right_stick.y;
+            if (loco_ctrl.left_vel != 0 ||loco_ctrl.right_vel != 0) {
+                out << "Driving - L: " <<loco_ctrl.left_vel
+                    << ", R: " <<loco_ctrl.right_vel << "\n";
             }
 
             // Extend dpad
             if (g.dpad.left) {
-                stepper += stepper_delta;
-                stepper = std::min(stepper, stepper_max);
-                out << "Arm Extend: " << stepper << "\n";
+               stepper_ctrl.set_point += stepper_delta;
+               stepper_ctrl.set_point =
+                        std::min((double)stepper_ctrl.set_point, stepper_max);
+                out << "Arm Extend: " << stepper_ctrl.set_point << "\n";
             } else if (g.dpad.right) {
-                stepper -= stepper_delta;
-                stepper = std::max(stepper, stepper_min);
-                out << "Arm Retract: " << stepper << "\n";
+               stepper_ctrl.set_point -= stepper_delta;
+               stepper_ctrl.set_point = 
+                        std::max((double)stepper_ctrl.set_point, stepper_min);
+                out << "Arm Retract: " << stepper_ctrl.set_point << "\n";
             }
-            s.stepper_ctrl.set_point = stepper;
 
             // Digger triggers
             if (g.left_trigger > 0) {
-                s.excav_ctrl.vel = -g.left_trigger;
-                out << "Dig Forward: " << s.excav_ctrl.vel << "\n";
+               excav_ctrl.vel = -g.left_trigger;
+                out << "Dig Forward: " <<excav_ctrl.vel << "\n";
             } else if (g.right_trigger > 0) {
-                s.excav_ctrl.vel = g.right_trigger;
-                out << "Dig Backward: " << s.excav_ctrl.vel << "\n";
+               excav_ctrl.vel = g.right_trigger;
+                out << "Dig Backward: " <<excav_ctrl.vel << "\n";
             } else {
-                s.excav_ctrl.vel = 0;
+               excav_ctrl.vel = 0;
             }
             break;
 
@@ -220,65 +207,36 @@ int main(int argc, char *argv[]) {
             out << "Adjusting\n\n";
             out << "Left Stick - Left Pitch Arm\n";
             out << "Right Stick - Right Pitch Arm\n";
-            out << "\n";
+                
+            if (g.left_stick.y > 0)
+                pitch_ctrl.left = 1;
+            else if (g.left_stick.y < 0)
+                pitch_ctrl.left = 2;
 
-            // Pitch
-            if (abs(g.left_stick.y) > dead) {
-                s.pitch_ctrl.left =
-                    (uint8_t)(g.left_stick.y > 0 ? PitchSignal::Extend
-                                                 : PitchSignal::Retract);
-                out << "Pitch left: " << s.pitch_ctrl.left;
-            }
-
-            if (abs(g.right_stick.y) > dead) {
-                s.pitch_ctrl.right =
-                    (uint8_t)(g.right_stick.y > 0 ? PitchSignal::Extend
-                                                  : PitchSignal::Retract);
-                out << "Pitch right: " << s.pitch_ctrl.left;
-            }
+            if (g.right_stick.y > 0)
+                pitch_ctrl.right = 1;
+            else if (g.right_stick.y < 0)
+                pitch_ctrl.right = 2;
             break;
-
+        
         case Mode::Home:
-            out << "Homing\n\n";
-            out << "Extend: Dpad Left or Right\n";
-            out << "\n";
-
-            if (g.dpad.left || g.dpad.right) {
-                out << "Extend Home\n";
-                stepper_home = true;
-                stepper = stepper_min;
-                s.stepper_ctrl.set_point = stepper;
-            }
-
+            stepper_ctrl.home = true;
             break;
 
         case Mode::Stop:
-            out << "Contemplating Life\n";
-            s.e_stop.stop = true;
-            break;
-
-        default:
+            e_stop.stop = true;
             break;
         }
 
-        // Sending homing messages
-        s.stepper_ctrl.home = stepper_home;
-
-        // Update last state
-        lastX = g.buttons.X;
-        lastY = g.buttons.Y;
-        lastA = g.buttons.A;
-        lastB = g.buttons.B;
-
-        // Print
+        printw(out.str().c_str());
         refresh();
-
-        stop_pub.publish(stop);
-        pitch_pub.publish(pitch);
-        loco_pub.publish(loco);
-        excav_pub.publish(excav);
-        stepper_pub.publish(stepper);
-        mast_pub.publish(mast);
+        
+        stop_pub.publish(e_stop);
+            pitch_pub.publish(pitch_ctrl);
+            loco_pub.publish(loco_ctrl);
+            excav_pub.publish(excav_ctrl);
+            stepper_pub.publish(stepper_ctrl);
+            mast_pub.publish(mast_ctrl);
         
         nyquil.sleep();
     }

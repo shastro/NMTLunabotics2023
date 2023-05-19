@@ -13,15 +13,15 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
     params:
       input_layer: elevation_inpainted
       output_layer: elevation_smooth
-      radius: 0.06
+      radius: 0.1
 
   # Compute surface normals.
   - name: surface_normals
     type: gridMapFilters/NormalVectorsFilter
     params:
-      input_layer: elevation_inpainted
+      input_layer: elevation_smooth
       output_layers_prefix: normal_vectors_
-      radius: 0.05
+      radius: 0.1
       normal_vector_positive_axis: z
 
   # Compute slope from surface normal.
@@ -30,7 +30,23 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
     params:
       output_layer: slope
       expression: acos(normal_vectors_z)
+  
+  - name: slope_lower_threshold
+    type: gridMapFilters/ThresholdFilter
+    params:
+      condition_layer: slope
+      output_layer: slope
+      lower_threshold: 0.05
+      set_to: 0.0
 
+  - name: slope_upper_threshold
+    type: gridMapFilters/ThresholdFilter
+    params:
+      condition_layer: slope
+      output_layer: slope
+      upper_threshold: 1.0
+      set_to: 1.0 # Other uses: .nan, .inf
+    
   # Compute roughness as absolute difference from map to smoothened map.
   - name: roughness
     type: gridMapFilters/MathExpressionFilter
@@ -43,7 +59,7 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
     params:
       input_layer: elevation_inpainted
       output_layer: traversability
-      expression: 0.5 * (1.0 - (slope / 0.6)) + 0.5 * (1.0 - (roughness / 0.1))
+      expression: 0.7 * (1.0 - (slope / 0.6)) + 0.3 * (1.0 - (roughness / 0.1))
 
   # Set lower threshold on traversability.
   - name: traversability_lower_threshold
@@ -62,3 +78,4 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
       output_layer: traversability
       upper_threshold: 0.8
       set_to: 1.0 # Other uses: .nan, .inf
+    

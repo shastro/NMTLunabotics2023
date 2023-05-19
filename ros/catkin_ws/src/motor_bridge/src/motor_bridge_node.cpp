@@ -12,9 +12,9 @@
 #include "can_interface.hpp"
 #include <linux/can.h>
 
-#define CAN_BUS "can0"
+#define CAN_BUS "vcan0"
 static SocketCAN can;
-bool debug = false;
+bool debug = true;
 
 motor_bridge::EStop last_stop;
 motor_bridge::PitchCtrl last_pitch;
@@ -35,6 +35,7 @@ void send(uint8_t* buff, int id, const char* name, std::string print);
 int main(int argc, char **argv) {
     // Setup ncurses
     if (debug) {
+        /*
         initscr();
         cbreak();
         keypad(stdscr, true);
@@ -43,6 +44,7 @@ int main(int argc, char **argv) {
         start_color();
         init_pair(1, COLOR_WHITE, COLOR_BLACK);
         init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+        */
     }
 
     try {
@@ -71,6 +73,7 @@ void stop(const motor_bridge::EStop::ConstPtr &msg) {
     int can_id;
     can_id = pack_msg(*msg, buff);
     send(buff, can_id, "EStop", printable(*msg));
+    last_stop = *msg;
 }
 
 void pitch(const motor_bridge::PitchCtrl::ConstPtr &msg) {
@@ -79,6 +82,7 @@ void pitch(const motor_bridge::PitchCtrl::ConstPtr &msg) {
     int can_id;
     can_id = pack_msg(*msg, buff);
     send(buff, can_id, "Pitch", printable(*msg));
+    last_pitch = *msg;
 }
 
 void loco(const motor_bridge::LocoCtrl::ConstPtr &msg) {
@@ -87,6 +91,7 @@ void loco(const motor_bridge::LocoCtrl::ConstPtr &msg) {
     int can_id;
     can_id = pack_msg(*msg, buff);
     send(buff, can_id, "Loco", printable(*msg));
+    last_loco = *msg;
 }
 
 void excav(const motor_bridge::ExcavCtrl::ConstPtr &msg) {
@@ -95,6 +100,7 @@ void excav(const motor_bridge::ExcavCtrl::ConstPtr &msg) {
     int can_id;
     can_id = pack_msg(*msg, buff);
     send(buff, can_id, "Excav", printable(*msg));
+    last_excav = *msg;
 }
 
 void stepper(const motor_bridge::StepperCtrl::ConstPtr &msg) {
@@ -103,6 +109,7 @@ void stepper(const motor_bridge::StepperCtrl::ConstPtr &msg) {
     int can_id;
     can_id = pack_msg(*msg, buff);
     send(buff, can_id, "Stepper", printable(*msg));
+    last_stepper = *msg;
 }
 
 void mast(const motor_bridge::MastCtrl::ConstPtr &msg) {
@@ -111,26 +118,37 @@ void mast(const motor_bridge::MastCtrl::ConstPtr &msg) {
     int can_id;
     can_id = pack_msg(*msg, buff);
     send(buff, can_id, "Mast", printable(*msg));
+    last_mast = *msg;
 }
 
 void send(uint8_t* buff, int id, const char* name, std::string print) {
+    if (debug) {
+    //move(0, 0);
+    //clear();
+    }
     try {
         can.transmit(id, buff);
         if (debug) {
+            std::cout << print;
+            /*
             attron(COLOR_PAIR(1));
             printw(print.c_str());
             attroff(COLOR_PAIR(1));
+            */
         }
     } catch (std::string err) {
         if (debug) {
+            std::cerr << err << std::endl;
+            /*
             attron(COLOR_PAIR(2));
             printw(name);
             printw(": ");
             printw(err.c_str());
             printw("\n");
             attroff(COLOR_PAIR(2));
+            */
         }
     }
-    if (debug) { refresh(); }
+    //if (debug) { refresh(); }
 }
 
