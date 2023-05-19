@@ -33,7 +33,7 @@ extern "C" {
 #define DAVID_PITCH_DRIVER_TELEM_LENGTH (5u)
 #define DAVID_LOCO_CTRL_LENGTH (4u)
 #define DAVID_EXCAV_CTRL_LENGTH (2u)
-#define DAVID_STEPPER_CTRL_LENGTH (2u)
+#define DAVID_STEPPER_CTRL_LENGTH (1u)
 #define DAVID_STEPPER_TELEM_LENGTH (3u)
 #define DAVID_MAST_CTRL_LENGTH (1u)
 #define DAVID_MAST_TELEM_LENGTH (2u)
@@ -78,14 +78,16 @@ extern "C" {
 #define DAVID_PITCH_DRIVER_TELEM_RIGHT_DIRECTION_EXTEND_CHOICE (1u)
 #define DAVID_PITCH_DRIVER_TELEM_RIGHT_DIRECTION_RETRACT_CHOICE (2u)
 
-#define DAVID_STEPPER_CTRL_HOME_FALSE_CHOICE (0u)
-#define DAVID_STEPPER_CTRL_HOME_TRUE_CHOICE (1u)
+#define DAVID_STEPPER_CTRL_LEFT_DIR_STOP_CHOICE (0u)
+#define DAVID_STEPPER_CTRL_LEFT_DIR_EXTEND_CHOICE (1u)
+#define DAVID_STEPPER_CTRL_LEFT_DIR_RETRACT_CHOICE (2u)
+
+#define DAVID_STEPPER_CTRL_RIGHT_DIR_STOP_CHOICE (0u)
+#define DAVID_STEPPER_CTRL_RIGHT_DIR_EXTEND_CHOICE (1u)
+#define DAVID_STEPPER_CTRL_RIGHT_DIR_RETRACT_CHOICE (2u)
 
 #define DAVID_STEPPER_TELEM_AT_MIN_STOP_FALSE_CHOICE (0u)
 #define DAVID_STEPPER_TELEM_AT_MIN_STOP_TRUE_CHOICE (1u)
-
-#define DAVID_STEPPER_TELEM_AT_MAX_STOP_FALSE_CHOICE (0u)
-#define DAVID_STEPPER_TELEM_AT_MAX_STOP_TRUE_CHOICE (1u)
 
 #define DAVID_MAST_CTRL_DIRECTION_CCW_CHOICE (0u)
 #define DAVID_MAST_CTRL_DIRECTION_STOP_CHOICE (1u)
@@ -269,14 +271,14 @@ struct david_stepper_ctrl_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t home;
+    uint8_t left_dir;
 
     /**
-     * Range: 0..1422.222222222222222222222222 (0.0..500 mm)
-     * Scale: 0.3515625
-     * Offset: 0.0
+     * Range: -
+     * Scale: 1
+     * Offset: 0
      */
-    uint16_t set_point;
+    uint8_t right_dir;
 };
 
 /**
@@ -285,6 +287,8 @@ struct david_stepper_ctrl_t {
  * 
                 Min and Max stop refer to if we are currently at a
                 limit switch. TODO: Get correct slope for steppers
+
+                Actual max is 500 mm
             
  *
  * All signal values are as on the CAN bus.
@@ -298,25 +302,18 @@ struct david_stepper_telem_t {
     uint8_t at_min_stop;
 
     /**
-     * Range: -
-     * Scale: 1
-     * Offset: 0
-     */
-    uint8_t at_max_stop;
-
-    /**
-     * Range: 0..1422.222222222222222222222222 (0.0..500 mm)
-     * Scale: 0.3515625
+     * Range: 0..2048 (0.0..520 mm)
+     * Scale: 0.25390625
      * Offset: 0.0
      */
-    uint16_t position;
+    uint16_t left_position;
 
     /**
-     * Range: 0..1422.222222222222222222222222 (0.0..500 mm)
-     * Scale: 0.3515625
+     * Range: 0..2048 (0.0..520 mm)
+     * Scale: 0.25390625
      * Offset: 0.0
      */
-    uint16_t set_point;
+    uint16_t right_position;
 };
 
 /**
@@ -986,7 +983,7 @@ int david_stepper_ctrl_unpack(
  *
  * @return Encoded signal.
  */
-uint8_t david_stepper_ctrl_home_encode(double value);
+uint8_t david_stepper_ctrl_left_dir_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -995,7 +992,7 @@ uint8_t david_stepper_ctrl_home_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_stepper_ctrl_home_decode(uint8_t value);
+double david_stepper_ctrl_left_dir_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1004,7 +1001,7 @@ double david_stepper_ctrl_home_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_stepper_ctrl_home_is_in_range(uint8_t value);
+bool david_stepper_ctrl_left_dir_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1013,7 +1010,7 @@ bool david_stepper_ctrl_home_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint16_t david_stepper_ctrl_set_point_encode(double value);
+uint8_t david_stepper_ctrl_right_dir_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1022,7 +1019,7 @@ uint16_t david_stepper_ctrl_set_point_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_stepper_ctrl_set_point_decode(uint16_t value);
+double david_stepper_ctrl_right_dir_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1031,7 +1028,7 @@ double david_stepper_ctrl_set_point_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_stepper_ctrl_set_point_is_in_range(uint16_t value);
+bool david_stepper_ctrl_right_dir_is_in_range(uint8_t value);
 
 /**
  * Pack message StepperTelem.
@@ -1095,7 +1092,7 @@ bool david_stepper_telem_at_min_stop_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t david_stepper_telem_at_max_stop_encode(double value);
+uint16_t david_stepper_telem_left_position_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1104,7 +1101,7 @@ uint8_t david_stepper_telem_at_max_stop_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_stepper_telem_at_max_stop_decode(uint8_t value);
+double david_stepper_telem_left_position_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1113,7 +1110,7 @@ double david_stepper_telem_at_max_stop_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_stepper_telem_at_max_stop_is_in_range(uint8_t value);
+bool david_stepper_telem_left_position_is_in_range(uint16_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1122,7 +1119,7 @@ bool david_stepper_telem_at_max_stop_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint16_t david_stepper_telem_position_encode(double value);
+uint16_t david_stepper_telem_right_position_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1131,7 +1128,7 @@ uint16_t david_stepper_telem_position_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_stepper_telem_position_decode(uint16_t value);
+double david_stepper_telem_right_position_decode(uint16_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1140,34 +1137,7 @@ double david_stepper_telem_position_decode(uint16_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_stepper_telem_position_is_in_range(uint16_t value);
-
-/**
- * Encode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to encode.
- *
- * @return Encoded signal.
- */
-uint16_t david_stepper_telem_set_point_encode(double value);
-
-/**
- * Decode given signal by applying scaling and offset.
- *
- * @param[in] value Signal to decode.
- *
- * @return Decoded signal.
- */
-double david_stepper_telem_set_point_decode(uint16_t value);
-
-/**
- * Check that given signal is in allowed range.
- *
- * @param[in] value Signal to check.
- *
- * @return true if in range, false otherwise.
- */
-bool david_stepper_telem_set_point_is_in_range(uint16_t value);
+bool david_stepper_telem_right_position_is_in_range(uint16_t value);
 
 /**
  * Pack message MastCtrl.
