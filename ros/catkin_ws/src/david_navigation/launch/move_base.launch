@@ -39,6 +39,7 @@
         command="load" />
   </node>
 
-  <node name='base_controller' pkg='david_navigation' type='base_controller' respawn='true'/>
+  <node name='base_controller' pkg='david_navigation' respawn='true'/>
+  <node name='motor_bridge' pkg='motor_bridge' respawn='true'/>
 
 </launch>
