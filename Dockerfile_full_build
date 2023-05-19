@@ -47,40 +47,31 @@ COPY can /can
 # Incremental-ish builds to avoid full rebuilds. Keep these in order
 # from least to most often changed.
 # Uncomment the ones to be compiled
-#COPY ros/catkin_ws/src/kindr /ros/catkin_ws/src/kindr_ros
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+COPY ros/catkin_ws/src/kindr /ros/catkin_ws/src/kindr
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
-#COPY ros/catkin_ws/src/kindr_ros /ros/catkin_ws/src/kindr_ros
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+COPY ros/catkin_ws/src/kindr_ros /ros/catkin_ws/src/kindr_ros
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 COPY ros/catkin_ws/src/message_logger /ros/catkin_ws/src/message_logger
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
-#COPY ros/catkin_ws/src/realsense-ros /ros/catkin_ws/src/realsense-ros
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+COPY ros/catkin_ws/src/realsense-ros /ros/catkin_ws/src/realsense-ros
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
-#COPY ros/catkin_ws/src/se2_grid_map_generator_msgs /ros/catkin_ws/src/se2_grid_map_generator_msgs
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/elevation_mapping
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
-#COPY ros/catkin_ws/src/se2_grid_map_generator /ros/catkin_ws/src/se2_grid_map_generator
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
-
-#COPY ros/catkin_ws/src/se2_navigation_msgs /ros/catkin_ws/src/se2_navigation_msgs
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
-
-#COPY ros/catkin_ws/src/se2_planning /ros/catkin_ws/src/se2_planning
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
-
-#COPY ros/catkin_ws/src/se2_planning_ros /ros/catkin_ws/src/se2_planning_ros
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
-
-#COPY ros/catkin_ws/src/david_tui /ros/catkin_ws/src/david_tui
-#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/elevation_mapping_demos
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 COPY ros/catkin_ws/src/motor_bridge /ros/catkin_ws/src/motor_bridge
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/pad_send
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/david_config
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 # Now copy all the source code in to make sure everything is up to
