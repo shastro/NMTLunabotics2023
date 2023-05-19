@@ -38,4 +38,7 @@
         file="$(find david_navigation)/config/base_local_planner_params.yaml"
         command="load" />
   </node>
+
+  <node name='base_controller' pkg='david_navigation' type='base_controller' respawn='true'/>
+
 </launch>
