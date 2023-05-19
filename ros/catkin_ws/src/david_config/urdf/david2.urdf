@@ -1,11 +1,15 @@
 <?xml version="1.0" ?>
 <robot name="david">
-    <link name="base_link" />
-    <link name="right_tread" />
-    <link name="left_tread" />
-
     <link name="back_right" />
-    <link name="back_sensor_mount" />
+    <link name="back_sensors" />
+    <link name="base_link" />
+    <link name="d455_1" />
+    <link name="d455_2" />
+    <link name="l515_1" />
+    <link name="l515_2" />
+    <link name="left_tread" />
+    <link name="right_tread" />
+    <link name="t265" />
 
     <joint name="right_tread_joint">
         <origin xyz="0 -0.275 0" rpy="0 0 0" />
