@@ -11,14 +11,10 @@
 #define LPUL 4
 #define LDIR 11
 #define MIN_LIMIT A0
-#define MAX_LIMIT A1
-
-enum Class Dirs { BACKWARD = -1, STOP = 0, FORWARD = 1 };
 
 Stepper right;
 Stepper left;
 InPin min_limit;
-InPin max_limit;
 
 bool eStopped = false;
 bool home = false;
@@ -28,7 +24,6 @@ bool at_max = false;
 unsigned long pos = 0;
 unsigned long point = 0;
 unsigned long count = 0;
-enum Dirs dir;
 
 CANPacket packet;
 
@@ -37,6 +32,10 @@ void pack_telemetry(unsigned char buf[8]) {
 
 void setup() {
     MCP_CAN can = setup_can();
+
+    left = Stepper(LPUL, LDIR);
+    right = Stepper(RPUL, RDIR);
+    min_limit = InPin(MIN_LIMIT);
 }
 
 void loop() {
