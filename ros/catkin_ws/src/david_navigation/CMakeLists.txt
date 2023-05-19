@@ -30,6 +30,7 @@ add_executable(base_controller
   src/base_controller.cpp
 )
 add_dependencies(base_controller
+  david_config
   motor_bridge
   ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(base_controller ${catkin_LIBRARIES})
@@ -38,6 +39,7 @@ add_executable(occupancy_grid
   src/occupancy_grid.cpp
 )
 add_dependencies(occupancy_grid
+    david_config
     grid_map_core
     grid_map_ros
     ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
