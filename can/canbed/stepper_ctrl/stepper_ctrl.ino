@@ -16,18 +16,16 @@ struct StepperController {
         HOME = 1,
     };
     enum States state;
-    enum Dirs {
-        BACKWARD = -1,
-        STOP = 0,
-        FORWARD = 1
-    };
+    enum Dirs { BACKWARD = -1, STOP = 0, FORWARD = 1 };
     unsigned long int pos;
     unsigned long int point;
     enum Dirs dir;
     unsigned int homing_timer;
 
-    StepperController(int pulse_l, int dir_l, int pulse_r, int dir_r, int min, int max) :
-    left(pulse_l, dir_l), right(pulse_r, dir_r), min_limit(min), max_limit(max) {
+    StepperController(int pulse_l, int dir_l, int pulse_r, int dir_r, int min,
+                      int max)
+        : left(pulse_l, dir_l), right(pulse_r, dir_r), min_limit(min),
+          max_limit(max) {
         state = MOVE;
         pos = 0;
         point = 0;
@@ -40,7 +38,7 @@ struct StepperController {
         // TODO(lcf): THIS IS FUCKY, it moves soo little....
         point = (unsigned long int)(p * (STEP_TO_MM));
     }
-    
+
     void doStep(enum Dirs dir) {
         if (dir != STOP) {
             pos += dir;
@@ -49,7 +47,7 @@ struct StepperController {
         }
     }
 
-    const int ticks_per_loop = 2000; 
+    const int ticks_per_loop = 2000;
     const int read_limit_frequency = 200;
     const int step_delay_micros = 5;
     void loop() {
@@ -73,17 +71,19 @@ struct StepperController {
                 }
             } break;
             case MOVE: {
-                dir = sign((int)point - (int)pos);
+                dir = (Dirs)sign((int)point - (int)pos);
                 if (dir == BACKWARD && at_min) {
-                    point = pos; dir = STOP;
+                    point = pos;
+                    dir = STOP;
                 }
                 if (dir == FORWARD && at_max) {
-                    point = pos; dir = STOP;
+                    point = pos;
+                    dir = STOP;
                 }
             } break;
             }
 
-            doStep(dir);            
+            doStep(dir);
             delayMicroseconds(step_delay_micros);
         } // end while(ticks)
 
@@ -94,24 +94,26 @@ struct StepperController {
         david_stepper_telem_t data = {0};
         data.at_min_stop = min_limit.read();
         data.at_max_stop = max_limit.read();
-        // TODO(lcf): steppers should always be at same pos, so we can get rid of
-        // left/right position and have position and point in kcd to verify commands
-        // are updating point correctly
-        data.position  = david_stepper_telem_position_encode(((double)pos)/STEP_TO_MM);
-        data.set_point  = david_stepper_telem_position_encode(((double)point)/STEP_TO_MM);
+        // TODO(lcf): steppers should always be at same pos, so we can get rid
+        // of left/right position and have position and point in kcd to verify
+        // commands are updating point correctly
+        data.position =
+            david_stepper_telem_position_encode(((double)pos) / STEP_TO_MM);
+        data.set_point =
+            david_stepper_telem_position_encode(((double)point) / STEP_TO_MM);
         david_stepper_telem_pack(buf, &data, 8);
     }
 };
 
 void setup() {
     MCP_CAN can = setup_can();
-    
-    #define RPUL 10
-    #define RDIR 6
-    #define LPUL 4
-    #define LDIR 11
-    #define MIN_LIMIT A0
-    #define MAX_LIMIT A1
+
+#define RPUL 10
+#define RDIR 6
+#define LPUL 4
+#define LDIR 11
+#define MIN_LIMIT A0
+#define MAX_LIMIT A1
 
     int count = 0;
 
@@ -119,32 +121,31 @@ void setup() {
 
     bool eStopped = false;
     for (;;) {
-  
+
         count++;
 
-        CANPacket packet = can_read(can);
+        CANPacket packet = can_read_nonblocking(can);
         switch (packet.id) {
-            FRAME_CASE(DAVID_E_STOP, david_e_stop) {
-                eStopped = frame.stop;
-            }
+            FRAME_CASE(DAVID_E_STOP, david_e_stop) { eStopped = frame.stop; }
         }
 
         // Send Telemetry
         if (count % 2 == 0) {
-            CANPacket telemetry = {DAVID_STEPPER_TELEM_FRAME_ID, 0};
+            CANPacket telemetry(DAVID_STEPPER_TELEM_FRAME_ID);
             control.pack_telemetry(telemetry.buf);
             can_send(can, telemetry);
         }
-        
+
         if (eStopped)
             continue;
-        
+
         switch (packet.id) {
             FRAME_CASE(DAVID_STEPPER_CTRL, david_stepper_ctrl) {
                 if (frame.home) {
                     control.state = control.HOME;
                 } else {
-                    control.setPoint(david_stepper_telem_set_point_decode(frame.set_point));
+                    control.setPoint(
+                        david_stepper_telem_set_point_decode(frame.set_point));
                 }
             }
         }
