@@ -43,6 +43,7 @@ RUN apt-get install -y \
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
 COPY ros/catkin_ws /ros/catkin_ws
+RUM rm -rf /ros/catkin_ws/devel /ros/catkin_ws/build
 COPY can /can
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 COPY ros/ros_entrypoint.sh /ros_entrypoint.sh
