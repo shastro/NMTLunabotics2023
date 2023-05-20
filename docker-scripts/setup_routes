@@ -38,4 +38,4 @@ EOF
     rm $BUILD_FILE $C_FILE
 }
 
-sudo ip route add "10.0.0.0/24" via "$(lookup_addr jetson)" dev "wlp0s20f3" proto static
+sudo ip route add "10.0.0.0/24" via "$(lookup_addr jetson)" dev "wlp2s0" proto static

@@ -12,6 +12,7 @@
     <link name="left_tread" />
     <link name="right_tread" />
     <link name="t265_link" />
+    <link name="t265_pose_frame" />
 
     <joint name="right_tread_joint" type="fixed">
         <origin xyz="0 -0.275 0" rpy="0 0 0" />
@@ -52,6 +53,13 @@
         <origin xyz="0 0 0.095" rpy="0 0 0" />
         <parent link="back_sensors" />
         <child link="t265_link" />
+        <axis xyz="0 0 0" />
+    </joint>
+
+    <joint name="t265_pose_joint" type="fixed">
+        <origin xyz="0 0 -0.095" rpy="0 0 0" />
+        <parent link="t265_pose_frame" />
+        <child link="base_link" />
         <axis xyz="0 0 0" />
     </joint>
 
