@@ -60,10 +60,10 @@ RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 COPY ros/catkin_ws/src/realsense-ros /ros/catkin_ws/src/realsense-ros
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
-COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/elevation_mapping
+COPY ros/catkin_ws/src/elevation_mapping /ros/catkin_ws/src/elevation_mapping
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
-COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/elevation_mapping_demos
+COPY ros/catkin_ws/src/elevation_mapping_demos /ros/catkin_ws/src/elevation_mapping_demos
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 COPY ros/catkin_ws/src/motor_bridge /ros/catkin_ws/src/motor_bridge
@@ -72,10 +72,10 @@ RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/pad_send
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
-COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/david_config
+COPY ros/catkin_ws/src/david_config /ros/catkin_ws/src/david_config
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
-COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/david_navigation
+COPY ros/catkin_ws/src/david_navigation /ros/catkin_ws/src/david_navigation
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 # Now copy all the source code in to make sure everything is up to
