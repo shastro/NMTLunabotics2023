@@ -100,13 +100,13 @@ void setup() {
             continue;
         }
 
-        const int direction_voltages = {HIGH, LOW, LOW};
+        const int direction_voltages[] = {HIGH, LOW, LOW};
         switch (packet.id) {
             FRAME_CASE(DAVID_STEPPER_CTRL, david_stepper_ctrl) {
                 control.left_dir = frame.left-1;
-                control.left.direction.write(direction_voltages(frame.left));
+                control.left.direction.write(direction_voltages[frame.left]);
                 control.right_dir = frame.right-1;
-                control.right.direction.write(direction_voltages(frame.right));
+                control.right.direction.write(direction_voltages[frame.right]);
             }
         }
         
