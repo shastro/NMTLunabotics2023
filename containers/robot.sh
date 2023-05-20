@@ -65,5 +65,5 @@ docker exec -d $CONTAINER_NAME /ros_entrypoint.sh /scripts/unfuck_realsense
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun \
     motor_bridge motor_bridge
 
-docker exec -d $CONTAINER_NAME /ros_entrypoint.sh roslaunch \
+docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch \
     david_config mapping.launch
