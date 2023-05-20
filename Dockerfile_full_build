@@ -72,10 +72,10 @@ RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/pad_send
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
-COPY ros/catkin_ws/src/david_config /ros/catkin_ws/src/david_config
+COPY ros/catkin_ws/src/david_navigation /ros/catkin_ws/src/david_navigation
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
-COPY ros/catkin_ws/src/david_navigation /ros/catkin_ws/src/david_navigation
+COPY ros/catkin_ws/src/david_config /ros/catkin_ws/src/david_config
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 # Now copy all the source code in to make sure everything is up to
