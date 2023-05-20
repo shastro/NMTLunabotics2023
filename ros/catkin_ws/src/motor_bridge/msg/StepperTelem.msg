@@ -1,6 +1,5 @@
 # StepperTelem ros message - auto generated from kcd
 
 bool at_min_stop
-bool at_max_stop
-float32 position
-float32 set_point
+float32 left_position
+float32 right_position

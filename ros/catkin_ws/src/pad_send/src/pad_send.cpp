@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
             out << "\n";
 
             // Pitch control with dpad
-            if (g.dad.up) {
+            if (g.dpad.up) {
                 pitch_ctrl.left  = pitch_ctrl.right = 1;
                 out << "Pitch up\n";
             } else if (g.dpad.down) {
@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
             }
 
             // Extend dpad
-            if (g.dad.right) {
+            if (g.dpad.right) {
                 stepper_ctrl.left = stepper_ctrl.right = 1;
                 out << "stepper up\n";
             } else if (g.dpad.left) {
@@ -220,7 +220,6 @@ int main(int argc, char *argv[]) {
             break;
         
         case Mode::Home:
-            stepper_ctrl.home = true;
             break;
 
         case Mode::Stop:

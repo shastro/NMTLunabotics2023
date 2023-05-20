@@ -74,8 +74,8 @@ int pack_msg(const motor_bridge::ExcavCtrl& msg, uint8_t* buff) {
 
 int pack_msg(const motor_bridge::StepperCtrl& msg, uint8_t* buff) {
     david_stepper_ctrl_t t = {
-        .home = david_stepper_ctrl_home_encode(msg.home),
-        .set_point = david_stepper_ctrl_set_point_encode(msg.set_point),
+        .left = david_stepper_ctrl_left_encode(msg.left),
+        .right = david_stepper_ctrl_right_encode(msg.right),
     };
 
     david_stepper_ctrl_pack(buff, &t, sizeof(t));
@@ -85,9 +85,8 @@ int pack_msg(const motor_bridge::StepperCtrl& msg, uint8_t* buff) {
 int pack_msg(const motor_bridge::StepperTelem& msg, uint8_t* buff) {
     david_stepper_telem_t t = {
         .at_min_stop = david_stepper_telem_at_min_stop_encode(msg.at_min_stop),
-        .at_max_stop = david_stepper_telem_at_max_stop_encode(msg.at_max_stop),
-        .position = david_stepper_telem_position_encode(msg.position),
-        .set_point = david_stepper_telem_set_point_encode(msg.set_point),
+        .left_position = david_stepper_telem_left_position_encode(msg.left_position),
+        .right_position = david_stepper_telem_right_position_encode(msg.right_position),
     };
 
     david_stepper_telem_pack(buff, &t, sizeof(t));
@@ -166,8 +165,8 @@ std::string printable(const motor_bridge::ExcavCtrl& msg) {
 
 std::string printable(const motor_bridge::StepperCtrl& msg) {
     std::stringstream s;    s << "StepperCtrl - ";
-    s << "home: " << (int)msg.home << ", ";
-    s << "set_point: " << (int)msg.set_point << ", ";
+    s << "left: " << (int)msg.left << ", ";
+    s << "right: " << (int)msg.right << ", ";
     s << std::endl;
     return s.str();
 }
@@ -175,9 +174,8 @@ std::string printable(const motor_bridge::StepperCtrl& msg) {
 std::string printable(const motor_bridge::StepperTelem& msg) {
     std::stringstream s;    s << "StepperTelem - ";
     s << "at_min_stop: " << (int)msg.at_min_stop << ", ";
-    s << "at_max_stop: " << (int)msg.at_max_stop << ", ";
-    s << "position: " << (int)msg.position << ", ";
-    s << "set_point: " << (int)msg.set_point << ", ";
+    s << "left_position: " << (int)msg.left_position << ", ";
+    s << "right_position: " << (int)msg.right_position << ", ";
     s << std::endl;
     return s.str();
 }
