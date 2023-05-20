@@ -35,7 +35,7 @@ struct StepperController {
     void loop() {
         int steps = steps_per_loop;
         bool at_min = false;
-        while (int steps = 0; steps < steps_per_loop; steps++) {
+        for (int steps = 0; steps < steps_per_loop; steps++) {
             if ((steps % read_limit_frequency) == 0) {
                 at_min = min_limit.read();
             }
