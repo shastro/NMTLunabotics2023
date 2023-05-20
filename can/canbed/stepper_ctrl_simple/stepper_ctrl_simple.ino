@@ -34,9 +34,6 @@ void pack_telemetry(unsigned char buf[8]);
 MCP_CAN can = setup_can();
 
 void setup() {
-    while(!min_limit.read()) {
-        doStep(false);
-    }
 }
 
 void loop() {
@@ -79,27 +76,27 @@ void loop() {
 
     // Handle point
     if (pos < point) {
-        doStep(true);
-    } else if (pos > point) {
         doStep(false);
+    } else if (pos > point) {
+        doStep(true);
     }
     
 }
 
 void doStep(bool dir) {
     if (dir) {
-        pos++;
-    } else {
         pos--;
+    } else {
+        pos++;
     }
     ldir.write(dir);
     rdir.write(dir);
     lpul.write(HIGH);
     lpul.write(HIGH);
-    delayMicroseconds(1000);    
+    delayMicroseconds(100);    
     lpul.write(LOW);
     rpul.write(LOW);
-    delayMicroseconds(1000);    
+    delayMicroseconds(100);    
 }
 
 void pack_telemetry(unsigned char buf[8]) {
