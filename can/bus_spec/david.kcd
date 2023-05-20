@@ -151,15 +151,19 @@
                 measure of position whenever they hit a limit switch.
                 We should home on startup
             </Notes>
-            <Signal name="Home" offset="0" length="1">
+            <Signal name="Left" offset="0" length="2">
                 <LabelSet>
-                    <Label name='False' value="0"/>
-                    <Label name='True' value="1"/>
+                    <Label name="Stop" value="0" />
+                    <Label name="Extend" value="1" />
+                    <Label name="Retract" value="2" />
                 </LabelSet>
             </Signal>
-            <Signal name="SetPoint" offset="1" length="11">
-                <Value type="unsigned" unit="mm" slope="0.3515625"
-                       intercept="0.0" min="0.0" max="500"/>
+            <Signal name="Right" offset="2" length="4">
+                <LabelSet>
+                    <Label name="Stop" value="0" />
+                    <Label name="Extend" value="1" />
+                    <Label name="Retract" value="2" />
+                </LabelSet>
             </Signal>
         </Message>
 
@@ -167,6 +171,8 @@
             <Notes>
                 Min and Max stop refer to if we are currently at a
                 limit switch. TODO: Get correct slope for steppers
+
+                Actual max is 500 mm
             </Notes>
             <Signal name="AtMinStop" offset="0" length="1">
                 <LabelSet>
@@ -174,19 +180,13 @@
                     <Label name='True' value="1"/>
                 </LabelSet>
             </Signal>
-            <Signal name="AtMaxStop" offset="1" length="1">
-                <LabelSet>
-                    <Label name='False' value="0"/>
-                    <Label name='True' value="1"/>
-                </LabelSet>
+            <Signal name="LeftPosition" offset="2" length="11">
+                <Value type="unsigned" unit="mm" slope="0.25390625"
+                       intercept="0.0" min="0.0" max="520"/>
             </Signal>
-            <Signal name="Position" offset="2" length="11">
-                <Value type="unsigned" unit="mm" slope="0.3515625"
-                       intercept="0.0" min="0.0" max="500"/>
-            </Signal>
-            <Signal name="SetPoint" offset="13" length="11">
-                <Value type="unsigned" unit="mm" slope="0.3515625"
-                       intercept="0.0" min="0.0" max="500"/>
+            <Signal name="RightPosition" offset="13" length="11">
+                <Value type="unsigned" unit="mm" slope="0.25390625"
+                       intercept="0.0" min="0.0" max="520"/>
             </Signal>
         </Message>
 

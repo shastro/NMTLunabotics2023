@@ -227,15 +227,24 @@ struct Relay {
 struct Stepper {
     OutPin pulse;
     OutPin direction;
+    long count;
+    enum Dirs { BACKWARD = -1, STOP = 0, FORWARD = 1 };
 
     Stepper(int pulse_pin, int dir_pin)
-        : pulse(pulse_pin), direction(dir_pin) {}
+        : pulse(pulse_pin), direction(dir_pin) {
+        count = 0;
+    }
 
-    void doStep(unsigned int step) {
+    void doStep(unsigned int dir) {
         const int pulse_sequence[] = {HIGH, HIGH, LOW, LOW};
         const int dir_sequence[] = {LOW, HIGH, HIGH, LOW};
-        pulse.write(pulse_sequence[step % 4]);
-        direction.write(dir_sequence[step % 4]);
+        count += dir;
+        if (dir != 0) {
+            pulse.write(LOW);
+            pulse.write(HIGH);
+            // pulse.write(pulse_sequence[count % 4]);
+            // direction.write(dir_sequence[dir+1]);
+        }
     }
 };
 

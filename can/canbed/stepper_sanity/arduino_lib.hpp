@@ -243,7 +243,7 @@ struct Stepper {
             pulse.write(LOW);
             pulse.write(HIGH);
             // pulse.write(pulse_sequence[count % 4]);
-            // direction.write(dir_sequence[dir+1]);
+            direction.write(dir_sequence[dir+1]);
         }
     }
 };

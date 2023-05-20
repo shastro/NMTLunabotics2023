@@ -524,8 +524,8 @@ int david_stepper_ctrl_pack(
 
     memset(&dst_p[0], 0, 1);
 
-    dst_p[0] |= pack_left_shift_u8(src_p->left, 0u, 0x03u);
-    dst_p[0] |= pack_left_shift_u8(src_p->right, 2u, 0x3cu);
+    dst_p[0] |= pack_left_shift_u8(src_p->left_dir, 0u, 0x03u);
+    dst_p[0] |= pack_left_shift_u8(src_p->right_dir, 2u, 0x3cu);
 
     return (1);
 }
@@ -539,38 +539,38 @@ int david_stepper_ctrl_unpack(
         return (-EINVAL);
     }
 
-    dst_p->left = unpack_right_shift_u8(src_p[0], 0u, 0x03u);
-    dst_p->right = unpack_right_shift_u8(src_p[0], 2u, 0x3cu);
+    dst_p->left_dir = unpack_right_shift_u8(src_p[0], 0u, 0x03u);
+    dst_p->right_dir = unpack_right_shift_u8(src_p[0], 2u, 0x3cu);
 
     return (0);
 }
 
-uint8_t david_stepper_ctrl_left_encode(double value)
+uint8_t david_stepper_ctrl_left_dir_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double david_stepper_ctrl_left_decode(uint8_t value)
+double david_stepper_ctrl_left_dir_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool david_stepper_ctrl_left_is_in_range(uint8_t value)
+bool david_stepper_ctrl_left_dir_is_in_range(uint8_t value)
 {
     return (value <= 3u);
 }
 
-uint8_t david_stepper_ctrl_right_encode(double value)
+uint8_t david_stepper_ctrl_right_dir_encode(double value)
 {
     return (uint8_t)(value);
 }
 
-double david_stepper_ctrl_right_decode(uint8_t value)
+double david_stepper_ctrl_right_dir_decode(uint8_t value)
 {
     return ((double)value);
 }
 
-bool david_stepper_ctrl_right_is_in_range(uint8_t value)
+bool david_stepper_ctrl_right_dir_is_in_range(uint8_t value)
 {
     return (value <= 15u);
 }
