@@ -27,14 +27,17 @@ struct StepperController {
     StepperController(int pulse_l, int dir_l, int pulse_r, int dir_r, int min, int max) : left(pulse_l, dir_l), right(pulse_r, dir_r), min_limit(min), max_limit(max) {
             right_dir = STOP;
             left_dir = STOP;
+            left.direction.write(LOW);
+            right.direction.write(LOW);
     }
 
-    const int steps_per_loop = 1000;
+    const int steps_per_loop = 2000;
     const int read_limit_frequency = 50;
     const int step_delay_micros = 50;
     void loop() {
         int steps = steps_per_loop;
         bool at_min = false;
+
         for (int steps = 0; steps < steps_per_loop; steps++) {
             if ((steps % read_limit_frequency) == 0) {
                 at_min = min_limit.read();
@@ -55,7 +58,6 @@ struct StepperController {
             delayMicroseconds(step_delay_micros);
         } // end while(ticks)
         
-        delay(50);
     }
 
     void pack_telemetry(unsigned char buf[8]) {
@@ -98,12 +100,13 @@ void setup() {
             continue;
         }
 
+        const int direction_voltages = {HIGH, LOW, LOW};
         switch (packet.id) {
             FRAME_CASE(DAVID_STEPPER_CTRL, david_stepper_ctrl) {
-                control.left_dir = frame.left_dir-1;
-                control.left.direction.write((frame.left_dir == 0)? LOW : HIGH);
-                control.right_dir = frame.right_dir-1;
-                control.right.direction.write((frame.right_dir == 0)? LOW : HIGH);
+                control.left_dir = frame.left-1;
+                control.left.direction.write(direction_voltages(frame.left));
+                control.right_dir = frame.right-1;
+                control.right.direction.write(direction_voltages(frame.right));
             }
         }
         
