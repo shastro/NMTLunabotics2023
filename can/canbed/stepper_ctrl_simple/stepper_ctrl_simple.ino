@@ -40,17 +40,17 @@ struct StepperController {
                 at_min = min_limit.read();
             }
 
-            if (left_dir == BACKWARD && at_min) {
-                left.count = 0;
-            } else {
+            /* if (left_dir == BACKWARD && at_min) { */
+                /* left.count = 0; */
+            /* } else { */
                 left.doStep(left_dir); // TODO(lcf) why no increment
-            }
+            /* } */
 
-            if (right_dir == BACKWARD && at_min) {
-                right.count = 0;
-            } else {
+            /* if (right_dir == BACKWARD && at_min) { */
+                /* right.count = 0; */
+            /* } else { */
                 right.doStep(right_dir);
-            }
+            /* } */
             
             delayMicroseconds(step_delay_micros);
         } // end while(ticks)
