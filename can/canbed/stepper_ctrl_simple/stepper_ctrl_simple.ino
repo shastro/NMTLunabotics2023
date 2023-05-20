@@ -44,13 +44,11 @@ struct StepperController {
                 /* left.count = 0; */
             /* } else { */
                 left.doStep(left_dir); // TODO(lcf) why no increment
-                left.doStep(left_dir);
             /* } */
 
             /* if (right_dir == BACKWARD && at_min) { */
                 /* right.count = 0; */
             /* } else { */
-                right.doStep(right_dir);
                 right.doStep(right_dir);
             /* } */
             

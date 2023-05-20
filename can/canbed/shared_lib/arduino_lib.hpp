@@ -240,7 +240,9 @@ struct Stepper {
         const int dir_sequence[] = {LOW, HIGH, HIGH, LOW};
         count += dir;
         if (dir != 0) {
-            pulse.write(pulse_sequence[count % 4]);
+            pulse.write(LOW);
+            pulse.write(HIGH);
+            // pulse.write(pulse_sequence[count % 4]);
             direction.write(dir_sequence[dir+1]);
         }
     }
