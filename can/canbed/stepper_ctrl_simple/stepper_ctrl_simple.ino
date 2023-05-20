@@ -31,7 +31,7 @@ struct StepperController {
 
     const int steps_per_loop = 1000;
     const int read_limit_frequency = 50;
-    const int step_delay_micros = 5;
+    const int step_delay_micros = 50;
     void loop() {
         int steps = steps_per_loop;
         bool at_min = false;
@@ -44,11 +44,13 @@ struct StepperController {
                 /* left.count = 0; */
             /* } else { */
                 left.doStep(left_dir); // TODO(lcf) why no increment
+                left.doStep(left_dir);
             /* } */
 
             /* if (right_dir == BACKWARD && at_min) { */
                 /* right.count = 0; */
             /* } else { */
+                right.doStep(right_dir);
                 right.doStep(right_dir);
             /* } */
             
@@ -80,7 +82,7 @@ void setup() {
     StepperController control(RPUL, RDIR, LPUL, LDIR, MIN_LIMIT, MAX_LIMIT);
 
     bool eStopped = false;
-    for (int count = 0; true; count++) {
+    for (int count = 0; ; count++) {
         CANPacket packet = can_read_nonblocking(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) { eStopped = frame.stop; }
@@ -94,13 +96,14 @@ void setup() {
             can_send(can, telemetry);
         }
 
-        if (eStopped)
+        if (eStopped) {
             continue;
+        }
 
         switch (packet.id) {
             FRAME_CASE(DAVID_STEPPER_CTRL, david_stepper_ctrl) {
-                control.left_dir = frame.left_dir;
-                control.right_dir = frame.right_dir;
+                control.left_dir = frame.left_dir-1;
+                control.right_dir = frame.right_dir-1;
             }
         }
         
