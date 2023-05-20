@@ -236,8 +236,8 @@ struct Stepper {
     }
 
     void doStep(unsigned int dir) {
-        const int pulse_sequence[] = {HIGH, HIGH, LOW, LOW};
-        const int dir_sequence[] = {LOW, HIGH, HIGH, LOW};
+        // const int pulse_sequence[] = {HIGH, HIGH, LOW, LOW};
+        // const int dir_sequence[] = {LOW, HIGH, HIGH, LOW};
         count += dir;
         if (dir != 0) {
             pulse.write(LOW);
