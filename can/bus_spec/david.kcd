@@ -151,14 +151,14 @@
                 measure of position whenever they hit a limit switch.
                 We should home on startup
             </Notes>
-            <Signal name="LeftDir" offset="0" length="2">
+            <Signal name="Left" offset="0" length="2">
                 <LabelSet>
                     <Label name="Stop" value="0" />
                     <Label name="Extend" value="1" />
                     <Label name="Retract" value="2" />
                 </LabelSet>
             </Signal>
-            <Signal name="RightDir" offset="2" length="4">
+            <Signal name="Right" offset="2" length="4">
                 <LabelSet>
                     <Label name="Stop" value="0" />
                     <Label name="Extend" value="1" />
