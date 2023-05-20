@@ -101,7 +101,9 @@ void setup() {
         switch (packet.id) {
             FRAME_CASE(DAVID_STEPPER_CTRL, david_stepper_ctrl) {
                 control.left_dir = frame.left_dir-1;
+                control.left.direction.write((frame.left_dir == 0)? LOW : HIGH);
                 control.right_dir = frame.right_dir-1;
+                control.right.direction.write((frame.right_dir == 0)? LOW : HIGH);
             }
         }
         
