@@ -30,20 +30,20 @@ struct StepperController {
     }
 
     const int steps_per_loop = 1000;
-    const int read_limit_frequency = 100;
-    const int step_delay_micros = 3;
+    const int read_limit_frequency = 50;
+    const int step_delay_micros = 5;
     void loop() {
         int steps = steps_per_loop;
         bool at_min = false;
-        while (steps > 0) {
-            if (steps-- % read_limit_frequency == 0) {
+        while (int steps = 0; steps < steps_per_loop; steps++) {
+            if ((steps % read_limit_frequency) == 0) {
                 at_min = min_limit.read();
             }
 
             if (left_dir == BACKWARD && at_min) {
                 left.count = 0;
             } else {
-                left.doStep(left_dir);
+                left.doStep(left_dir); // TODO(lcf) why no increment
             }
 
             if (right_dir == BACKWARD && at_min) {
@@ -54,6 +54,8 @@ struct StepperController {
             
             delayMicroseconds(step_delay_micros);
         } // end while(ticks)
+        
+        delay(50);
     }
 
     void pack_telemetry(unsigned char buf[8]) {
@@ -77,9 +79,8 @@ void setup() {
 
     StepperController control(RPUL, RDIR, LPUL, LDIR, MIN_LIMIT, MAX_LIMIT);
 
-    int count = 0;
     bool eStopped = false;
-    for (;;) {
+    for (int count = 0; true; count++) {
         CANPacket packet = can_read_nonblocking(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) { eStopped = frame.stop; }
@@ -87,7 +88,7 @@ void setup() {
 
         // Send Telemetry
         #define TELEMETRY_FREQUENCY 2
-        if (count++ % TELEMETRY_FREQUENCY == 0) {
+        if (count % TELEMETRY_FREQUENCY == 0) {
             CANPacket telemetry(DAVID_STEPPER_TELEM_FRAME_ID);
             control.pack_telemetry(telemetry.buf);
             can_send(can, telemetry);
