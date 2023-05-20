@@ -43,8 +43,47 @@ RUN apt-get install -y \
 
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
-COPY ros/catkin_ws /ros/catkin_ws
-RUN rm -rf /ros/catkin_ws/devel /ros/catkin_ws/build
 COPY can /can
+
+# Incremental-ish builds to avoid full rebuilds. Keep these in order
+# from least to most often changed.
+# Uncomment the ones to be compiled
+COPY ros/catkin_ws/src/kindr /ros/catkin_ws/src/kindr
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+COPY ros/catkin_ws/src/kindr_ros /ros/catkin_ws/src/kindr_ros
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+COPY ros/catkin_ws/src/message_logger /ros/catkin_ws/src/message_logger
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+COPY ros/catkin_ws/src/realsense-ros /ros/catkin_ws/src/realsense-ros
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/elevation_mapping
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/elevation_mapping_demos
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+COPY ros/catkin_ws/src/motor_bridge /ros/catkin_ws/src/motor_bridge
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/pad_send
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/david_config
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+COPY ros/catkin_ws/src/pad_send /ros/catkin_ws/src/david_navigation
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+# Now copy all the source code in to make sure everything is up to
+# date. I'm fairly confident this will work but not 100% sure it won't
+# rebuild everything ~~Alex
+# RUN rm -rf /ros/catkin_ws/src
+# COPY ros/catkin_ws/src /ros/catkin_ws/src
+# RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+# Add /catkin_ws to the ROS environment.
 COPY ros/ros_entrypoint.sh /ros_entrypoint.sh
