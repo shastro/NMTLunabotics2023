@@ -229,7 +229,7 @@ struct Stepper {
     OutPin pulse;
     OutPin dirpin;
     long count;
-    enum Dirs { BACKWARD = -1, STOP = 0, FORWARD = 1 };
+    enum Dirs { STOP = 0, EXTEND = 1, RETRACT = 2 };
     enum Dirs dir; 
 
     Stepper(int pulse_pin, int dir_pin)
@@ -244,7 +244,7 @@ struct Stepper {
     }
 
     void doStep() {
-        int dir_table[] = {-1, 0, 1};
+        int dir_table[] = {0, 1, -1};
         count += dir_table[dir];
         if (dir != 0) {
             pulse.write(LOW);

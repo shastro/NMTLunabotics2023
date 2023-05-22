@@ -32,13 +32,13 @@ struct StepperController {
         for (int steps = 0; steps < steps_per_loop; steps++) {
             at_min = min_limit.read();
 
-            if (left.dir == Stepper::BACKWARD && at_min) {
+            if (left.dir == Stepper::RETRACT && at_min) {
                 left.count = 0;
             } else {
                 left.doStep(); // TODO(lcf) why no increment
             }
 
-            if (right.dir == Stepper::BACKWARD && at_min) {
+            if (right.dir == Stepper::RETRACT && at_min) {
                 right.count = 0;
             } else {
                 right.doStep();
