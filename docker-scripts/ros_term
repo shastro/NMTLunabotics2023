@@ -65,6 +65,10 @@ for ((c=32; c>=0; c--)); do
     fi
 done
 
+# -e "QT_X11_NO_MITSHM=1"
+# -e "OGRE_RTT_MODE=Copy"
+# --gpus all
+
 params=(
     --rm
     -it
