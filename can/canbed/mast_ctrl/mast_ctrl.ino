@@ -6,28 +6,38 @@
 #include "arduino_lib.hpp"
 #include "david.h"
 
+int spin_voltages[3] = {0, 0, 1};
 struct StepperController {
     enum Dirs {
-        CCW = 0,
-        STOP = 1,
-        CW = 2
+        CCW = -1,
+        STOP = 0,
+        CW = 1
     };
     enum Dirs dir;
 
-    Stepper cam;
+    OutPin pulse;
+    OutPin dirpin;
+    long count;
 
     #define STEP_TO_DEGREE (0.0138461538462)
 
-StepperController(int pulse_c, int dir_c) :
-    cam(pulse_c, dir_c) {
-        cam.setDirection(STOP);
-        cam.count = 26000;
+    StepperController(int pulse_c, int dir_c) :
+    pulse(pulse_c), dirpin(dir_c) {
+        dir = STOP;
+        dirpin.write(spin_voltages[dir]);
+        count = 26000;
     }
-    void doStep(enum Dirs dir) {
-        if ((cam.count >= 52000 && dir < 0) || (cam.count <= 0 && dir > 0) || (cam.count < 52000 && cam.count > 0)) {
-            cam.doStep();
+    
+    void doStep() {
+        if ((count >= 52000 && dir < 0) || (count <= 0 && dir > 0) || (count < 52000 && count > 0)) {
+            if (dir != STOP) {
+                count += dir;
+                pulse.write(0);
+                pulse.write(1);
+                delayMicroseconds(300);
+            }
         }   
-      }
+    }
 
     const int ticks_per_loop = 50;
     const int step_delay_micros = 200;
@@ -39,7 +49,7 @@ StepperController(int pulse_c, int dir_c) :
     }
 
     void pack_telemetry(unsigned char buf[8]) {
-        double stepDegree = step*STEP_TO_DEGREE-360;
+        double stepDegree = count*STEP_TO_DEGREE-360;
         constrain(stepDegree, -360, 359);
         david_mast_telem_t data = {0};
         data.angle = david_mast_telem_angle_encode(((double)stepDegree));
@@ -55,9 +65,8 @@ void setup() {
     StepperController control(PUL, DIR);
 
     bool eStopped = false;
-    for (;;) {
-        CANPacket packet = can_read(can);
-        count++;
+    for (int count = 0; ; count++) {
+        CANPacket packet = can_read_nonblocking(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
                 eStopped = frame.stop;
@@ -66,7 +75,7 @@ void setup() {
 
         // Send Telemetry
         if (count % 2000 == 0) {
-            CANPacket telemetry = {DAVID_MAST_TELEM_FRAME_ID, 0};
+            CANPacket telemetry = CANPacket(DAVID_MAST_TELEM_FRAME_ID);
             control.pack_telemetry(telemetry.buf);
             can_send(can, telemetry);
             Serial.print(count);
@@ -77,7 +86,8 @@ void setup() {
         
         switch (packet.id) {
             FRAME_CASE(DAVID_MAST_CTRL, david_mast_ctrl) {
-                control.cam.setDirection(frame.direction);
+                control.dir = frame.direction-1;
+                control.dirpin.write(spin_voltages[frame.direction]);
             }
         }
         control.loop();
