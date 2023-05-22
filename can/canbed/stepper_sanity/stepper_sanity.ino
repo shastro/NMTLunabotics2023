@@ -18,7 +18,7 @@ void setup() {
     digitalWrite(RDIR, DIR_FORWARD);
     digitalWrite(LDIR, DIR_FORWARD);
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 20000; i++) {
         digitalWrite(RPUL, LOW);
         digitalWrite(LPUL, LOW);
         digitalWrite(RPUL, HIGH);
