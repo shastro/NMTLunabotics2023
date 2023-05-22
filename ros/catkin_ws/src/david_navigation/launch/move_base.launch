@@ -6,11 +6,11 @@
 <launch>
   <master auto="start"/>
 
-  <include file='$(find david_config)/launch/mapping.launch'>   
+  <include file='$(find david_config)/launch/mapping.launch' />
 
   <node name="move_base"
         pkg="move_base" type="move_base"
-        respawn="false" output="screen">
+        respawn="true" output="screen">
 
     <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
 
