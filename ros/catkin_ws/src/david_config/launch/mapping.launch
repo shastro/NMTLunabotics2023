@@ -36,7 +36,7 @@
         <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY" />
     </include>
 
-    <!-- include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
         <arg name="camera" value="l515_2 " />
         <arg name="serial_no" value="f0461308 " />
         <arg name="filters" value="pointcloud" />
@@ -45,7 +45,7 @@
         <arg name="depth_height" value="480" />
         <arg name="enable_color" value="false" />
         <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY" />
-    </include -->
+    </include>
 
     <include file="$(find realsense2_camera)/launch/rs_t265.launch">
         <arg name="camera" value="t265" />
