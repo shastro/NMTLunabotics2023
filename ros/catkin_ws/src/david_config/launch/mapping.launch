@@ -29,7 +29,7 @@
         <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY" />
     </include>
 
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <!-- include file="$(find realsense2_camera)/launch/rs_camera.launch">
         <arg name="camera" value="l515_1" />
         <arg name="serial_no" value="f1381818" />
         <arg name="filters" value="pointcloud" />
@@ -38,7 +38,7 @@
         <arg name='initial_reset' value='true' />
         <arg name='reconnect_timeout' value='10' />
         <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY" />
-    </include>
+    </include -->
 
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">
         <arg name="camera" value="l515_2 " />
