@@ -53,8 +53,8 @@ track_point_y:                              0.0
 track_point_z:                              0.0
 
 # Map.
-length_in_x:                                15.0
-length_in_y:                                15.0
+length_in_x:                                7.0
+length_in_y:                                7.0
 position_x:                                 0.0
 position_y:                                 0.0
 resolution:                                 0.1
