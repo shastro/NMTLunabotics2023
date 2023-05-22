@@ -7,7 +7,7 @@ input_sources:
     sensor_processor:
       type: structured_light
       ignore_points_above: 1
-      ignore_points_below: -2
+      ignore_points_below: -1
 
   l515_2:
     type: pointcloud
@@ -17,7 +17,7 @@ input_sources:
     sensor_processor:
       type: structured_light
       ignore_points_above: 1
-      ignore_points_below: -2
+      ignore_points_below: -1
 
   d455_1:
     type: pointcloud
@@ -27,7 +27,7 @@ input_sources:
     sensor_processor:
       type: structured_light
       ignore_points_above: 1
-      ignore_points_below: -2
+      ignore_points_below: -0.5
 
   d455_2:
     type: pointcloud
@@ -37,7 +37,7 @@ input_sources:
     sensor_processor:
       type: structured_light
       ignore_points_above: 1
-      ignore_points_below: -2
+      ignore_points_below: -0.5
 
 map_frame_id: "map"
 robot_base_frame_id: "base_link"
@@ -57,14 +57,5 @@ length_in_x:                                15.0
 length_in_y:                                15.0
 position_x:                                 0.0
 position_y:                                 0.0
-resolution:                                 0.05
+resolution:                                 0.1
 
-grid_map_topic: "/elevation_mapping/elevation_mapping_raw"
-grid_map_visualization:
-  # Setup occupancy grid
-  - name: traversability_grid
-    type: occupancy_grid
-    params:
-     layer: traversability
-     data_min: -0.15
-     data_max: 0.15
