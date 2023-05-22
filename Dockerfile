@@ -41,6 +41,14 @@ RUN apt-get install -y \
     ros-noetic-grid-map-rviz-plugin \
     ros-noetic-xacro
 
+# Install visual and debugging tools
+RUN apt-get install -y \
+    ros-noetic-rosbag \
+    ros-noetic-plotjuggler \
+    ros-noetic-rqt-tf-tree \
+    ros-noetic-rqt-plot \
+    ros-noetic-rqt-image-view 
+
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws /ros/catkin_ws
 COPY can /can
