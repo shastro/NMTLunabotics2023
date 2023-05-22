@@ -6,61 +6,50 @@
 #include "arduino_lib.hpp"
 #include "david.h"
 
-// TODO(cad): measure steps to rotation, so that
-// TODO(cad): enforce a limit of rotations so that the cable does not get wound around
-// to much.
-
 struct StepperController {
     enum Dirs {
-        CCW = -1,
-        STOP = 0,
-        CW = 1
+        CCW = 0,
+        STOP = 1,
+        CW = 2
     };
     enum Dirs dir;
 
     Stepper cam;
 
-    unsigned int step;
-
-    double stepDegree;
-
     #define STEP_TO_DEGREE (0.0138461538462)
 
-    StepperController(int pulse_c, int dir_c) :
+StepperController(int pulse_c, int dir_c) :
     cam(pulse_c, dir_c) {
-        dir = STOP;
-        step = 26000;
+        cam.setDirection(STOP);
+        cam.count = 26000;
     }
     void doStep(enum Dirs dir) {
-        if (dir != STOP) {
-          if ((step >= 52000 && dir < 0) || (step <= 0 && dir > 0) || (step < 52000 && step > 0)) {
-            step += dir;
-            cam.doStep(step);
-          }   
-        }
+        if ((cam.count >= 52000 && dir < 0) || (cam.count <= 0 && dir > 0) || (cam.count < 52000 && cam.count > 0)) {
+            cam.doStep();
+        }   
       }
 
     const int ticks_per_loop = 50;
     const int step_delay_micros = 200;
     void loop() {
         for (int i = 0; i < ticks_per_loop; i++) {
-            doStep(dir);
+            doStep();
             delayMicroseconds(step_delay_micros);
         }
     }
+
     void pack_telemetry(unsigned char buf[8]) {
-    stepDegree = step*STEP_TO_DEGREE-360;
-    constrain(stepDegree, -360, 359);
-    david_mast_telem_t data = {0};
-    data.angle = david_mast_telem_angle_encode(((double)stepDegree));
-    david_mast_telem_pack(buf, &data, 8);
-    //Serial.println(stepDegree);
+        double stepDegree = step*STEP_TO_DEGREE-360;
+        constrain(stepDegree, -360, 359);
+        david_mast_telem_t data = {0};
+        data.angle = david_mast_telem_angle_encode(((double)stepDegree));
+        david_mast_telem_pack(buf, &data, 8);
+        //Serial.println(stepDegree);
     }
 };
 
 void setup() {
     MCP_CAN can = setup_can();
-    int count = 0;
     #define PUL 5 // For camera mast
     #define DIR 4
     StepperController control(PUL, DIR);
@@ -88,7 +77,7 @@ void setup() {
         
         switch (packet.id) {
             FRAME_CASE(DAVID_MAST_CTRL, david_mast_ctrl) {
-                control.dir = frame.direction-1;
+                control.cam.setDirection(frame.direction);
             }
         }
         control.loop();
