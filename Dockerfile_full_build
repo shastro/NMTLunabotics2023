@@ -39,7 +39,8 @@ RUN apt-get install -y \
     ros-noetic-tf-conversions \
     ros-noetic-grid-map-filters \
     ros-noetic-grid-map-rviz-plugin \
-    ros-noetic-xacro
+    ros-noetic-xacro \
+    ros-noetic-teb-local-planner
 
 # Install visual and debugging tools
 RUN apt-get install -y \
