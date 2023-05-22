@@ -37,5 +37,7 @@ void setup() {
         delayMicroseconds(50);
     }
 
+
+    for (;;) {}
 }
 
