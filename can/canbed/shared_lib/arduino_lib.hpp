@@ -229,21 +229,25 @@ struct Stepper {
     OutPin direction;
     long count;
     enum Dirs { BACKWARD = -1, STOP = 0, FORWARD = 1 };
+    enum Dirs dir;
 
     Stepper(int pulse_pin, int dir_pin)
         : pulse(pulse_pin), direction(dir_pin) {
         count = 0;
     }
 
-    void doStep(unsigned int dir) {
-        // const int pulse_sequence[] = {HIGH, HIGH, LOW, LOW};
-        // const int dir_sequence[] = {LOW, HIGH, HIGH, LOW};
-        count += dir;
+    const int direction_voltages = {HIGH, LOW, LOW};
+    void setDirection(unsigned int dir) {
+        this.dir = dir;
+        direction.write(direction_voltages[dir]);
+    }
+
+    void doStep() {
+        int dir_table[] = {-1, 0, 1};
+        count += dir_table[dir];
         if (dir != 0) {
             pulse.write(LOW);
             pulse.write(HIGH);
-            // pulse.write(pulse_sequence[count % 4]);
-            // direction.write(dir_sequence[dir+1]);
         }
     }
 };
