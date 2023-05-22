@@ -74,7 +74,7 @@ void setup() {
         }
 
         // Send Telemetry
-        #define TELEMETRY_FREQUENCY 5
+        #define TELEMETRY_FREQUENCY 200
         if (count % TELEMETRY_FREQUENCY == 0) {
             CANPacket telemetry(DAVID_STEPPER_TELEM_FRAME_ID);
             control.pack_telemetry(telemetry.buf);
