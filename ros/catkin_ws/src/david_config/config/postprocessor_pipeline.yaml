@@ -13,7 +13,7 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
     params:
       input_layer: elevation_inpainted
       output_layer: elevation_smooth
-      radius: 0.3
+      radius: 0.2
 
   # Compute surface normals.
   - name: surface_normals
@@ -21,7 +21,7 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
     params:
       input_layer: elevation_smooth
       output_layers_prefix: normal_vectors_
-      radius: 0.3
+      radius: 0.4
       normal_vector_positive_axis: z
 
   # Compute slope from surface normal.
