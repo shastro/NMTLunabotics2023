@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -eux
 
 # sudo su
 [ "$USER" != root ] && exec sudo "$0"
