@@ -20,6 +20,10 @@ docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
 
 it=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 
+LOG_FILE="/var/log/rosbags/$(date -Iseconds)"
+LOG_DIR="$(dirname "$LOG_FILE")"
+mkdir -p "$LOG_DIR"
+
 params=(
     # Detach from the container, and create a fake virtual terminal.
     -dt
@@ -31,10 +35,13 @@ params=(
     # Allow access to devices.
     --volume=/dev:/dev
 
+    # Allow access to writing logs.
+    --volume="$LOG_DIR":"$LOG_DIR"
+
     # Device rules for accessing Realsense cameras.
     --device-cgroup-rule "c 81:* rmw"
     --device-cgroup-rule "c 189:* rmw"
-    
+
     # Environmental variables
     -e ROS_MASTER_URI=http://$it:11311
     -e ROS_IP=$it
@@ -58,12 +65,17 @@ trap cleanup INT
 # Set up the ROS core.
 docker run "${params[@]}" $IMAGE_NAME roscore
 
+# Set up rosbag with a log file.
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
+       rosbag record -aO "$LOG_FILE"
+
 # Run the camera node.
-docker exec -d $CONTAINER_NAME /ros_entrypoint.sh /scripts/unfuck_realsense
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
+       /scripts/unfuck_realsense
 
 # Run the motor_bridge node.
-docker exec -d $CONTAINER_NAME /ros_entrypoint.sh rosrun \
-    motor_bridge motor_bridge
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
+       rosrun motor_bridge motor_bridge
 
-docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch \
-    david_config mapping.launch
+docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh \
+       roslaunch david_config mapping.launch
