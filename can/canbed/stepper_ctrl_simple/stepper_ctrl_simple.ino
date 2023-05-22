@@ -6,8 +6,6 @@
 #include "arduino_lib.hpp"
 #include "david.h"
 
-enum Dirs { BACKWARD = -1, STOP = 0, FORWARD = 1 };
-
 #define RPUL 10
 #define RDIR 6
 #define LPUL 4
@@ -21,43 +19,30 @@ struct StepperController {
 
     Stepper right;
     Stepper left;
-    enum Dirs right_dir;
-    enum Dirs left_dir;
-
     StepperController(int pulse_l, int dir_l, int pulse_r, int dir_r, int min, int max) : left(pulse_l, dir_l), right(pulse_r, dir_r), min_limit(min), max_limit(max) {
-            right_dir = STOP;
-            left_dir = STOP;
-            left.direction.write(LOW);
-            right.direction.write(LOW);
     }
 
-    const int steps_per_loop = 2000;
-    const int read_limit_frequency = 50;
-    const int step_delay_micros = 50;
+    const int steps_per_loop = 500;
+    const int step_delay_micros = 5; // TODO(lcf): what is the lowest we can make this?
     void loop() {
         int steps = steps_per_loop;
         bool at_min = false;
-
+    
         for (int steps = 0; steps < steps_per_loop; steps++) {
-            if ((steps % read_limit_frequency) == 0) {
-                at_min = min_limit.read();
+            at_min = min_limit.read();
+
+            if (left.dir == Stepper::RETRACT && at_min) {
+                left.count = 0;
+            } else {
+                left.doStep(); // TODO(lcf) why no increment
             }
 
-            /* if (left_dir == BACKWARD && at_min) { */
-                /* left.count = 0; */
-            /* } else { */
-                left.doStep(left_dir); // TODO(lcf) why no increment
-            /* } */
-
-            /* if (right_dir == BACKWARD && at_min) { */
-                /* right.count = 0; */
-            /* } else { */
-                right.doStep(right_dir);
-            /* } */
-            
-            delayMicroseconds(step_delay_micros);
-        } // end while(ticks)
-        
+            if (right.dir == Stepper::RETRACT && at_min) {
+                right.count = 0;
+            } else {
+                right.doStep();
+            }
+        }
     }
 
     void pack_telemetry(unsigned char buf[8]) {
@@ -89,7 +74,7 @@ void setup() {
         }
 
         // Send Telemetry
-        #define TELEMETRY_FREQUENCY 2
+        #define TELEMETRY_FREQUENCY 5
         if (count % TELEMETRY_FREQUENCY == 0) {
             CANPacket telemetry(DAVID_STEPPER_TELEM_FRAME_ID);
             control.pack_telemetry(telemetry.buf);
@@ -100,13 +85,10 @@ void setup() {
             continue;
         }
 
-        const int direction_voltages = {HIGH, LOW, LOW};
         switch (packet.id) {
             FRAME_CASE(DAVID_STEPPER_CTRL, david_stepper_ctrl) {
-                control.left_dir = frame.left-1;
-                control.left.direction.write(direction_voltages(frame.left));
-                control.right_dir = frame.right-1;
-                control.right.direction.write(direction_voltages(frame.right));
+                control.left.setDirection(frame.left_dir);
+                control.right.setDirection(frame.right_dir);
             }
         }
         
