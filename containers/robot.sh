@@ -79,5 +79,5 @@ docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
        rosrun motor_bridge motor_bridge
 
-docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh \
-       roslaunch david_config mapping.launch
+#docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh \
+#       roslaunch david_config mapping.launch
