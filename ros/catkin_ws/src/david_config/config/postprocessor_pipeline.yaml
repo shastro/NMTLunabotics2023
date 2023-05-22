@@ -31,19 +31,12 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
       output_layer: slope
       expression: acos(normal_vectors_z)
   
-  # Compute roughness as absolute difference from map to smoothened map.
-  - name: roughness
-    type: gridMapFilters/MathExpressionFilter
-    params:
-      output_layer: roughness
-      expression: abs(elevation_inpainted - elevation_smooth)
-
   - name: traversability
     type: gridMapFilters/MathExpressionFilter
     params:
       input_layer: elevation_inpainted
       output_layer: traversability
-      expression: 1 * (1.0 - (slope / 0.6)) + 0 * (1.0 - (roughness / 0.1))
+      expression: 1 * (1.0 - (slope / 0.6))
 
   # Set lower threshold on traversability.
   - name: traversability_lower_threshold
