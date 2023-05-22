@@ -14,10 +14,12 @@ int min = -max; // Min val ... well yeah
 int dead = 20;  // Can't be too touchy. < dead = 0
 int rate = 100; // in hertz
 
+/*
 double stepper_delta = 20.0 / rate; // in mm/s
 double min_max_mod = 0.999;
 double stepper_max = STEPPER_CTRL_SET_POINT_MAX * min_max_mod;
 double stepper_min = STEPPER_CTRL_SET_POINT_MIN * min_max_mod;
+*/
 
 // State handling
 enum class Mode { Normal, Adjust, Home, Stop };
@@ -131,7 +133,7 @@ int main(int argc, char *argv[]) {
             m = Mode::Normal;
         }
         
-        stepper_ctrl.home = false;
+        stepper_ctrl.left = stepper_ctrl.right = 0;
         e_stop.stop = false;
         loco_ctrl.left_vel = 0;
         loco_ctrl.right_vel = 0;
@@ -149,7 +151,7 @@ int main(int argc, char *argv[]) {
             out << "\n";
 
             // Pitch control with dpad
-            if (g.dpad.up) {
+            if (g.dad.up) {
                 pitch_ctrl.left  = pitch_ctrl.right = 1;
                 out << "Pitch up\n";
             } else if (g.dpad.down) {
@@ -179,16 +181,14 @@ int main(int argc, char *argv[]) {
             }
 
             // Extend dpad
-            if (g.dpad.left) {
-               stepper_ctrl.set_point += stepper_delta;
-               stepper_ctrl.set_point =
-                        std::min((double)stepper_ctrl.set_point, stepper_max);
-                out << "Arm Extend: " << stepper_ctrl.set_point << "\n";
-            } else if (g.dpad.right) {
-               stepper_ctrl.set_point -= stepper_delta;
-               stepper_ctrl.set_point = 
-                        std::max((double)stepper_ctrl.set_point, stepper_min);
-                out << "Arm Retract: " << stepper_ctrl.set_point << "\n";
+            if (g.dad.right) {
+                stepper_ctrl.left = stepper_ctrl.right = 1;
+                out << "stepper up\n";
+            } else if (g.dpad.left) {
+                stepper_ctrl.left = stepper_ctrl.right = 2;
+                out << "stepper down\n";
+            } else {
+                stepper_ctrl.left = stepper_ctrl.right = 0;
             }
 
             // Digger triggers

@@ -78,13 +78,13 @@ extern "C" {
 #define DAVID_PITCH_DRIVER_TELEM_RIGHT_DIRECTION_EXTEND_CHOICE (1u)
 #define DAVID_PITCH_DRIVER_TELEM_RIGHT_DIRECTION_RETRACT_CHOICE (2u)
 
-#define DAVID_STEPPER_CTRL_LEFT_DIR_STOP_CHOICE (0u)
-#define DAVID_STEPPER_CTRL_LEFT_DIR_EXTEND_CHOICE (1u)
-#define DAVID_STEPPER_CTRL_LEFT_DIR_RETRACT_CHOICE (2u)
+#define DAVID_STEPPER_CTRL_LEFT_STOP_CHOICE (0u)
+#define DAVID_STEPPER_CTRL_LEFT_EXTEND_CHOICE (1u)
+#define DAVID_STEPPER_CTRL_LEFT_RETRACT_CHOICE (2u)
 
-#define DAVID_STEPPER_CTRL_RIGHT_DIR_STOP_CHOICE (0u)
-#define DAVID_STEPPER_CTRL_RIGHT_DIR_EXTEND_CHOICE (1u)
-#define DAVID_STEPPER_CTRL_RIGHT_DIR_RETRACT_CHOICE (2u)
+#define DAVID_STEPPER_CTRL_RIGHT_STOP_CHOICE (0u)
+#define DAVID_STEPPER_CTRL_RIGHT_EXTEND_CHOICE (1u)
+#define DAVID_STEPPER_CTRL_RIGHT_RETRACT_CHOICE (2u)
 
 #define DAVID_STEPPER_TELEM_AT_MIN_STOP_FALSE_CHOICE (0u)
 #define DAVID_STEPPER_TELEM_AT_MIN_STOP_TRUE_CHOICE (1u)
@@ -271,14 +271,14 @@ struct david_stepper_ctrl_t {
      * Scale: 1
      * Offset: 0
      */
-    uint8_t left_dir;
+    uint8_t left;
 
     /**
      * Range: -
      * Scale: 1
      * Offset: 0
      */
-    uint8_t right_dir;
+    uint8_t right;
 };
 
 /**
@@ -983,7 +983,7 @@ int david_stepper_ctrl_unpack(
  *
  * @return Encoded signal.
  */
-uint8_t david_stepper_ctrl_left_dir_encode(double value);
+uint8_t david_stepper_ctrl_left_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -992,7 +992,7 @@ uint8_t david_stepper_ctrl_left_dir_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_stepper_ctrl_left_dir_decode(uint8_t value);
+double david_stepper_ctrl_left_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1001,7 +1001,7 @@ double david_stepper_ctrl_left_dir_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_stepper_ctrl_left_dir_is_in_range(uint8_t value);
+bool david_stepper_ctrl_left_is_in_range(uint8_t value);
 
 /**
  * Encode given signal by applying scaling and offset.
@@ -1010,7 +1010,7 @@ bool david_stepper_ctrl_left_dir_is_in_range(uint8_t value);
  *
  * @return Encoded signal.
  */
-uint8_t david_stepper_ctrl_right_dir_encode(double value);
+uint8_t david_stepper_ctrl_right_encode(double value);
 
 /**
  * Decode given signal by applying scaling and offset.
@@ -1019,7 +1019,7 @@ uint8_t david_stepper_ctrl_right_dir_encode(double value);
  *
  * @return Decoded signal.
  */
-double david_stepper_ctrl_right_dir_decode(uint8_t value);
+double david_stepper_ctrl_right_decode(uint8_t value);
 
 /**
  * Check that given signal is in allowed range.
@@ -1028,7 +1028,7 @@ double david_stepper_ctrl_right_dir_decode(uint8_t value);
  *
  * @return true if in range, false otherwise.
  */
-bool david_stepper_ctrl_right_dir_is_in_range(uint8_t value);
+bool david_stepper_ctrl_right_is_in_range(uint8_t value);
 
 /**
  * Pack message StepperTelem.
