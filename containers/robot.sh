@@ -65,6 +65,8 @@ trap cleanup INT
 # Set up the ROS core.
 docker run "${params[@]}" $IMAGE_NAME roscore
 
+sleep 2
+
 # Set up rosbag with a log file.
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
        rosbag record -aO "$LOG_FILE"
