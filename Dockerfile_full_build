@@ -52,7 +52,6 @@ RUN apt-get install -y \
 
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
-COPY can /can
 
 # Incremental-ish builds to avoid full rebuilds. Keep these in order
 # from least to most often changed.
@@ -74,6 +73,8 @@ RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 COPY ros/catkin_ws/src/elevation_mapping_demos /ros/catkin_ws/src/elevation_mapping_demos
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+COPY can /can
 
 COPY ros/catkin_ws/src/motor_bridge /ros/catkin_ws/src/motor_bridge
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
