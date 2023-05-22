@@ -87,8 +87,8 @@ void setup() {
 
         switch (packet.id) {
             FRAME_CASE(DAVID_STEPPER_CTRL, david_stepper_ctrl) {
-                control.left.setDirection(frame.left_dir);
-                control.right.setDirection(frame.right_dir);
+                control.left.setDirection(frame.left);
+                control.right.setDirection(frame.right);
             }
         }
         
