@@ -224,22 +224,23 @@ struct Relay {
 };
 
 // Single Stepper Motor
+int direction_voltages[3] = {HIGH, LOW, LOW};
 struct Stepper {
     OutPin pulse;
-    OutPin direction;
+    OutPin dirpin;
     long count;
     enum Dirs { BACKWARD = -1, STOP = 0, FORWARD = 1 };
-    enum Dirs dir;
+    enum Dirs dir; 
 
     Stepper(int pulse_pin, int dir_pin)
-        : pulse(pulse_pin), direction(dir_pin) {
+        : pulse(pulse_pin), dirpin(dir_pin) {
         count = 0;
+        dir = STOP;
     }
 
-    const int direction_voltages = {HIGH, LOW, LOW};
-    void setDirection(unsigned int dir) {
-        this.dir = dir;
-        direction.write(direction_voltages[dir]);
+    void setDirection(unsigned int d) {
+        dir = d;
+        dirpin.write(direction_voltages[dir]);
     }
 
     void doStep() {

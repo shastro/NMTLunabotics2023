@@ -19,12 +19,8 @@ struct StepperController {
 
     Stepper right;
     Stepper left;
-    enum Dirs right_dir;
-    enum Dirs left_dir;
 
     StepperController(int pulse_l, int dir_l, int pulse_r, int dir_r, int min, int max) : left(pulse_l, dir_l), right(pulse_r, dir_r), min_limit(min), max_limit(max) {
-        left.setDirection(Stepper::STOP);
-        right.setDirection(Stepper::STOP);
     }
 
     const int steps_per_loop = 500;
@@ -32,17 +28,17 @@ struct StepperController {
     void loop() {
         int steps = steps_per_loop;
         bool at_min = false;
-
+    
         for (int steps = 0; steps < steps_per_loop; steps++) {
             at_min = min_limit.read();
 
-            if (left.direction == BACKWARD && at_min) {
+            if (left.dir == Stepper::BACKWARD && at_min) {
                 left.count = 0;
             } else {
                 left.doStep(); // TODO(lcf) why no increment
             }
 
-            if (right.direction == BACKWARD && at_min) {
+            if (right.dir == Stepper::BACKWARD && at_min) {
                 right.count = 0;
             } else {
                 right.doStep();
@@ -94,10 +90,8 @@ void setup() {
 
         switch (packet.id) {
             FRAME_CASE(DAVID_STEPPER_CTRL, david_stepper_ctrl) {
-                control.setDirection(frame.left);
-                control.left.direction.write(direction_voltages(frame.left));
-                control.setDirection(frame.right);
-                control.right.direction.write(direction_voltages(frame.right));
+                control.left.setDirection(frame.left_dir);
+                control.right.setDirection(frame.right_dir);
             }
         }
         
