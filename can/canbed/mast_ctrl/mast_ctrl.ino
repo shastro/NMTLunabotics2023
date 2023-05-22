@@ -65,7 +65,7 @@ void setup() {
         }
 
         // Send Telemetry
-        if (count % 20 == 0) {
+        if (count % 2000 == 0) {
             CANPacket telemetry = {DAVID_MAST_TELEM_FRAME_ID, 0};
             control.pack_telemetry(telemetry.buf);
             can_send(can, telemetry);

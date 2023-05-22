@@ -74,7 +74,7 @@ void setup() {
         }
 
         // Send Telemetry
-        #define TELEMETRY_FREQUENCY 5
+        #define TELEMETRY_FREQUENCY 200
         if (count % TELEMETRY_FREQUENCY == 0) {
             CANPacket telemetry(DAVID_STEPPER_TELEM_FRAME_ID);
             control.pack_telemetry(telemetry.buf);
@@ -87,8 +87,8 @@ void setup() {
 
         switch (packet.id) {
             FRAME_CASE(DAVID_STEPPER_CTRL, david_stepper_ctrl) {
-                control.left.setDirection(frame.left_dir);
-                control.right.setDirection(frame.right_dir);
+                control.left.setDirection(frame.left);
+                control.right.setDirection(frame.right);
             }
         }
         
