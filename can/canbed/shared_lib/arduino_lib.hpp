@@ -224,7 +224,7 @@ struct Relay {
 };
 
 // Single Stepper Motor
-int direction_voltages[3] = {HIGH, LOW, LOW};
+int direction_voltages[3] = {1, 0, 1};
 struct Stepper {
     OutPin pulse;
     OutPin dirpin;
@@ -243,12 +243,12 @@ struct Stepper {
         dirpin.write(direction_voltages[dir]);
     }
 
-    void doStep() {
+    inline void doStep() {
         int dir_table[] = {0, 1, -1};
         count += dir_table[dir];
-        if (dir != 0) {
-            pulse.write(LOW);
-            pulse.write(HIGH);
+        if (dir != STOP) {
+            pulse.write(0);
+            pulse.write(1);
         }
     }
 };

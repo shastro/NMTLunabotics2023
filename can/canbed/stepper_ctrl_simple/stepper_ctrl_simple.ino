@@ -24,7 +24,7 @@ struct StepperController {
     }
 
     const int steps_per_loop = 500;
-    const int step_delay_micros = 50; // TODO(lcf): what is the lowest we can make this?
+    const int step_delay_micros = 5; // TODO(lcf): what is the lowest we can make this?
     void loop() {
         int steps = steps_per_loop;
         bool at_min = false;
@@ -43,8 +43,6 @@ struct StepperController {
             } else {
                 right.doStep();
             }
-            
-            delayMicroseconds(step_delay_micros);
         }
     }
 

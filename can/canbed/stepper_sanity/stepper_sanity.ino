@@ -16,25 +16,25 @@ void setup() {
     
     InPin min_limit(A0);
 
-    rdir.write(FORWARD);
-    ldir.write(FORWARD);
-    for (int i = 0; i < 20000; i++) {
-        rpul.write(0);
-        lpul.write(0);
-        rpul.write(1);
-        lpul.write(1);
-        delayMicroseconds(DELAY);
-    }
+    /* rdir.write(FORWARD); */
+    /* ldir.write(FORWARD); */
+    /* for (int i = 0; i < 100000; i++) { */
+    /*     rpul.write(0); */
+    /*     lpul.write(0); */
+    /*     rpul.write(1); */
+    /*     lpul.write(1); */
+    /*     delayMicroseconds(DELAY); */
+    /* } */
 
-    rdir.write(BACKWARD);
-    ldir.write(BACKWARD);
-    while (!min_limit.read()) {
-        rpul.write(0); 
-        lpul.write(0);
-        rpul.write(1);
-        lpul.write(1);
-        delayMicroseconds(DELAY);
-    }
+    /* rdir.write(BACKWARD); */
+    /* ldir.write(BACKWARD); */
+    /* while (!min_limit.read()) { */
+        /* rpul.write(0);  */
+        /* lpul.write(0); */
+        /* rpul.write(1); */
+        /* lpul.write(1); */
+        /* delayMicroseconds(DELAY); */
+    /* } */
 
     for (;;) {}
 }
