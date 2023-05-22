@@ -115,6 +115,12 @@ void setup() {
 
     scheduler_dense([&]() {
         CANPacket packet = can_read_nonblocking(can);
+        if (!packet)
+            return;
+
+        Serial.print("got packet with ID ");
+        Serial.println(packet.id);
+
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) { e_stopped = frame.stop; }
         }
@@ -126,6 +132,7 @@ void setup() {
 
         switch (packet.id) {
             FRAME_CASE(DAVID_PITCH_CTRL, david_pitch_ctrl) {
+                Serial.println("setting directions");
                 control.set_directions((Dir)frame.left, (Dir)frame.right);
             }
         }
