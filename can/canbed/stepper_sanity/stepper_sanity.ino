@@ -10,14 +10,32 @@ void setup() {
 #define MIN_LIMIT A0
 #define MAX_LIMIT A1
 
-    digitalWrite(RDIR, HIGH);
-    digitalWrite(LDIR, HIGH);
+#define DIR_BACKWARD HIGH
+#define DIR_FORWARD LOW
 
-    for (;;) {
+    InPin min_limit(MIN_LIMIT);
+    
+    digitalWrite(RDIR, DIR_FORWARD);
+    digitalWrite(LDIR, DIR_FORWARD);
+
+    for (int i = 0; i < 1000; i++) {
         digitalWrite(RPUL, LOW);
         digitalWrite(LPUL, LOW);
         digitalWrite(RPUL, HIGH);
         digitalWrite(LPUL, HIGH);
         delayMicroseconds(50);
     }
+
+    digitalWrite(RDIR, DIR_BACKWARD);
+    digitalWrite(LDIR, DIR_BACKWARD);
+
+    while (!min_limit.read()) {
+        digitalWrite(RPUL, LOW);
+        digitalWrite(LPUL, LOW);
+        digitalWrite(RPUL, HIGH);
+        digitalWrite(LPUL, HIGH);
+        delayMicroseconds(50);
+    }
+
 }
+
