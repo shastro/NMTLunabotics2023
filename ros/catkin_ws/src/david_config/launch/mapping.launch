@@ -3,7 +3,7 @@
     <env name="ROSCONSOLE_CONFIG_FILE"
         value="$(find david_config)/config/rosconsole.conf"/>
 
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <!-- include file="$(find realsense2_camera)/launch/rs_camera.launch">
         <arg name="camera" value="d455_1" />
         <arg name="serial_no" value="213522250920 " />
         <arg name="filters" value="pointcloud" />
@@ -11,6 +11,8 @@
         <arg name="depth_width" value="640" />
         <arg name="depth_height" value="480" />
         <arg name="enable_color" value="false" />
+        <arg name='initial_reset' value='true' />
+        <arg name='reconnect_timeout' value='10' />
         <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY" />
     </include>
 
@@ -22,17 +24,19 @@
         <arg name="depth_width" value="640" />
         <arg name="depth_height" value="480" />
         <arg name="enable_color" value="false" />
+        <arg name='initial_reset' value='true' />
+        <arg name='reconnect_timeout' value='10' />
         <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY" />
     </include>
 
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">
         <arg name="camera" value="l515_1" />
-        <arg name="serial_no" value="f1381818 " />
+        <arg name="serial_no" value="f1381818" />
         <arg name="filters" value="pointcloud" />
         <arg name="depth_fps" value="30" />
-        <arg name="depth_width" value="640" />
-        <arg name="depth_height" value="480" />
         <arg name="enable_color" value="false" />
+        <arg name='initial_reset' value='true' />
+        <arg name='reconnect_timeout' value='10' />
         <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY" />
     </include>
 
@@ -41,17 +45,17 @@
         <arg name="serial_no" value="f0461308 " />
         <arg name="filters" value="pointcloud" />
         <arg name="depth_fps" value="30" />
-        <arg name="depth_width" value="640" />
-        <arg name="depth_height" value="480" />
         <arg name="enable_color" value="false" />
+        <arg name='initial_reset' value='true' />
+        <arg name='reconnect_timeout' value='10' />
         <arg name="pointcloud_texture_stream" value="RS2_STREAM_ANY" />
     </include>
 
     <include file="$(find realsense2_camera)/launch/rs_t265.launch">
         <arg name="camera" value="t265" />
-        <arg name='initial_reset' value='true'>
-        <arg name='reconnect_timeout' value='10'>
-    </include>
+        <arg name='initial_reset' value='true' />
+        <arg name='reconnect_timeout' value='10' />
+    </include -->
 
     <!-- Pose publisher -->
     <node pkg="david_config" name="pose_pub" type="pose_pub" />

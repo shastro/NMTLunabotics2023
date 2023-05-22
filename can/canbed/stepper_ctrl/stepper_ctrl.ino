@@ -130,7 +130,7 @@ void setup() {
         }
 
         // Send Telemetry
-        if (count % 2 == 0) {
+        if (count % 200 == 0) {
             CANPacket telemetry(DAVID_STEPPER_TELEM_FRAME_ID);
             control.pack_telemetry(telemetry.buf);
             can_send(can, telemetry);
