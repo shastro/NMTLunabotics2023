@@ -31,7 +31,7 @@ IFS=$'\n\t'
 # overwrite /etc/hostapd/ath0.cfg and ath2.cfg, then restart hostapd
 # on the access point.
 
-SSID=Team_15
+SSID=Team15
 PSK=lunabotics
 
 sshpass -p'@rt3m!$NMT' \
