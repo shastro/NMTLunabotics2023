@@ -78,23 +78,45 @@ docker exec -d $CONTAINER_NAME /ros_entrypoint.sh /scripts/unfuck_realsense
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
     rosrun motor_bridge motor_bridge
 
-docker exec -d $CONTAINER_NAME /ros_entrypoint.sh --wait \
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
     roslaunch realsense2_camera rs_t265.launch \
     camera:=t265 \
     initial_reset:=true \
     reconnect_timeout:=10
 
+sleep 5
+
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
-    roslaunch realsense2_camera rs_camera.launch --wait \
+    roslaunch realsense2_camera rs_camera.launch \
+    camera:=d455_1 serial_no:=213522250920 \
+    filters:=pointcloud depth_fps:=30 enable_color:=false \
+    pointcloud_texture_stream:=RS2_STREAM_ANY
+      
+sleep 5
+
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
+    roslaunch realsense2_camera rs_camera.launch \
+    camera:=d455_2 serial_no:=213522253528 \
+    filters:=pointcloud depth_fps:=30 enable_color:=false \
+    pointcloud_texture_stream:=RS2_STREAM_ANY
+      
+sleep 5
+
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
+    roslaunch realsense2_camera rs_camera.launch \
     camera:=l515_1 serial_no:=f1381818 \
     filters:=pointcloud depth_fps:=30 enable_color:=false \
     pointcloud_texture_stream:=RS2_STREAM_ANY
       
-docker exec -d $CONTAINER_NAME /ros_entrypoint.sh --wait \
+sleep 5
+
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
     roslaunch realsense2_camera rs_camera.launch \
     camera:=l515_2 serial_no:=f0461308 \
     filters:=pointcloud depth_fps:=30 enable_color:=false \
     pointcloud_texture_stream:=RS2_STREAM_ANY
+
+sleep 5
       
-docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh \
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
        roslaunch david_config mapping.launch
