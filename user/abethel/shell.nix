@@ -96,5 +96,6 @@ mkShell {
     (import ./arduino-nix { inherit pkgs; })
     ncurses.dev
     # (import ./libcan { inherit pkgs; })
+    sshpass
   ];
 }
