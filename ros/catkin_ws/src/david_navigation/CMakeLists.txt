@@ -6,6 +6,8 @@ find_package(catkin REQUIRED COMPONENTS
     rosconsole
     roscpp
     std_msgs
+    move_base
+    teb_local_planner
     roscpp_serialization
     roslib
     rostime

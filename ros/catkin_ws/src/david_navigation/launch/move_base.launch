@@ -5,19 +5,11 @@
 <launch>
   <master auto="start"/>
 
-  <!-- Run the map server. -->
-  <!-- <node name="map_server" -->
-  <!--       pkg="map_server" type="map_server" -->
-  <!--       args="$(find my_map_package)/my_map.pgm my_map_resolution"/> -->
-
-  <!--- Run AMCL. -->
-  <!-- <include file="$(find amcl)/examples/amcl_diff.launch" /> -->
+  <include file='$(find david_config)/launch/mapping.launch'>   
 
   <node name="move_base"
         pkg="move_base" type="move_base"
         respawn="false" output="screen">
-
-    <!-- <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" /> -->
 
     <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
 
