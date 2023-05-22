@@ -29,7 +29,7 @@
     </joint>
 
     <joint name="d455_2_link_joint" type="fixed">
-        <origin xyz="-0.01 0.02 0.16" rpy="-0.261799386 3.14159265 3.14159265" />
+        <origin xyz="-0.01 0.02 0.16" rpy="0 -0.261799386 0" />
         <parent link="right_tread" />
         <child link="d455_2_link" />
         <axis xyz="0 0 0" />
