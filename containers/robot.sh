@@ -89,7 +89,7 @@ sleep 5
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
     roslaunch realsense2_camera rs_camera.launch \
     camera:=d455_1 serial_no:=213522250920 \
-    filters:=pointcloud depth_fps:=30 enable_color:=false \
+    filters:=pointcloud depth_fps:=10 enable_color:=false \
     pointcloud_texture_stream:=RS2_STREAM_ANY
       
 sleep 5
@@ -97,7 +97,7 @@ sleep 5
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
     roslaunch realsense2_camera rs_camera.launch \
     camera:=d455_2 serial_no:=213522253528 \
-    filters:=pointcloud depth_fps:=30 enable_color:=false \
+    filters:=pointcloud depth_fps:=10 enable_color:=false \
     pointcloud_texture_stream:=RS2_STREAM_ANY
       
 sleep 5
@@ -105,7 +105,7 @@ sleep 5
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
     roslaunch realsense2_camera rs_camera.launch \
     camera:=l515_1 serial_no:=f1381818 \
-    filters:=pointcloud depth_fps:=30 enable_color:=false \
+    filters:=pointcloud depth_fps:=10 enable_color:=false \
     pointcloud_texture_stream:=RS2_STREAM_ANY
       
 sleep 5
@@ -113,7 +113,7 @@ sleep 5
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
     roslaunch realsense2_camera rs_camera.launch \
     camera:=l515_2 serial_no:=f0461308 \
-    filters:=pointcloud depth_fps:=30 enable_color:=false \
+    filters:=pointcloud depth_fps:=10 enable_color:=false \
     pointcloud_texture_stream:=RS2_STREAM_ANY
 
 sleep 5
