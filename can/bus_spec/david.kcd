@@ -181,12 +181,12 @@
                 </LabelSet>
             </Signal>
             <Signal name="LeftPosition" offset="2" length="11">
-                <Value type="unsigned" unit="mm" slope="0.25390625"
-                       intercept="0.0" min="0.0" max="520"/>
+                <Value type="unsigned" unit="mm" slope="0.00155755015839"
+                       intercept="0.0" min="0.0" max="590"/>
             </Signal>
             <Signal name="RightPosition" offset="13" length="11">
-                <Value type="unsigned" unit="mm" slope="0.25390625"
-                       intercept="0.0" min="0.0" max="520"/>
+                <Value type="unsigned" unit="mm" slope="0.00155755015839"
+                       intercept="0.0" min="0.0" max="590"/>
             </Signal>
         </Message>
 

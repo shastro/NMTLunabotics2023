@@ -13,6 +13,8 @@
 #define MIN_LIMIT A0
 #define MAX_LIMIT A1
 
+#define MAX_STEPS 370000
+
 struct StepperController {
     InPin min_limit;
     InPin max_limit;
@@ -33,12 +35,16 @@ struct StepperController {
 
             if (left.dir == Stepper::RETRACT && at_min) {
                 left.count = 0;
+            } else if (left.dir == Stepper::EXTEND && left.count >= MAX_STEPS) {
+                left.count = MAX_STEPS;
             } else {
-                left.doStep(); // TODO(lcf) why no increment
+                left.doStep();
             }
 
             if (right.dir == Stepper::RETRACT && at_min) {
                 right.count = 0;
+            } else if (right.dir == Stepper::EXTEND && right.count >= MAX_STEPS){
+                right.count = MAX_STEPS;
             } else {
                 right.doStep();
             }
