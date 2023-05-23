@@ -1,5 +1,24 @@
 <?xml version="1.0" ?>
 <launch>
+    <env name="ROSCONSOLE_CONFIG_FILE"
+        value="$(find david_config)/config/rosconsole.conf"/>
+
+    <!-- Pose publisher -->
+    <node pkg="david_config" name="pose_pub" type="pose_pub" />
+
+
+    <node pkg="tf2_ros" type="static_transform_publisher"
+        name="static_transform_publisher"
+        args="0 0 0 0 0 0 map t265_odom_frame" respawn="true" />
+
+    <!-- Transform publisher -->
+    <param name="david_description"
+        textfile="$(find david_config)/urdf/david2.urdf" />
+    <node pkg="robot_state_publisher"  name="state_publisher"
+        type="robot_state_publisher" output="screen">
+        <remap from="robot_description" to="david_description" />
+    </node>
+
     <!-- Elevation mapping node -->
     <node pkg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
         <rosparam command="load" file="$(find david_config)/config/mapping.yaml" />

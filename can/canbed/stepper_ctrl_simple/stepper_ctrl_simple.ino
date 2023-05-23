@@ -23,7 +23,6 @@ struct StepperController {
     }
 
     const int steps_per_loop = 500;
-    const int step_delay_micros = 5; // TODO(lcf): what is the lowest we can make this?
     void loop() {
         int steps = steps_per_loop;
         bool at_min = false;
@@ -74,7 +73,7 @@ void setup() {
         }
 
         // Send Telemetry
-        #define TELEMETRY_FREQUENCY 200
+        #define TELEMETRY_FREQUENCY 100
         if (count % TELEMETRY_FREQUENCY == 0) {
             CANPacket telemetry(DAVID_STEPPER_TELEM_FRAME_ID);
             control.pack_telemetry(telemetry.buf);

@@ -50,6 +50,29 @@ RUN apt-get install -y \
     ros-noetic-rqt-plot \
     ros-noetic-rqt-image-view 
 
+RUN apt-get install -y software-properties-common
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE \
+    || apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE
+RUN add-apt-repository "deb https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" -u
+RUN apt-get update
+RUN apt-get install -y \
+    ros-noetic-librealsense2
+
+# Elevation Mapping GPU dependencies
+RUN apt-get install -y python3-pip
+RUN apt-get install -y wget
+RUN wget https://nvidia.box.com/shared/static/p57jwntv436lfrd78inwl7iml6p13fzh.whl -O torch-1.8.0-cp36-cp36m-linux_aarch64.whl
+RUN pip3 install Cython
+RUN pip3 install numpy==1.19.5 torch-1.8.0-cp36-cp36m-linux_aarch64.whl
+RUN pip3 install cupy
+RUN apt-get install -y ros-melodic-pybind11-catkin
+RUN apt-get install -y ros-melodic-grid-map-core ros-melodic-grid-map-msgs
+RUN apt-get install gfortran
+RUN apt-get install -y libopencv-dev
+RUN apt-get install -y libgmp-dev
+RUN apt-get install -y libmpfr-dev
+RUN apt-get install -y libboost-all-dev
+
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
 
@@ -68,10 +91,13 @@ RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 COPY ros/catkin_ws/src/realsense-ros /ros/catkin_ws/src/realsense-ros
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
-COPY ros/catkin_ws/src/elevation_mapping /ros/catkin_ws/src/elevation_mapping
-RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+#COPY ros/catkin_ws/src/elevation_mapping /ros/catkin_ws/src/elevation_mapping
+#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
-COPY ros/catkin_ws/src/elevation_mapping_demos /ros/catkin_ws/src/elevation_mapping_demos
+#COPY ros/catkin_ws/src/elevation_mapping_demos /ros/catkin_ws/src/elevation_mapping_demos
+#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
+COPY ros/catkin_ws/src/elevation_mapping /ros/catkin_ws/src/elevation_mapping_cupy
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 COPY can /can
