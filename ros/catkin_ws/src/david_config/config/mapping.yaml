@@ -7,7 +7,7 @@ input_sources:
     sensor_processor:
       type: structured_light
       ignore_points_above: 1
-      ignore_points_below: -2
+      ignore_points_below: -1
 
   l515_2:
     type: pointcloud
@@ -17,7 +17,7 @@ input_sources:
     sensor_processor:
       type: structured_light
       ignore_points_above: 1
-      ignore_points_below: -2
+      ignore_points_below: -1
 
   d455_1:
     type: pointcloud
@@ -27,7 +27,7 @@ input_sources:
     sensor_processor:
       type: structured_light
       ignore_points_above: 1
-      ignore_points_below: -2
+      ignore_points_below: -0.5
 
   d455_2:
     type: pointcloud
@@ -37,14 +37,14 @@ input_sources:
     sensor_processor:
       type: structured_light
       ignore_points_above: 1
-      ignore_points_below: -2
+      ignore_points_below: -0.5
 
 map_frame_id: "map"
 robot_base_frame_id: "base_link"
 
 postprocessor_pipeline_name: postprocessor_pipeline
 #enable_continuous_cleanup: true
-postprocessor_num_threads: 6
+postprocessor_num_threads: 1
 
 robot_pose_with_covariance_topic: "/pose_with_covariance"
 track_point_frame_id:                       "t265_pose_frame"
@@ -53,18 +53,9 @@ track_point_y:                              0.0
 track_point_z:                              0.0
 
 # Map.
-length_in_x:                                15.0
-length_in_y:                                15.0
+length_in_x:                                7.5
+length_in_y:                                7.5
 position_x:                                 0.0
 position_y:                                 0.0
-resolution:                                 0.05
+resolution:                                 0.1
 
-grid_map_topic: "/elevation_mapping/elevation_mapping_raw"
-grid_map_visualization:
-  # Setup occupancy grid
-  - name: traversability_grid
-    type: occupancy_grid
-    params:
-     layer: traversability
-     data_min: -0.15
-     data_max: 0.15

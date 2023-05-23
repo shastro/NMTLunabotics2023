@@ -5,7 +5,7 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
     params:
       input_layer: elevation
       output_layer: elevation_inpainted
-      radius: 0.1
+      radius: 0.2
 
   # Create a smoothed filter
   - name: mean_in_radius
@@ -21,7 +21,7 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
     params:
       input_layer: elevation_smooth
       output_layers_prefix: normal_vectors_
-      radius: 0.1
+      radius: 0.4
       normal_vector_positive_axis: z
 
   # Compute slope from surface normal.
@@ -39,13 +39,13 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
       expression: 1 * (1.0 - (slope / 0.6))
 
   # Set lower threshold on traversability.
-  - name: traversability_lower_threshold
-    type: gridMapFilters/ThresholdFilter
-    params:
-      condition_layer: traversability
-      output_layer: traversability
-      lower_threshold: 0.5
-      set_to: 0.0
+  # - name: traversability_lower_threshold
+  #   type: gridMapFilters/ThresholdFilter
+  #   params:
+  #     condition_layer: traversability
+  #     output_layer: traversability
+  #     lower_threshold: 0.5
+  #     set_to: 0.0
 
   # Set upper threshold on traversability.
   - name: traversability_upper_threshold
