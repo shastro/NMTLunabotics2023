@@ -50,6 +50,9 @@ RUN apt-get install -y \
     ros-noetic-rqt-plot \
     ros-noetic-rqt-image-view 
 
+RUN apt-get install -y \
+    gdb
+
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws /ros/catkin_ws
 COPY can /can
