@@ -198,11 +198,11 @@ int main(int argc, char *argv[]) {
             }
 
             // Digger triggers
-            if (g.left_trigger > 0) {
-                excav_ctrl.vel = -g.left_trigger;
+            if (g.right_trigger > 0) {
+                excav_ctrl.vel = -g.right_trigger;
                 out << "Dig Forward: " << excav_ctrl.vel << "\n";
-            } else if (g.right_trigger > 0) {
-                excav_ctrl.vel = g.right_trigger;
+            } else if (g.left_trigger > 0) {
+                excav_ctrl.vel = g.left_trigger;
                 out << "Dig Backward: " << excav_ctrl.vel << "\n";
             } else {
                 excav_ctrl.vel = 0;
