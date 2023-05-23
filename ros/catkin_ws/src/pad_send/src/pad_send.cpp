@@ -187,10 +187,10 @@ int main(int argc, char *argv[]) {
             }
 
             // Extend dpad
-            if (g.dpad.right) {
+            if (g.dpad.left) {
                 stepper_ctrl.left = stepper_ctrl.right = 1;
                 out << "stepper up\n";
-            } else if (g.dpad.left) {
+            } else if (g.dpad.right) {
                 stepper_ctrl.left = stepper_ctrl.right = 2;
                 out << "stepper down\n";
             } else {
