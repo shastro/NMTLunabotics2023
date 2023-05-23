@@ -25,16 +25,17 @@ struct StepperController {
     pulse(pulse_c), dirpin(dir_c) {
         dir = STOP;
         dirpin.write(spin_voltages[dir]);
-        count = 26000;
+        count = 15000;
     }
     
     void doStep() {
-        if ((count >= 52000 && dir < 0) || (count <= 0 && dir > 0) || (count < 52000 && count > 0)) {
+        if ((count >= 30000 && dir < 0) || (count <= 0 && dir > 0) || (count < 30000 && count > 0)) {
             if (dir != STOP) {
                 count += dir;
                 pulse.write(0);
                 pulse.write(1);
                 delayMicroseconds(300);
+                Serial.println(count);
             }
         }   
     }
@@ -65,7 +66,7 @@ void setup() {
     StepperController control(PUL, DIR);
 
     bool eStopped = false;
-    for (int count = 0; ; count++) {
+    for (int countup = 0; ; countup++) {
         CANPacket packet = can_read_nonblocking(can);
         switch (packet.id) {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) {
@@ -74,13 +75,16 @@ void setup() {
         }
 
         // Send Telemetry
-        if (count % 2000 == 0) {
+        if (countup % 2000 == 0) {
             CANPacket telemetry = CANPacket(DAVID_MAST_TELEM_FRAME_ID);
             control.pack_telemetry(telemetry.buf);
             can_send(can, telemetry);
-            Serial.print(count);
+            //Serial.print(countup);
+            if (countup > 100000) {
+              countup = 0;
+            }
         }
-        Serial.println(count);
+        //Serial.println(countup);
         if (eStopped)
             continue;
         
