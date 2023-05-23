@@ -120,3 +120,6 @@ sleep 5
       
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
        roslaunch david_config prep_mapping.launch
+
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
+       roslaunch david_config mapping.launch
