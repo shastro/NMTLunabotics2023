@@ -56,7 +56,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key F6E65AC044F831AC80A0
 RUN add-apt-repository "deb https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" -u
 RUN apt-get update
 RUN apt-get install -y \
-    ros-noetic-librealsense2 \
+    ros-noetic-librealsense2
 RUN apt-cache search realsense
 
 COPY ros/scripts /ros/scripts
