@@ -77,7 +77,6 @@ params=(
     -v /dev:/dev:rw
     -e "QT_X11_NO_MITSHM=1"
     -e "OGRE_RTT_MODE=Copy"
-    --gpus all
     --device-cgroup-rule "c 81:* rmw"
     --device-cgroup-rule "c 189:* rmw"
     --name=lunabotics-term
