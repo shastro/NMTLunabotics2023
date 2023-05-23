@@ -73,14 +73,6 @@ void setup() {
             FRAME_CASE(DAVID_E_STOP, david_e_stop) { eStopped = frame.stop; }
         }
 
-        // Send Telemetry
-        #define TELEMETRY_FREQUENCY 200
-        if (count % TELEMETRY_FREQUENCY == 0) {
-            CANPacket telemetry(DAVID_STEPPER_TELEM_FRAME_ID);
-            control.pack_telemetry(telemetry.buf);
-            can_send(can, telemetry);
-        }
-
         if (eStopped) {
             continue;
         }
