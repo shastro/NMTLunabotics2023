@@ -61,7 +61,7 @@ RUN apt-get install -y \
 # Elevation Mapping GPU dependencies
 RUN apt-get install -y python3-pip
 RUN apt-get install -y wget
-RUN wget https://nvidia.box.com/shared/static/p57jwntv436lfrd78inwl7iml6p13fzh.whl -O torch-1.8.0-cp36-cp36m-linux_aarch64.whl
+RUN wget https://nvidia.box.com/shared/static/fjtbno0vpo676a25cgvuqc1wty0fkkg6.whl -O torch-1.8.0-cp36-cp36m-linux_aarch64.whl
 RUN pip3 install Cython
 RUN pip3 install numpy==1.19.5 torch-1.8.0-cp36-cp36m-linux_aarch64.whl
 RUN pip3 install cupy
