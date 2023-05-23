@@ -9,11 +9,12 @@
 void setup() {
     MCP_CAN can = setup_can();
 
-    #define INHIBIT A3
-    #define RELAY_CCW 5
-    #define RELAY_CW 4
-    #define RELAY_PWM 6
-    MidwestMotorController excav(INHIBIT, RELAY_CCW, RELAY_CW, RELAY_PWM);
+#define INHIBIT A3
+#define RELAY_CCW D5
+#define RELAY_CW D4
+#define RELAY_PWM D6
+    MidwestMotorController excav(INHIBIT, Relay(RELAY_CCW, RELAY_CW, RELAY_PWM),
+                                 1);
 
     bool eStopped = false;
     for (;;) {
@@ -38,5 +39,3 @@ void setup() {
         }
     }
 }
-
-
