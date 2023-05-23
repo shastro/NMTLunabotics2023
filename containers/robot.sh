@@ -31,7 +31,7 @@ params=(
     # Use host's network interfaces to listen to ROS, and operate the
     # CAN bus.
     --network=host
-    --gpu=all
+    --runtime=nvidia
 
     # Allow access to devices.
     --volume=/dev:/dev
@@ -119,5 +119,5 @@ docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
 
 sleep 5
       
-#docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
-#       roslaunch david_config mapping.launch
+docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
+       roslaunch david_config mapping.launch
