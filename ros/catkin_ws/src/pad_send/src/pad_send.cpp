@@ -25,7 +25,7 @@ double stepper_min = STEPPER_CTRL_SET_POINT_MIN * min_max_mod;
 enum class Mode { Normal, Adjust, Home, Stop };
 Mode m = Mode::Normal;
 
-//Publishers
+// Publishers
 ros::Publisher stop_pub;
 ros::Publisher loco_pub;
 ros::Publisher pitch_pub;
@@ -33,7 +33,7 @@ ros::Publisher stepper_pub;
 ros::Publisher excav_pub;
 ros::Publisher mast_pub;
 
-//Messages
+// Messages
 motor_bridge::EStop e_stop;
 motor_bridge::PitchCtrl pitch_ctrl;
 motor_bridge::LocoCtrl loco_ctrl;
@@ -53,12 +53,18 @@ int main(int argc, char *argv[]) {
     // Set up ros
     ros::init(argc, argv, "pad_send");
     ros::NodeHandle nh;
-    ros::Publisher stop_pub = nh.advertise<motor_bridge::EStop>("/system/stop", 5);
-    ros::Publisher pitch_pub = nh.advertise<motor_bridge::PitchCtrl>("/system/pitch_ctrl", 5);
-    ros::Publisher loco_pub = nh.advertise<motor_bridge::LocoCtrl>("/system/loco_ctrl", 5);
-    ros::Publisher stepper_pub = nh.advertise<motor_bridge::StepperCtrl>("/system/stepper_ctrl", 5);
-    ros::Publisher excav_pub = nh.advertise<motor_bridge::ExcavCtrl>("/system/excav_ctrl", 5);
-    ros::Publisher mast_pub = nh.advertise<motor_bridge::MastCtrl>("/system/mast_ctrl", 5);
+    ros::Publisher stop_pub =
+        nh.advertise<motor_bridge::EStop>("/system/stop", 5);
+    ros::Publisher pitch_pub =
+        nh.advertise<motor_bridge::PitchCtrl>("/system/pitch_ctrl", 5);
+    ros::Publisher loco_pub =
+        nh.advertise<motor_bridge::LocoCtrl>("/system/loco_ctrl", 5);
+    ros::Publisher stepper_pub =
+        nh.advertise<motor_bridge::StepperCtrl>("/system/stepper_ctrl", 5);
+    ros::Publisher excav_pub =
+        nh.advertise<motor_bridge::ExcavCtrl>("/system/excav_ctrl", 5);
+    ros::Publisher mast_pub =
+        nh.advertise<motor_bridge::MastCtrl>("/system/mast_ctrl", 5);
     ros::Rate nyquil(rate);
 
     // Setup ncurses
@@ -101,7 +107,7 @@ int main(int argc, char *argv[]) {
 
         // Quit
         if (g.buttons.xbox) {
-           e_stop.stop = true;
+            e_stop.stop = true;
             stop_pub.publish(e_stop);
             endwin();
             return 0;
@@ -132,13 +138,13 @@ int main(int argc, char *argv[]) {
         if (g.buttons.X) {
             m = Mode::Normal;
         }
-        
+
         stepper_ctrl.left = stepper_ctrl.right = 0;
         e_stop.stop = false;
         loco_ctrl.left_vel = 0;
         loco_ctrl.right_vel = 0;
         pitch_ctrl.left = pitch_ctrl.right = 0;
-        
+
         switch (m) {
         case Mode::Normal:
             // Controls
@@ -152,39 +158,39 @@ int main(int argc, char *argv[]) {
 
             // Pitch control with dpad
             if (g.dpad.up) {
-                pitch_ctrl.left  = pitch_ctrl.right = 1;
+                pitch_ctrl.left = pitch_ctrl.right = 1;
                 out << "Pitch up\n";
             } else if (g.dpad.down) {
-                pitch_ctrl.left  = pitch_ctrl.right = 2;
+                pitch_ctrl.left = pitch_ctrl.right = 2;
                 out << "Pitch down\n";
             } else {
-                pitch_ctrl.left  = pitch_ctrl.right = 0;
+                pitch_ctrl.left = pitch_ctrl.right = 0;
             }
 
             // Viagra bumpers
             if (g.buttons.left_bumper) {
                 out << "david's shaft left\n";
-               mast_ctrl.direction = 0;
+                mast_ctrl.direction = 0;
             } else if (g.buttons.right_bumper) {
                 out << "david's shaft right\n";
-               mast_ctrl.direction = 2;
+                mast_ctrl.direction = 2;
             } else {
-               mast_ctrl.direction = 1;
+                mast_ctrl.direction = 1;
             }
 
             // Drive with both sticks
-           loco_ctrl.left_vel = g.left_stick.y;
-           loco_ctrl.right_vel = g.right_stick.y;
-            if (loco_ctrl.left_vel != 0 ||loco_ctrl.right_vel != 0) {
-                out << "Driving - L: " <<loco_ctrl.left_vel
-                    << ", R: " <<loco_ctrl.right_vel << "\n";
+            loco_ctrl.left_vel = g.left_stick.y;
+            loco_ctrl.right_vel = g.right_stick.y;
+            if (loco_ctrl.left_vel != 0 || loco_ctrl.right_vel != 0) {
+                out << "Driving - L: " << loco_ctrl.left_vel
+                    << ", R: " << loco_ctrl.right_vel << "\n";
             }
 
             // Extend dpad
-            if (g.dpad.right) {
+            if (g.dpad.left) {
                 stepper_ctrl.left = stepper_ctrl.right = 1;
                 out << "stepper up\n";
-            } else if (g.dpad.left) {
+            } else if (g.dpad.right) {
                 stepper_ctrl.left = stepper_ctrl.right = 2;
                 out << "stepper down\n";
             } else {
@@ -192,14 +198,14 @@ int main(int argc, char *argv[]) {
             }
 
             // Digger triggers
-            if (g.left_trigger > 0) {
-               excav_ctrl.vel = -g.left_trigger;
-                out << "Dig Forward: " <<excav_ctrl.vel << "\n";
-            } else if (g.right_trigger > 0) {
-               excav_ctrl.vel = g.right_trigger;
-                out << "Dig Backward: " <<excav_ctrl.vel << "\n";
+            if (g.right_trigger > 0) {
+                excav_ctrl.vel = -g.right_trigger;
+                out << "Dig Forward: " << excav_ctrl.vel << "\n";
+            } else if (g.left_trigger > 0) {
+                excav_ctrl.vel = g.left_trigger;
+                out << "Dig Backward: " << excav_ctrl.vel << "\n";
             } else {
-               excav_ctrl.vel = 0;
+                excav_ctrl.vel = 0;
             }
             break;
 
@@ -207,7 +213,7 @@ int main(int argc, char *argv[]) {
             out << "Adjusting\n\n";
             out << "Left Stick - Left Pitch Arm\n";
             out << "Right Stick - Right Pitch Arm\n";
-                
+
             if (g.left_stick.y > 0)
                 pitch_ctrl.left = 1;
             else if (g.left_stick.y < 0)
@@ -218,7 +224,7 @@ int main(int argc, char *argv[]) {
             else if (g.right_stick.y < 0)
                 pitch_ctrl.right = 2;
             break;
-        
+
         case Mode::Home:
             break;
 
@@ -227,16 +233,16 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        printw(out.str().c_str());
+        printw("%s", out.str().c_str());
         refresh();
-        
+
         stop_pub.publish(e_stop);
-            pitch_pub.publish(pitch_ctrl);
-            loco_pub.publish(loco_ctrl);
-            excav_pub.publish(excav_ctrl);
-            stepper_pub.publish(stepper_ctrl);
-            mast_pub.publish(mast_ctrl);
-        
+        pitch_pub.publish(pitch_ctrl);
+        loco_pub.publish(loco_ctrl);
+        excav_pub.publish(excav_ctrl);
+        stepper_pub.publish(stepper_ctrl);
+        mast_pub.publish(mast_ctrl);
+
         nyquil.sleep();
     }
     endwin();

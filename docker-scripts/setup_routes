@@ -38,4 +38,6 @@ EOF
     rm $BUILD_FILE $C_FILE
 }
 
-sudo ip route add "10.0.0.0/24" via "$(lookup_addr jetson)" dev "wlp2s0" proto static
+WIFI_DEV=$(nmcli --get-values GENERAL.DEVICE,GENERAL.TYPE device show | sed '/^wifi/!{h;d;};x' | head -n 1)
+
+sudo ip route add "10.0.0.0/24" via "$(lookup_addr jetson)" dev $WIFI_DEV proto static
