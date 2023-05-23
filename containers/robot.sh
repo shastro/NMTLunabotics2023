@@ -31,6 +31,7 @@ params=(
     # Use host's network interfaces to listen to ROS, and operate the
     # CAN bus.
     --network=host
+    --gpu=all
 
     # Allow access to devices.
     --volume=/dev:/dev
