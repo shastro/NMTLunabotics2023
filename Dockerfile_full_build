@@ -50,10 +50,6 @@ RUN apt-get install -y \
     ros-noetic-rqt-plot \
     ros-noetic-rqt-image-view 
 
-# Install librealsense
-# To avoid waiting for input during package installation
-ENV DEBIAN_FRONTEND=noninteractive
-
 # Builder dependencies installation
 RUN apt-get update \
     && apt-get install -qq -y --no-install-recommends \
@@ -92,32 +88,6 @@ RUN cd /usr/src/librealsense \
     -DCMAKE_BUILD_TYPE=Release ../ \
     && make -j$(($(nproc)-1)) all \
     && make install 
-
-######################################
-#   librealsense Base Image Stage    #
-######################################
-FROM ${BASE_IMAGE} as librealsense
-
-# Copy binaries from builder stage
-COPY --from=librealsense-builder /opt/librealsense /usr/local/
-COPY --from=librealsense-builder /usr/lib/python3/dist-packages/pyrealsense2 /usr/lib/python3/dist-packages/pyrealsense2
-COPY --from=librealsense-builder /usr/src/librealsense/config/99-realsense-libusb.rules /etc/udev/rules.d/
-COPY --from=librealsense-builder /usr/src/librealsense/config/99-realsense-d4xx-mipi-dfu.rules /etc/udev/rules.d/
-ENV PYTHONPATH=$PYTHONPATH:/usr/local/lib
-
-# Install dep packages
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \	
-    libusb-1.0-0 \
-    udev \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    software-properties-common \
-    && rm -rf /var/lib/apt/lists/*
-
-# Shows a list of connected Realsense devices
-CMD [ "rs-enumerate-devices", "--compact" ]
 
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
