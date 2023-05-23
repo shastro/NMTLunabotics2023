@@ -50,45 +50,52 @@ RUN apt-get install -y \
     ros-noetic-rqt-plot \
     ros-noetic-rqt-image-view 
 
-# Builder dependencies installation
-RUN apt-get update \
-    && apt-get install -qq -y --no-install-recommends \
-    build-essential \
-    cmake \
-    git \
-    libssl-dev \
-    libusb-1.0-0-dev \
-    pkg-config \
-    libgtk-3-dev \
-    libglfw3-dev \
-    libgl1-mesa-dev \
-    libglu1-mesa-dev \    
-    curl \
-    python3 \
-    python3-dev \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+## Builder dependencies installation
+#RUN apt-get update \
+#    && apt-get install -qq -y --no-install-recommends \
+#    build-essential \
+#    cmake \
+#    git \
+#    libssl-dev \
+#    libusb-1.0-0-dev \
+#    pkg-config \
+#    libgtk-3-dev \
+#    libglfw3-dev \
+#    libgl1-mesa-dev \
+#    libglu1-mesa-dev \    
+#    curl \
+#    python3 \
+#    python3-dev \
+#    ca-certificates \
+#    && rm -rf /var/lib/apt/lists/*
+#
+## Download sources
+#WORKDIR /usr/src
+#ENV LIBRS_VERSION=2.53.1
+#RUN curl https://codeload.github.com/IntelRealSense/librealsense/tar.gz/refs/tags/v$LIBRS_VERSION -o librealsense.tar.gz
+#RUN tar -zxf librealsense.tar.gz \
+#    && rm librealsense.tar.gz 
+#RUN ln -s /usr/src/librealsense-$LIBRS_VERSION /usr/src/librealsense
+#
+## Build and install
+#RUN cd /usr/src/librealsense \
+#    && mkdir build && cd build \
+#    && cmake \
+#    -DCMAKE_C_FLAGS_RELEASE="${CMAKE_C_FLAGS_RELEASE} -s" \
+#    -DCMAKE_CXX_FLAGS_RELEASE="${CMAKE_CXX_FLAGS_RELEASE} -s" \
+#    -DCMAKE_INSTALL_PREFIX=/opt/librealsense \    
+#    -DBUILD_GRAPHICAL_EXAMPLES=OFF \
+#    -DBUILD_PYTHON_BINDINGS:bool=true \
+#    -DCMAKE_BUILD_TYPE=Release ../ \
+#    && make -j$(($(nproc)-1)) all \
+#    && make install 
 
-# Download sources
-WORKDIR /usr/src
-ENV LIBRS_VERSION=2.53.1
-RUN curl https://codeload.github.com/IntelRealSense/librealsense/tar.gz/refs/tags/v$LIBRS_VERSION -o librealsense.tar.gz
-RUN tar -zxf librealsense.tar.gz \
-    && rm librealsense.tar.gz 
-RUN ln -s /usr/src/librealsense-$LIBRS_VERSION /usr/src/librealsense
-
-# Build and install
-RUN cd /usr/src/librealsense \
-    && mkdir build && cd build \
-    && cmake \
-    -DCMAKE_C_FLAGS_RELEASE="${CMAKE_C_FLAGS_RELEASE} -s" \
-    -DCMAKE_CXX_FLAGS_RELEASE="${CMAKE_CXX_FLAGS_RELEASE} -s" \
-    -DCMAKE_INSTALL_PREFIX=/opt/librealsense \    
-    -DBUILD_GRAPHICAL_EXAMPLES=OFF \
-    -DBUILD_PYTHON_BINDINGS:bool=true \
-    -DCMAKE_BUILD_TYPE=Release ../ \
-    && make -j$(($(nproc)-1)) all \
-    && make install 
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE || sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE
+RUN add-apt-repository "deb https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" -u
+RUN apt-get install -y librealsense2-dkms \
+    librealsense2-utils \
+    librealsense2-dev \
+    librealsense2-dbg
 
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
