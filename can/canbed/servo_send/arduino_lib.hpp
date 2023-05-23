@@ -224,18 +224,32 @@ struct Relay {
 };
 
 // Single Stepper Motor
+int direction_voltages[3] = {1, 0, 1};
 struct Stepper {
     OutPin pulse;
-    OutPin direction;
+    OutPin dirpin;
+    long count;
+    enum Dirs { STOP = 0, EXTEND = 1, RETRACT = 2 };
+    enum Dirs dir; 
 
     Stepper(int pulse_pin, int dir_pin)
-        : pulse(pulse_pin), direction(dir_pin) {}
+        : pulse(pulse_pin), dirpin(dir_pin) {
+        count = 0;
+        dir = STOP;
+    }
 
-    void doStep(unsigned int step) {
-        const int pulse_sequence[] = {HIGH, HIGH, LOW, LOW};
-        const int dir_sequence[] = {LOW, HIGH, HIGH, LOW};
-        pulse.write(pulse_sequence[step % 4]);
-        direction.write(dir_sequence[step % 4]);
+    void setDirection(unsigned int d) {
+        dir = d;
+        dirpin.write(direction_voltages[dir]);
+    }
+
+    inline void doStep() {
+        int dir_table[] = {0, 1, -1};
+        count += dir_table[dir];
+        if (dir != STOP) {
+            pulse.write(0);
+            pulse.write(1);
+        }
     }
 };
 
@@ -243,6 +257,12 @@ struct Stepper {
 struct MidwestMotorController {
     OutPin enable;
     Relay relay;
+
+    // Experimentally determined that the motors' maximum velocity is
+    // somewhere around 0.45-0.5 duty cycle. It's unclear why, but as
+    // a result for better control we can just multiply by 0.5; make
+    // this adjustable though.
+    double post_scale = 0.5;
 
   public:
     MidwestMotorController(int inhibit, int relay_ccw, int relay_cw,
@@ -256,15 +276,16 @@ struct MidwestMotorController {
         setVel(0.0);
     }
 
+    MidwestMotorController(int inhibit, Relay relay, double post_scale)
+        : enable(inhibit), relay(relay), post_scale(post_scale) {
+        setVel(0.0);
+    }
+
     const double vel_scale = 100.0;
     const double vel_deadzone = 0.01;
     void setVel(double vel) {
         vel /= vel_scale;
-        // Experimentally determined that the motors' maximum velocity
-        // is somewhere around 0.45-0.5 duty cycle. It's unclear why,
-        // but as a result for better control we can just multiply by
-        // 0.5;
-        vel *= 0.5;
+        vel *= post_scale;
 
         // The motors are slightly more responsive when going forwards
         // than when going backwards.

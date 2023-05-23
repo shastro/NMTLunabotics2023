@@ -258,6 +258,12 @@ struct MidwestMotorController {
     OutPin enable;
     Relay relay;
 
+    // Experimentally determined that the motors' maximum velocity is
+    // somewhere around 0.45-0.5 duty cycle. It's unclear why, but as
+    // a result for better control we can just multiply by 0.5; make
+    // this adjustable though.
+    double post_scale = 0.5;
+
   public:
     MidwestMotorController(int inhibit, int relay_ccw, int relay_cw,
                            int relay_pwm)
@@ -270,15 +276,16 @@ struct MidwestMotorController {
         setVel(0.0);
     }
 
+    MidwestMotorController(int inhibit, Relay relay, double post_scale)
+        : enable(inhibit), relay(relay), post_scale(post_scale) {
+        setVel(0.0);
+    }
+
     const double vel_scale = 100.0;
     const double vel_deadzone = 0.01;
     void setVel(double vel) {
         vel /= vel_scale;
-        // Experimentally determined that the motors' maximum velocity
-        // is somewhere around 0.45-0.5 duty cycle. It's unclear why,
-        // but as a result for better control we can just multiply by
-        // 0.5;
-        vel *= 0.5;
+        vel *= post_scale;
 
         // The motors are slightly more responsive when going forwards
         // than when going backwards.
