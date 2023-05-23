@@ -25,11 +25,11 @@ struct StepperController {
     pulse(pulse_c), dirpin(dir_c) {
         dir = STOP;
         dirpin.write(spin_voltages[dir]);
-        count = 15000;
+        count = 6750;
     }
     
     void doStep() {
-        if ((count >= 30000 && dir < 0) || (count <= 0 && dir > 0) || (count < 30000 && count > 0)) {
+        if ((count >= 12500 && dir < 0) || (count <= 0 && dir > 0) || (count < 12500 && count > 0)) {
             if (dir != STOP) {
                 count += dir;
                 pulse.write(0);
