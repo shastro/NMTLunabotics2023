@@ -25,6 +25,10 @@ void cmd_vel_callback(const geometry_msgs::Twist &msg) {
     // > (cmd_vel.linear.x, cmd_vel.linear.y, cmd_vel.angular.z)
     // > velocities and converting them into motor commands to send to
     // > a mobile base.
+
+    double rad_per_second = 5.43144; // rad/s at 99% power
+    double rps_per_vel = rad_per_second/ 99; // rad/s per power percentage
+    
     double v = msg.linear.x;
     double omega = msg.angular.z;
 
@@ -33,8 +37,8 @@ void cmd_vel_callback(const geometry_msgs::Twist &msg) {
     double omega_r = (v + omega * ROBOT_WIDTH / 2) / WHEEL_RADIUS;
 
     motor_bridge::LocoCtrl loco_msg;
-    loco_msg.left_vel = omega_l;
-    loco_msg.right_vel = omega_r;
+    loco_msg.left_vel = omega_l / rps_per_vel;
+    loco_msg.right_vel = omega_r / rps_per_vel;
 
     base_pub.publish(loco_msg);
 }
