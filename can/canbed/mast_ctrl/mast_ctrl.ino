@@ -19,7 +19,7 @@ struct StepperController {
     OutPin dirpin;
     long count;
 
-    #define STEP_TO_DEGREE (0.0138461538462)
+    #define STEP_TO_DEGREE (0.0533333333333)
 
     StepperController(int pulse_c, int dir_c) :
     pulse(pulse_c), dirpin(dir_c) {
@@ -29,13 +29,13 @@ struct StepperController {
     }
     
     void doStep() {
-        if ((count >= 12500 && dir < 0) || (count <= 0 && dir > 0) || (count < 12500 && count > 0)) {
+        if ((count >= 13500 && dir < 0) || (count <= 0 && dir > 0) || (count < 13500 && count > 0)) {
             if (dir != STOP) {
                 count += dir;
                 pulse.write(0);
                 pulse.write(1);
-                delayMicroseconds(300);
-                Serial.println(count);
+                delayMicroseconds(500);
+                //Serial.println(count);
             }
         }   
     }
@@ -75,14 +75,11 @@ void setup() {
         }
 
         // Send Telemetry
-        if (countup % 2000 == 0) {
+        if (countup % 30 == 0) {
             CANPacket telemetry = CANPacket(DAVID_MAST_TELEM_FRAME_ID);
             control.pack_telemetry(telemetry.buf);
             can_send(can, telemetry);
             //Serial.print(countup);
-            if (countup > 100000) {
-              countup = 0;
-            }
         }
         //Serial.println(countup);
         if (eStopped)
