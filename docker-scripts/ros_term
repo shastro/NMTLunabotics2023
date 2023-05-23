@@ -65,9 +65,6 @@ for ((c=32; c>=0; c--)); do
     fi
 done
 
-# -e "QT_X11_NO_MITSHM=1"
-# -e "OGRE_RTT_MODE=Copy"
-# --gpus all
 
 params=(
     --rm
@@ -78,6 +75,9 @@ params=(
     -e DISPLAY
     -v /tmp/.X11-unix:/tmp/.X11-unix:rw
     -v /dev:/dev:rw
+    -e "QT_X11_NO_MITSHM=1"
+    -e "OGRE_RTT_MODE=Copy"
+    --gpus all
     --device-cgroup-rule "c 81:* rmw"
     --device-cgroup-rule "c 189:* rmw"
     --name=lunabotics-term
