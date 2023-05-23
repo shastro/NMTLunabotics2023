@@ -63,8 +63,7 @@ RUN apt-get install -y python3-pip
 RUN apt-get install -y wget
 RUN wget https://nvidia.box.com/shared/static/p57jwntv436lfrd78inwl7iml6p13fzh.whl -O torch-1.8.0-cp36-cp36m-linux_aarch64.whl
 RUN pip3 install Cython
-# RUN pip3 install numpy torch-1.8.0-cp36-cp36m-linux_aarch64.whl
-RUN pip3 install https://developer.download.nvidia.com/compute/redist/jp/v51/pytorch/torch-1.14.0a0+fe05266f.nv23.04-cp38-cp38-linux_aarch64.whl
+RUN pip3 install numpy==1.19.5 torch-1.8.0-cp36-cp36m-linux_aarch64.whl
 RUN pip3 install cupy
 RUN apt-get install -y ros-melodic-pybind11-catkin
 RUN apt-get install -y ros-melodic-grid-map-core ros-melodic-grid-map-msgs
