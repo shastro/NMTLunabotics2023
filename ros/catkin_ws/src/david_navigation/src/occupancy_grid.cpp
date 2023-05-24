@@ -24,18 +24,19 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
         }
     }
 
-    grid_map::Matrix mx;
+    grid_map::Matrix mx = map.Matrix;
     int nRows = mx.rows();
     int nCols = mx.cols();
     nav_msgs::OccupancyGrid grid;
     grid.data.resize(nRows*nCols);
-    
+
+    #define threshold 0.5
     for (int j = 0; j < nCols; j++) {
         for (int i = 0; i < nRows; i++) {
             float xgrad = (((i+1 == nRows)? 0 : mx.coeff(i+1, j)) - ((i-1 == -1)? 0 : mx.coeff(i-1, j)))/(max-min);
             float ygrad = ((j+1 == nRows)? 0 : mx.coeff(i, j+1)) - ((j-1 == -1)? 0 : mx.coeff(i, j-1))/(max-min);
-            float val  = xgrad*xgrad + ygrad*ygrad;
-            grid.data[i + nRows*j] = (100*val);
+            float val  = 1.0 - xgrad*xgrad + ygrad*ygrad;
+            grid.data[i + nRows*j] = (val > threshold) 100 : 0;
         }
     }
     
