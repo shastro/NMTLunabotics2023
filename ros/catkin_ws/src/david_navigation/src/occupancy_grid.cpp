@@ -12,23 +12,44 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     grid_map::GridMap map;
     grid_map::GridMapRosConverter::fromMessage(*msg, map, msg->layers);
     
-    int min = 100;
-    int max = -100;
-    for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
-        float val = map.at(layer, *it);
-        if (val < min) {
-            min = val;
-        }
-        if (val > max) {
-            max = val;
-        }
-    }
+    float min = 100.0;
+    float max = -100.0;
+    float median = 0.0;
 
     grid_map::Matrix mx = map.get(layer);
     int nRows = mx.rows();
     int nCols = mx.cols();
-    nav_msgs::OccupancyGrid grid;
     grid.data.resize(nRows*nCols);
+    int sz = map.getSize().prod();
+    nav_msgs::OccupancyGrid grid;
+    grid.data.resize(sz);
+    
+    for (int j = 0; j < nCols; j++) {
+        for (int i = 0; i < nRows; i++) {
+            float val = mx.coeff(i,j);
+            if (val < min) {
+                min = val;
+            }
+            if (val > max) {
+                max = val;
+            }
+
+#define sign(x) ((x > 0) - (x < 0))
+#define rate 0.01
+            median += rate * sign(val - median);
+        }
+    }
+
+    float range = max-min;
+    float norm_median = median / range;
+
+    for (int j = 0; j < nCols; j++) {
+        for (int i = 0; i < nRows; i++) {
+            float norm_val = mx.coeff(i,j)/range;
+            float diff = norm_val - norm_median;
+            grid.data[j + i*nCols] = 100.0*diff*diff; 
+        }
+    }
 
     // #define threshold 0.5
     // for (int j = 0; j < nCols; j++) {
@@ -41,45 +62,47 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     //     }
     // }
 
-    // Centers
-    #define threshold 0.5
-    for (int j = 1; j < nCols-1; j++) {
-        for (int i = 1; i < nRows-1; i++) {
-            float xgrad = (mx.coeff(i+1, j) - mx.coeff(i-1, j))/2.0*(max-min);
-            float ygrad = (mx.coeff(i, j+1) - mx.coeff(i, j-1))/2.0*(max-min);
-            float val  = 1.0 - xgrad*xgrad + ygrad*ygrad;
-            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = val * 100.0; //(val > threshold)? 100 : 0;
-        }
-    }
+    
+    
+    // // Centers
+    // #define threshold 0.5
+    // for (int j = 1; j < nCols-1; j++) {
+    //     for (int i = 1; i < nRows-1; i++) {
+    //         float xgrad = (mx.coeff(i+1, j) - mx.coeff(i-1, j))/2.0*(max-min);
+    //         float ygrad = (mx.coeff(i, j+1) - mx.coeff(i, j-1))/2.0*(max-min);
+    //         float val  = 1.0 - xgrad*xgrad + ygrad*ygrad;
+    //         grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = val * 100.0; //(val > threshold)? 100 : 0;
+    //     }
+    // }
 
-    // Boundaries
-    for (int i = 1; i < nRows-1; i++) {
-        float grad = (mx.coeff(i, 1) - mx.coeff(i, 0))/(max-min);
-        float val  = 1.0 - grad*grad;
-        // grid.data[i + nRows*0] = (val > threshold)? 100 : 0;
-        grid.data[i + nRows*0] = 100*val;
-    }
+    // // Boundaries
+    // for (int i = 1; i < nRows-1; i++) {
+    //     float grad = (mx.coeff(i, 1) - mx.coeff(i, 0))/(max-min);
+    //     float val  = 1.0 - grad*grad;
+    //     // grid.data[i + nRows*0] = (val > threshold)? 100 : 0;
+    //     grid.data[i + nRows*0] = 100*val;
+    // }
 
-    for (int i = 1; i < nRows-1; i++) {
-        float grad = (mx.coeff(i, nCols-1) - mx.coeff(i, nCols-2))/(max-min);
-        float val  = 1.0 - grad*grad;
-        // grid.data[i + nRows*(nCols-1)] = (val > threshold)? 100 : 0;
-        grid.data[i + nRows*(nCols-1)] = 100.0*val;
-    }
+    // for (int i = 1; i < nRows-1; i++) {
+    //     float grad = (mx.coeff(i, nCols-1) - mx.coeff(i, nCols-2))/(max-min);
+    //     float val  = 1.0 - grad*grad;
+    //     // grid.data[i + nRows*(nCols-1)] = (val > threshold)? 100 : 0;
+    //     grid.data[i + nRows*(nCols-1)] = 100.0*val;
+    // }
 
-    for (int j = 0; j < nCols; j++) {
-        float grad = (mx.coeff(1, j) - mx.coeff(0, j))/(max-min);
-        float val  = 1.0 - grad*grad;
-        // grid.data[0 + nRows*j] = (val > threshold)? 100 : 0;
-        grid.data[0 + nRows*j] = 100.0*val;
-    }
+    // for (int j = 0; j < nCols; j++) {
+    //     float grad = (mx.coeff(1, j) - mx.coeff(0, j))/(max-min);
+    //     float val  = 1.0 - grad*grad;
+    //     // grid.data[0 + nRows*j] = (val > threshold)? 100 : 0;
+    //     grid.data[0 + nRows*j] = 100.0*val;
+    // }
 
-    for (int j = 0; j < nCols; j++) {
-        float grad = (mx.coeff(nRows-1, j) - mx.coeff(nRows-2, j))/(max-min);
-        float val  = 1.0 - grad*grad;
-        // grid.data[nRows-1 + nRows*j] = (val > threshold)? 100 : 0;
-        grid.data[nRows-1 + nRows*j] = 100.0*val;
-    }
+    // for (int j = 0; j < nCols; j++) {
+    //     float grad = (mx.coeff(nRows-1, j) - mx.coeff(nRows-2, j))/(max-min);
+    //     float val  = 1.0 - grad*grad;
+    //     // grid.data[nRows-1 + nRows*j] = (val > threshold)? 100 : 0;
+    //     grid.data[nRows-1 + nRows*j] = 100.0*val;
+    // }
 
     grid.header.frame_id = map.getFrameId();
     grid.header.stamp.fromNSec(map.getTimestamp());
