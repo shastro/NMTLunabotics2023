@@ -29,8 +29,8 @@
         <axis xyz="0 0 0" />
     </joint>
 
-    <joint name="d455_2_joint" type="fixed">
-        <origin xyz="0 -0.08265 -0.02027" rpy="0 0 0" />
+    <joint name="d455_2_link_joint" type="fixed">
+        <origin xyz="0 -0.08265 -0.02027" rpy="0 0 -1.57" />
         <parent link="right_depth_plate_top" />
         <child link="d455_2_link" />
         <axis xyz="0 0 0" />
