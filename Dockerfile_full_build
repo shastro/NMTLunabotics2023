@@ -154,9 +154,9 @@ COPY ros/catkin_ws/src/david_config /ros/catkin_ws/src/david_config
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 # Build any packages not listed above.
-RUN rm -rf /ros/catkin_ws/src
-COPY ros/catkin_ws/src /ros/catkin_ws/src
-RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+#RUN rm -rf /ros/catkin_ws/src
+#COPY ros/catkin_ws/src /ros/catkin_ws/src
+#RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 # Add /catkin_ws to the ROS environment.
 COPY ros/ros_entrypoint.sh /ros_entrypoint.sh
