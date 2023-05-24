@@ -52,6 +52,8 @@ params=(
     # Allow access to devices.
     --volume=/dev:/dev
 
+    --volume=/media:/media
+
     # Allow access to writing logs.
     --volume="$LOG_DIR":"$LOG_DIR"
 
