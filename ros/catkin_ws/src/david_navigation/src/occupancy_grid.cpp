@@ -48,7 +48,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
             float xgrad = (mx.coeff(i+1, j) - mx.coeff(i-1, j))/2.0*(max-min);
             float ygrad = (mx.coeff(i, j+1) - mx.coeff(i, j-1))/2.0*(max-min);
             float val  = 1.0 - xgrad*xgrad + ygrad*ygrad;
-            grid.data[i + nRows*j] = val * 100; //(val > threshold)? 100 : 0;
+            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = val * 100.0; //(val > threshold)? 100 : 0;
         }
     }
 
@@ -64,21 +64,21 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
         float grad = (mx.coeff(i, nCols-1) - mx.coeff(i, nCols-2))/(max-min);
         float val  = 1.0 - grad*grad;
         // grid.data[i + nRows*(nCols-1)] = (val > threshold)? 100 : 0;
-        grid.data[i + nRows*(nCols-1)] = 100*val;
+        grid.data[i + nRows*(nCols-1)] = 100.0*val;
     }
 
     for (int j = 0; j < nCols; j++) {
         float grad = (mx.coeff(1, j) - mx.coeff(0, j))/(max-min);
         float val  = 1.0 - grad*grad;
         // grid.data[0 + nRows*j] = (val > threshold)? 100 : 0;
-        grid.data[0 + nRows*j] = 100*val;
+        grid.data[0 + nRows*j] = 100.0*val;
     }
 
     for (int j = 0; j < nCols; j++) {
         float grad = (mx.coeff(nRows-1, j) - mx.coeff(nRows-2, j))/(max-min);
         float val  = 1.0 - grad*grad;
         // grid.data[nRows-1 + nRows*j] = (val > threshold)? 100 : 0;
-        grid.data[nRows-1 + nRows*j] = 100*val;
+        grid.data[nRows-1 + nRows*j] = 100.0*val;
     }
 
     grid.header.frame_id = map.getFrameId();
