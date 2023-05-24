@@ -35,7 +35,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
             float xgrad = (((i+1 == nRows)? 0 : mx.coeff(i+1, j)) - ((i-1 == -1)? 0 : mx.coeff(i-1, j)))/(max-min);
             float ygrad = ((j+1 == nRows)? 0 : mx.coeff(i, j+1)) - ((j-1 == -1)? 0 : mx.coeff(i, j-1))/(max-min);
             float val  = xgrad*xgrad + ygrad*ygrad;
-            grid.data[i + nRows*j] = (int8) (100*val);
+            grid.data[i + nRows*j] = (100*val);
         }
     }
     
