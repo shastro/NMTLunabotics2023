@@ -22,7 +22,7 @@ double stepper_min = STEPPER_CTRL_SET_POINT_MIN * min_max_mod;
 */
 
 // State handling
-enum class Mode { Normal, Adjust, Home, Stop };
+enum class Mode { Normal, Adjust, Reverse, Stop };
 Mode m = Mode::Normal;
 
 // Publishers
@@ -129,9 +129,9 @@ int main(int argc, char *argv[]) {
             m = Mode::Adjust;
         }
 
-        // Homing
+        // Reverse motion
         if (g.buttons.B && m != Mode::Stop) {
-            m = Mode::Home;
+            m = Mode::Reverse;
         }
 
         // Normal
@@ -225,7 +225,67 @@ int main(int argc, char *argv[]) {
                 pitch_ctrl.right = 2;
             break;
 
-        case Mode::Home:
+        case Mode::Reverse:
+            // Controls
+            out << "Reverse Operation\n\n";
+            out << "Drive: Sticks\n";
+            out << "Excavate: Triggers\n";
+            out << "Pitch: Dpad Up/Down\n";
+            out << "Extend/Retract: Dpad Left/Right\n";
+            out << "Mast: Bumpers\n";
+            out << "\n";
+
+            // Pitch control with dpad
+            if (g.dpad.up) {
+                pitch_ctrl.left = pitch_ctrl.right = 1;
+                out << "Pitch up\n";
+            } else if (g.dpad.down) {
+                pitch_ctrl.left = pitch_ctrl.right = 2;
+                out << "Pitch down\n";
+            } else {
+                pitch_ctrl.left = pitch_ctrl.right = 0;
+            }
+
+            // Viagra bumpers
+            if (g.buttons.left_bumper) {
+                out << "david's shaft left\n";
+                mast_ctrl.direction = 0;
+            } else if (g.buttons.right_bumper) {
+                out << "david's shaft right\n";
+                mast_ctrl.direction = 2;
+            } else {
+                mast_ctrl.direction = 1;
+            }
+
+            // Drive with both sticks
+            loco_ctrl.left_vel = -g.right_stick.y;
+            loco_ctrl.right_vel = -g.left_stick.y;
+            if (loco_ctrl.left_vel != 0 || loco_ctrl.right_vel != 0) {
+                out << "Driving - L: " << loco_ctrl.left_vel
+                    << ", R: " << loco_ctrl.right_vel << "\n";
+            }
+
+            // Extend dpad
+            if (g.dpad.left) {
+                stepper_ctrl.left = stepper_ctrl.right = 1;
+                out << "stepper up\n";
+            } else if (g.dpad.right) {
+                stepper_ctrl.left = stepper_ctrl.right = 2;
+                out << "stepper down\n";
+            } else {
+                stepper_ctrl.left = stepper_ctrl.right = 0;
+            }
+
+            // Digger triggers
+            if (g.right_trigger > 0) {
+                excav_ctrl.vel = -g.right_trigger;
+                out << "Dig Forward: " << excav_ctrl.vel << "\n";
+            } else if (g.left_trigger > 0) {
+                excav_ctrl.vel = g.left_trigger;
+                out << "Dig Backward: " << excav_ctrl.vel << "\n";
+            } else {
+                excav_ctrl.vel = 0;
+            }
             break;
 
         case Mode::Stop:
