@@ -58,60 +58,60 @@ RUN apt-get update
 RUN apt-get install -y \
     ros-noetic-librealsense2
 
-# Elevation Mapping GPU dependencies
-RUN apt-get install -y python3-pip
-RUN apt-get install -y wget
-RUN wget https://nvidia.box.com/shared/static/p57jwntv436lfrd78inwl7iml6p13fzh.whl -O torch-1.8.0-cp36-cp36m-linux_aarch64.whl
-RUN apt-get -y update 
-RUN apt-get -y install \
-    autoconf \
-    bc \
-    build-essential \
-    g++-8 \
-    gcc-8 \
-    clang-8 \
-    lld-8 \
-    gettext-base \
-    gfortran-8 \
-    iputils-ping \
-    libbz2-dev \
-    libc++-dev \
-    libcgal-dev \
-    libffi-dev \
-    libfreetype6-dev \
-    libhdf5-dev \
-    libjpeg-dev \
-    liblzma-dev \
-    libncurses5-dev \
-    libncursesw5-dev \
-    libpng-dev \
-    libreadline-dev \
-    libssl-dev \
-    libsqlite3-dev \
-    libxml2-dev \
-    libxslt-dev \
-    locales \
-    moreutils \
-    openssl \
-    python-openssl \
-    rsync \
-    scons \
-    python3-pip \
-    libopenblas-dev
-RUN python3 -m pip install --upgrade pip
-RUN python3 -m pip install aiohttp numpy=='1.19.4' scipy=='1.5.3'
-RUN python3 -m pip install --upgrade protobuf
-RUN python3 -m pip install --no-cache https://developer.download.nvidia.cn/compute/redist/jp/v51/pytorch/torch-2.0.0a0+8aa34602.nv23.03-cp38-cp38-linux_aarch64.whl
-RUN pip3 install Cython
-RUN pip3 install cupy
-RUN apt-get install -y ros-melodic-pybind11-catkin
-RUN apt-get install -y ros-melodic-grid-map-core ros-melodic-grid-map-msgs
-RUN apt-get install gfortran
-RUN apt-get install -y libopencv-dev
-RUN apt-get install -y libgmp-dev
-RUN apt-get install -y libmpfr-dev
-RUN apt-get install -y libboost-all-dev
-
+## Elevation Mapping GPU dependencies
+#RUN apt-get install -y python3-pip
+#RUN apt-get install -y wget
+#RUN wget https://nvidia.box.com/shared/static/p57jwntv436lfrd78inwl7iml6p13fzh.whl -O torch-1.8.0-cp36-cp36m-linux_aarch64.whl
+#RUN apt-get -y update 
+#RUN apt-get -y install \
+#    autoconf \
+#    bc \
+#    build-essential \
+#    g++-8 \
+#    gcc-8 \
+#    clang-8 \
+#    lld-8 \
+#    gettext-base \
+#    gfortran-8 \
+#    iputils-ping \
+#    libbz2-dev \
+#    libc++-dev \
+#    libcgal-dev \
+#    libffi-dev \
+#    libfreetype6-dev \
+#    libhdf5-dev \
+#    libjpeg-dev \
+#    liblzma-dev \
+#    libncurses5-dev \
+#    libncursesw5-dev \
+#    libpng-dev \
+#    libreadline-dev \
+#    libssl-dev \
+#    libsqlite3-dev \
+#    libxml2-dev \
+#    libxslt-dev \
+#    locales \
+#    moreutils \
+#    openssl \
+#    python-openssl \
+#    rsync \
+#    scons \
+#    python3-pip \
+#    libopenblas-dev
+#RUN python3 -m pip install --upgrade pip
+#RUN python3 -m pip install aiohttp numpy=='1.19.4' scipy=='1.5.3'
+#RUN python3 -m pip install --upgrade protobuf
+#RUN python3 -m pip install --no-cache https://developer.download.nvidia.cn/compute/redist/jp/v51/pytorch/torch-2.0.0a0+8aa34602.nv23.03-cp38-cp38-linux_aarch64.whl
+#RUN pip3 install Cython
+#RUN pip3 install cupy
+#RUN apt-get install -y ros-melodic-pybind11-catkin
+#RUN apt-get install -y ros-melodic-grid-map-core ros-melodic-grid-map-msgs
+#RUN apt-get install gfortran
+#RUN apt-get install -y libopencv-dev
+#RUN apt-get install -y libgmp-dev
+#RUN apt-get install -y libmpfr-dev
+#RUN apt-get install -y libboost-all-dev
+#
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
 
