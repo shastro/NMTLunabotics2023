@@ -46,7 +46,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
         for (int i = 0; i < nRows; i++) {
             float norm_val = mx.coeff(i,j)/range;
             float diff = norm_val - norm_median;
-            grid.data[j + i*nCols] = 100.0*diff*diff; 
+            grid.data[i + j*nCols] = 100.0*diff*diff*diff; 
         }
     }
 
