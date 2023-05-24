@@ -1,7 +1,5 @@
 input_sources:
   l515_1:
-<<<<<<< HEAD
-=======
     type: pointcloud
     topic: /l515_1/depth/color/points
     queue_size: 5
@@ -11,18 +9,6 @@ input_sources:
       ignore_points_above: 1
       ignore_points_below: -1
 
-  l515_2:
->>>>>>> parent of 7156955... Mapping update
-    type: pointcloud
-    topic: /l515_1/depth/color/points
-    queue_size: 5
-    publish_on_update: true
-    sensor_processor:
-      type: structured_light
-      ignore_points_above: 1
-      ignore_points_below: -1
-
-<<<<<<< HEAD
   # l515_2:
   #   type: pointcloud
   #   topic: /l515_2/depth/color/points
@@ -52,27 +38,6 @@ input_sources:
   #     type: structured_light
   #     ignore_points_above: 1
   #     ignore_points_below: -0.5
-=======
-  d455_1:
-    type: pointcloud
-    topic: /d455_1/depth/color/points
-    queue_size: 5
-    publish_on_update: true
-    sensor_processor:
-      type: structured_light
-      ignore_points_above: 1
-      ignore_points_below: -0.5
-
-  d455_2:
-    type: pointcloud
-    topic: /d455_2/depth/color/points
-    queue_size: 5
-    publish_on_update: true
-    sensor_processor:
-      type: structured_light
-      ignore_points_above: 1
-      ignore_points_below: -0.5
->>>>>>> parent of 7156955... Mapping update
 
 map_frame_id: "map"
 robot_base_frame_id: "base_link"
