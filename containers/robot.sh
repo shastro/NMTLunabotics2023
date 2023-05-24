@@ -15,6 +15,11 @@ make -C $DIR/can/bus_spec
 # Always run as root.
 [ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
 
+if [ "$HOSTNAME" = "luna-jetson" ]; then
+    # Set up DNS because it keeps messing itself up.
+    systemd-resolve --set-dns 8.8.8.8 wlan0
+fi
+
 # Build the image.
 docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
 
