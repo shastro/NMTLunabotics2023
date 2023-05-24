@@ -5,60 +5,59 @@ RUN apt-get update -y
 RUN DEBIAN_FRONTEND='noninteractive' apt-get install -y libpcl-dev
 # Standard tools
 RUN apt-get install -y \
-    clang \
-    make \
-    gcc \
-    g++ \
-    inetutils-ping \
-    net-tools \
-    git \
-    tmux \
-    python3-catkin-tools \
-    libeigen3-dev
+clang \
+make \
+gcc \
+g++ \
+inetutils-ping \
+net-tools \
+git \
+tmux \
+python3-catkin-tools \
+libeigen3-dev
 
 # 2. Install ROS packages from apt.
 RUN apt-get install -y \
-    ros-noetic-roscpp \
-    ros-noetic-eigen-conversions \
-    ros-noetic-gazebo-ros \
-    ros-noetic-grid-map-core \
-    ros-noetic-grid-map-ros \
-    ros-noetic-joint-state-publisher \
-    ros-noetic-move-base \
-    ros-noetic-ompl \
-    ros-noetic-realsense2-camera \
-    ros-noetic-robot-pose-ekf \
-    ros-noetic-robot-state-publisher \
-    ros-noetic-rosmon \
-    ros-noetic-rviz \
-    ros-noetic-tf2-tools \
-    ros-noetic-usb-cam \
-    ros-noetic-compressed-image-transport \
-    ros-noetic-rosmon \
-    ros-noetic-pcl-ros \
-    ros-noetic-tf-conversions \
-    ros-noetic-grid-map-filters \
-    ros-noetic-grid-map-rviz-plugin \
-    ros-noetic-xacro \
-    ros-noetic-teb-local-planner
+ros-noetic-roscpp \
+ros-noetic-eigen-conversions \
+ros-noetic-gazebo-ros \
+ros-noetic-grid-map-core \
+ros-noetic-grid-map-ros \
+ros-noetic-joint-state-publisher \
+ros-noetic-move-base \
+ros-noetic-ompl \
+ros-noetic-realsense2-camera \
+ros-noetic-robot-pose-ekf \
+ros-noetic-robot-state-publisher \
+ros-noetic-rosmon \
+ros-noetic-rviz \
+ros-noetic-tf2-tools \
+ros-noetic-usb-cam \
+ros-noetic-compressed-image-transport \
+ros-noetic-rosmon \
+ros-noetic-pcl-ros \
+ros-noetic-tf-conversions \
+ros-noetic-grid-map-filters \
+ros-noetic-grid-map-rviz-plugin \
+ros-noetic-xacro \
+ros-noetic-teb-local-planner
 
 # Install visual and debugging tools
 RUN apt-get install -y \
-    ros-noetic-rosbag \
-    ros-noetic-plotjuggler \
-    ros-noetic-rqt-tf-tree \
-    ros-noetic-rqt-plot \
-    ros-noetic-rqt-image-view 
+ros-noetic-rosbag \
+ros-noetic-plotjuggler \
+ros-noetic-rqt-tf-tree \
+ros-noetic-rqt-plot \
+ros-noetic-rqt-image-view 
 
 RUN apt-get install -y software-properties-common
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE \
-    || apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE
+|| apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE
 RUN add-apt-repository "deb https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" -u
 RUN apt-get update
 RUN apt-get install -y \
-    ros-noetic-librealsense2
+ros-noetic-librealsense2
 
-<<<<<<< HEAD
 ## Elevation Mapping GPU dependencies
 #RUN apt-get install -y python3-pip
 #RUN apt-get install -y wget
