@@ -10,3 +10,5 @@ iptables -t nat -A POSTROUTING -o "$EXTERNAL" -j MASQUERADE
 iptables -A INPUT -i "$INTERNAL" -j ACCEPT
 iptables -A INPUT -i "$EXTERNAL" -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -j ACCEPT
+
+route del -net 0.0.0.0 gw 192.168.1.1
