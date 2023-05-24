@@ -1,0 +1,9 @@
+<launch>
+    <!-- Transform publisher -->
+    <param name="david_description"
+        textfile="$(find david_config)/urdf/david2.urdf" />
+    <node pkg="robot_state_publisher"  name="state_publisher"
+        type="robot_state_publisher" output="screen">
+        <remap from="robot_description" to="david_description" />
+    </node>
+</launch>

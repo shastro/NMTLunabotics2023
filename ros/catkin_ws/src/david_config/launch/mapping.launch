@@ -10,14 +10,6 @@
         name="static_transform_publisher"
         args="0 0 0 0 0 0 map t265_odom_frame" respawn="true" />
 
-    <!-- Transform publisher -->
-    <param name="david_description"
-        textfile="$(find david_config)/urdf/david2.urdf" />
-    <node pkg="robot_state_publisher"  name="state_publisher"
-        type="robot_state_publisher" output="screen">
-        <remap from="robot_description" to="david_description" />
-    </node>
-
     <!-- Elevation mapping node -->
     <node pkg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
         <rosparam command="load" file="$(find david_config)/config/mapping.yaml" />
