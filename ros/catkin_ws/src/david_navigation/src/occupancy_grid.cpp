@@ -41,7 +41,6 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     //     }
     // }
 
-
     // Centers
     #define threshold 0.5
     for (int j = 1; j < nCols-1; j++) {
@@ -78,8 +77,21 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
         grid.data[0 + nRows*j] = (val > threshold) 100 : 0;
     }
 
+    grid.header.frame_id = msg.getFrameId();
+    grid.header.stamp.fromNSec(msg.getTimestamp());
+    grid.info.map_load_time = grid.header.stamp;  // Same as header stamp as we do not load the map.
+    grid.info.resolution = msg.getResolution();
+    grid.info.width = msg.getSize()(0);
+    grid.info.height = msg.getSize()(1);
+    Position position = msg.getPosition() - 0.5 * msg.getLength().matrix();
+    grid.info.origin.position.x = position.x();
+    grid.info.origin.position.y = position.y();
+    grid.info.origin.position.z = 0.0;
+    grid.info.origin.orientation.x = 0.0;
+    grid.info.origin.orientation.y = 0.0;
+    grid.info.origin.orientation.z = 0.0;
+    grid.info.origin.orientation.w = 1.0;
 
-    
     pub.publish(grid);
 }
 
