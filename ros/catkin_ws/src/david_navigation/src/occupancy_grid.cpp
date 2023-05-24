@@ -30,16 +30,68 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     nav_msgs::OccupancyGrid grid;
     grid.data.resize(nRows*nCols);
 
+    // #define threshold 0.5
+    // for (int j = 0; j < nCols; j++) {
+    //     for (int i = 0; i < nRows; i++) {
+    //         float xgrad = (((i+1 == nRows)? 0 : mx.coeff(i+1, j)) - ((i-1 == -1)? 0 : mx.coeff(i-1, j)))/(max-min);
+    //         float ygrad = ((j+1 == nRows)? 0 : mx.coeff(i, j+1)) - ((j-1 == -1)? 0 : mx.coeff(i, j-1))/(max-min);
+    //         float val  = 1.0 - xgrad*xgrad + ygrad*ygrad;
+    //         grid.data[i + nRows*j] = 100*val;
+    //         // grid.data[i + nRows*j] = (val > threshold) 100 : 0;
+    //     }
+    // }
+
+    // Centers
     #define threshold 0.5
-    for (int j = 0; j < nCols; j++) {
-        for (int i = 0; i < nRows; i++) {
-            float xgrad = (((i+1 == nRows)? 0 : mx.coeff(i+1, j)) - ((i-1 == -1)? 0 : mx.coeff(i-1, j)))/(max-min);
-            float ygrad = ((j+1 == nRows)? 0 : mx.coeff(i, j+1)) - ((j-1 == -1)? 0 : mx.coeff(i, j-1))/(max-min);
+    for (int j = 1; j < nCols-1; j++) {
+        for (int i = 1; i < nRows-1; i++) {
+            float xgrad = (mx.coeff(i+1, j) - mx.coeff(i-1, j))/2.0*(max-min);
+            float ygrad = (mx.coeff(i, j+1) - mx.coeff(i, j-1))/2.0*(max-min);
             float val  = 1.0 - xgrad*xgrad + ygrad*ygrad;
             grid.data[i + nRows*j] = val * 100; //(val > threshold)? 100 : 0;
         }
     }
-    
+
+    // Boundaries
+    for (int i = 1; i < nRows-1; i++) {
+        float grad = (mx.coeff(i, 1) - mx.coeff(i, 0))/(max-min);
+        float val  = 1.0 - grad*grad;
+        grid.data[i + nRows*j] = (val > threshold) 100 : 0;
+    }
+
+    for (int i = 1; i < nRows-1; i++) {
+        float grad = (mx.coeff(i, nRows-1) - mx.coeff(i, nRows-2))/(max-min);
+        float val  = 1.0 - grad*grad;
+        grid.data[i + nRows*j] = (val > threshold) 100 : 0;
+    }
+
+    for (int j = 0; j < nCols; j++) {
+        float grad = (mx.coeff(1, j) - mx.coeff(0, j))/(max-min);
+        float val  = 1.0 - grad*grad;
+        grid.data[0 + nRows*j] = (val > threshold) 100 : 0;
+    }
+
+    for (int j = 0; j < nCols; j++) {
+        float grad = (mx.coeff(nRows-1, j) - mx.coeff(nRows-2, j))/(max-min);
+        float val  = 1.0 - grad*grad;
+        grid.data[0 + nRows*j] = (val > threshold) 100 : 0;
+    }
+
+    grid.header.frame_id = msg.getFrameId();
+    grid.header.stamp.fromNSec(msg.getTimestamp());
+    grid.info.map_load_time = grid.header.stamp;  // Same as header stamp as we do not load the map.
+    grid.info.resolution = msg.getResolution();
+    grid.info.width = msg.getSize()(0);
+    grid.info.height = msg.getSize()(1);
+    Position position = msg.getPosition() - 0.5 * msg.getLength().matrix();
+    grid.info.origin.position.x = position.x();
+    grid.info.origin.position.y = position.y();
+    grid.info.origin.position.z = 0.0;
+    grid.info.origin.orientation.x = 0.0;
+    grid.info.origin.orientation.y = 0.0;
+    grid.info.origin.orientation.z = 0.0;
+    grid.info.origin.orientation.w = 1.0;
+
     pub.publish(grid);
 }
 
