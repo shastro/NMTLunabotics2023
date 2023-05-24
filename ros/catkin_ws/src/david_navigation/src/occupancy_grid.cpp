@@ -17,9 +17,9 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     float median = 0.0;
 
     grid_map::Matrix mx = map.get(layer);
-    int nRows = mx.rows();
-    int nCols = mx.cols();
-    grid.data.resize(nRows*nCols);
+    // int nRows = mx.rows();
+    // int nCols = mx.cols();
+    // grid.data.resize(nRows*nCols);
     int sz = map.getSize().prod();
     nav_msgs::OccupancyGrid grid;
     grid.data.resize(sz);
