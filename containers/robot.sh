@@ -5,6 +5,15 @@ set -x
 
 # robot.sh: runs the main robot container.
 
+disable_rebuild=false
+while getopts 'd' OPTION; do
+    case "$OPTION" in
+        d)
+            disable_rebuild=true
+            ;;
+    esac
+done
+
 DIR=../
 IMAGE_NAME=lunabotics-2023-ros
 CONTAINER_NAME=lunabotics-2023-robot
@@ -21,7 +30,9 @@ if [ "$HOSTNAME" = "luna-jetson" ]; then
 fi
 
 # Build the image.
-docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
+if ! $disable_rebuild; then
+    docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
+fi
 
 it=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 
