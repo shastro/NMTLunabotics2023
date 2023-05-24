@@ -5,6 +5,15 @@ set -x
 
 # robot.sh: runs the main robot container.
 
+disable_rebuild=false
+while getopts 'd' OPTION; do
+    case "$OPTION" in
+        d)
+            disable_rebuild=true
+            ;;
+    esac
+done
+
 DIR=../
 IMAGE_NAME=lunabotics-2023-ros
 CONTAINER_NAME=lunabotics-2023-robot
@@ -16,7 +25,9 @@ make -C $DIR/can/bus_spec
 [ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
 
 # Build the image.
-docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
+if ! $disable_rebuild; then
+    docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
+fi
 
 it=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 
@@ -61,4 +72,4 @@ docker run "${params[@]}" $IMAGE_NAME rosrun usb_cam usb_cam_node _image_width:=
 
 sleep 5
 
-libcamera-vid -n -t 0 --inline -o udp://192.168.1.44:5000?overrun_nonfatal=1&fifo_size=50000000 --width 320 --height 180 --codec h264
+libcamera-vid -n -t 0 --inline -o 'udp://192.168.1.44:5000?overrun_nonfatal=1&fifo_size=50000000' --width 320 --height 180 --codec h264

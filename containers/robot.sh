@@ -5,6 +5,15 @@ set -x
 
 # robot.sh: runs the main robot container.
 
+disable_rebuild=false
+while getopts 'd' OPTION; do
+    case "$OPTION" in
+        d)
+            disable_rebuild=true
+            ;;
+    esac
+done
+
 DIR=../
 IMAGE_NAME=lunabotics-2023-ros
 CONTAINER_NAME=lunabotics-2023-robot
@@ -21,7 +30,9 @@ if [ "$HOSTNAME" = "luna-jetson" ]; then
 fi
 
 # Build the image.
-docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
+if ! $disable_rebuild; then
+    docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
+fi
 
 it=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 
@@ -40,6 +51,8 @@ params=(
 
     # Allow access to devices.
     --volume=/dev:/dev
+
+    --volume=/media:/media
 
     # Allow access to writing logs.
     --volume="$LOG_DIR":"$LOG_DIR"
@@ -96,7 +109,7 @@ docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
     roslaunch realsense2_camera rs_camera.launch \
     camera:=d455_1 serial_no:=213522250920 \
     filters:=pointcloud depth_fps:=30 enable_color:=false \
-    decimate_filter.enable=true \
+    decimate_filter.enable:=true \
     depth_width:=640 \
     depth_height:=480 \
     pointcloud_texture_stream:=RS2_STREAM_ANY
@@ -107,7 +120,7 @@ docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
     roslaunch realsense2_camera rs_camera.launch \
     camera:=d455_2 serial_no:=213522253528 \
     filters:=pointcloud depth_fps:=30 enable_color:=false \
-    decimate_filter.enable=true \
+    decimate_filter.enable:=true \
     depth_width:=640 \
     depth_height:=480 \
     pointcloud_texture_stream:=RS2_STREAM_ANY
@@ -117,7 +130,7 @@ sleep 5
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
     roslaunch realsense2_camera rs_camera.launch \
     camera:=l515_1 serial_no:=f1381818 \
-    decimate_filter.enable=true \
+    decimate_filter.enable:=true \
     depth_width:=640 \
     depth_height:=480 \
     filters:=pointcloud depth_fps:=30 enable_color:=false \
@@ -128,7 +141,7 @@ sleep 5
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
     roslaunch realsense2_camera rs_camera.launch \
     camera:=l515_2 serial_no:=f0461308 \
-    decimate_filter.enable=true \
+    decimate_filter.enable:=true \
     depth_width:=640 \
     depth_height:=480 \
     filters:=pointcloud depth_fps:=30 enable_color:=false \

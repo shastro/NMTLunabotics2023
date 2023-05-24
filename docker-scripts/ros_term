@@ -4,20 +4,13 @@ IFS=$'\n\t'
 
 DIR="$(realpath "$(dirname "$0")")"/..
 
-# if -r, enable remote support
-param1=()
-while getopts 'r' OPTION; do
-    case "$OPTION" in
-        r)
-            # Generates a shell inside the ROS container, with ROS_MASTER_URI set
-            # to the Jetson.
 
-            lookup_addr () {
-                # Looking up addresses is weirdly almost impossible in bash in a
-                # way that respects /etc/hosts and acts exactly as the standard
-                # system resolver would. Shell out to C to do the lookup instead.
-                C_FILE=$(mktemp --suffix=.c)
-                cat > $C_FILE <<EOF
+lookup_addr () {
+    # Looking up addresses is weirdly almost impossible in bash in a
+    # way that respects /etc/hosts and acts exactly as the standard
+    # system resolver would. Shell out to C to do the lookup instead.
+    C_FILE=$(mktemp --suffix=.c)
+    cat > $C_FILE <<EOF
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,13 +31,19 @@ int main(int argc, char **argv) {
         printf("%s%d", i == 0 ? "" : ".", ip_data[i]);
 }
 EOF
-                BUILD_FILE=$(mktemp)
-                cc -o $BUILD_FILE $C_FILE
-                $BUILD_FILE "$@"
+    BUILD_FILE=$(mktemp)
+    cc -o $BUILD_FILE $C_FILE
+    $BUILD_FILE "$@"
 
-                rm $BUILD_FILE $C_FILE
-            }
+    rm $BUILD_FILE $C_FILE
+}
 
+# if -r, enable remote support; if -d, disable rebuilding.
+param1=()
+disable_rebuild=false
+while getopts 'rd' OPTION; do
+    case "$OPTION" in
+        r)
             JETSON_ADDRESS=$(lookup_addr jetson)
             MY_ADDRESS=$(ip route get $JETSON_ADDRESS | sed 's/.* src //;s/ .*//;2,$d')
 
@@ -53,7 +52,11 @@ EOF
                 -e ROS_IP=$MY_ADDRESS
                 -e ROS_MASTER_URI=http://jetson:11311
             )
-        ;;
+            ;;
+
+        d)
+            disable_rebuild=true
+            ;;
     esac
 done
 
@@ -84,7 +87,9 @@ params=(
     "${param2[@]}"
 )
 
-sudo docker build "$DIR" -t lunabotics-2023-ros
+if ! $disable_rebuild; then
+    sudo docker build "$DIR" -t lunabotics-2023-ros
+fi
 sudo docker run \
     "${params[@]}" \
     lunabotics-2023-ros \
