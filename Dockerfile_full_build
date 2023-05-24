@@ -58,6 +58,7 @@ RUN apt-get update
 RUN apt-get install -y \
     ros-noetic-librealsense2
 
+<<<<<<< HEAD
 ## Elevation Mapping GPU dependencies
 #RUN apt-get install -y python3-pip
 #RUN apt-get install -y wget
@@ -111,7 +112,7 @@ RUN apt-get install -y \
 #RUN apt-get install -y libgmp-dev
 #RUN apt-get install -y libmpfr-dev
 #RUN apt-get install -y libboost-all-dev
-#
+
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
 
