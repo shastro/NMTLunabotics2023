@@ -6,10 +6,6 @@
     <!-- Pose publisher -->
     <node pkg="david_config" name="pose_pub" type="pose_pub" />
 
-    <node pkg="tf2_ros" type="static_transform_publisher"
-        name="static_transform_publisher"
-        args="0 0 0 0 0 0 map t265_odom_frame" respawn="true" />
-
     <!-- Elevation mapping node -->
     <node pkg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
         <rosparam command="load" file="$(find david_config)/config/mapping.yaml" />
