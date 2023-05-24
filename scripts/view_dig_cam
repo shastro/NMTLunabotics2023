@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+ffplay udp://cameras:5000 -fflags nobuffer -flags low_delay -framedrop
