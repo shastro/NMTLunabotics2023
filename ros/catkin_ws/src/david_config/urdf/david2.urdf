@@ -10,6 +10,7 @@
     <link name="l515_1_link" />
     <link name="l515_2_link" />
     <link name="left_tread" />
+    <link name="right_depth_plate_top" />
     <link name="right_tread" />
     <link name="t265_link" />
     <link name="t265_pose_frame" />
@@ -28,10 +29,17 @@
         <axis xyz="0 0 0" />
     </joint>
 
-    <joint name="d455_2_link_joint" type="fixed">
-        <origin xyz="-0.01 0.02 0.16" rpy="0 0.261799386 -1.57" />
-        <parent link="right_tread" />
+    <joint name="d455_2_joint" type="fixed">
+        <origin xyz="0 -0.08265 -0.02027" rpy="0 0 0" />
+        <parent link="right_depth_plate_top" />
         <child link="d455_2_link" />
+        <axis xyz="0 0 0" />
+    </joint>
+
+    <joint name="right_depth_plate_top_joint" type="fixed">
+        <origin xyz="0.4225 0.125 0.1651" rpy="0 0 0" />
+        <parent link="back_right" />
+        <child link="right_depth_plate_top" />
         <axis xyz="0 0 0" />
     </joint>
 
