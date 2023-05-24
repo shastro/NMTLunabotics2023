@@ -12,3 +12,4 @@ iptables -A INPUT -i "$EXTERNAL" -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -j ACCEPT
 
 route del -net 0.0.0.0 gw 192.168.1.1
+systemctl restart network-addresses-enp7s0f1.service
