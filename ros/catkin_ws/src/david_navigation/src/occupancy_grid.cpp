@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
     ros::NodeHandle nh;
 
     ros::Subscriber sub =
-        nh.subscribe("/elevation_mapping/elevation_map_raw", 2, callback);
+        nh.subscribe("/elevation_mapping/elevation_map", 2, callback);
     pub = nh.advertise<nav_msgs::OccupancyGrid>("/map", 2);
 
     ros::spin();
