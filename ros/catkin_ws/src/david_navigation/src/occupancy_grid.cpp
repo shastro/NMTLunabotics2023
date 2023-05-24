@@ -81,13 +81,13 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
         grid.data[nRows-1 + nRows*j] = 100*val;
     }
 
-    grid.header.frame_id = msg->getFrameId();
-    grid.header.stamp.fromNSec(msg->getTimestamp());
+    grid.header.frame_id = map.getFrameId();
+    grid.header.stamp.fromNSec(map.getTimestamp());
     grid.info.map_load_time = grid.header.stamp;  // Same as header stamp as we do not load the map.
-    grid.info.resolution = msg->getResolution();
-    grid.info.width = msg->getSize()(0);
-    grid.info.height = msg->getSize()(1);
-    grid_map::Position position = msg->getPosition() - 0.5 * msg->getLength().matrix();
+    grid.info.resolution = map.getResolution();
+    grid.info.width = map.getSize()(0);
+    grid.info.height = map.getSize()(1);
+    grid_map::Position position = map.getPosition() - 0.5 * map.getLength().matrix();
     grid.info.origin.position.x = position.x();
     grid.info.origin.position.y = position.y();
     grid.info.origin.position.z = 0.0;
