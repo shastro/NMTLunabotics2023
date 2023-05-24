@@ -80,7 +80,7 @@
     </joint>
 
     <joint name="d455_1_link_joint" type="fixed">
-        <origin xyz="-0.005 -0.02 0.16" rpy="0 0.261799386 1.57" />
+        <origin xyz="0.01 -0.01 0.28" rpy="0 0 1.57" />
         <parent link="left_tread" />
         <child link="d455_1_link" />
         <axis xyz="0 0 0" />
