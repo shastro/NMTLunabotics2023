@@ -17,7 +17,7 @@ make -C $DIR/can/bus_spec
 
 if [ "$HOSTNAME" = "luna-jetson" ]; then
     # Set up DNS because it keeps messing itself up.
-    systemd-resolve --set-dns 8.8.8.8 wlan0
+    systemd-resolve --set-dns 8.8.8.8 --interface wlan0
 fi
 
 # Build the image.
