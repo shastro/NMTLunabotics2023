@@ -105,42 +105,28 @@ docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
 
 sleep 5
 
-docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
-    roslaunch realsense2_camera rs_camera.launch \
-    camera:=d455_1 serial_no:=213522250920 \
-    filters:=pointcloud depth_fps:=30 enable_color:=false \
-    decimate_filter.enable:=true \
-    depth_width:=640 \
-    depth_height:=480 \
-    pointcloud_texture_stream:=RS2_STREAM_ANY
-      
-sleep 5
+#docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
+#    roslaunch realsense2_camera rs_camera.launch \
+#    camera:=d455_1 serial_no:=213522250920 \
+#    filters:=pointcloud depth_fps:=30 enable_color:=false \
+#    decimate_filter.enable:=true \
+#    depth_width:=640 \
+#    depth_height:=480 \
+#    pointcloud_texture_stream:=RS2_STREAM_ANY
+#      
+#sleep 5
+#
+#docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
+#    roslaunch realsense2_camera rs_camera.launch \
+#    camera:=d455_2 serial_no:=213522253528 \
+#    filters:=pointcloud depth_fps:=30 enable_color:=false \
+#    decimate_filter.enable:=true \
+#    depth_width:=640 \
+#    depth_height:=480 \
+#    pointcloud_texture_stream:=RS2_STREAM_ANY
+#      
+#sleep 5
 
-docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
-    roslaunch realsense2_camera rs_camera.launch \
-    camera:=d455_2 serial_no:=213522253528 \
-    filters:=pointcloud depth_fps:=30 enable_color:=false \
-    decimate_filter.enable:=true \
-    depth_width:=640 \
-    depth_height:=480 \
-    pointcloud_texture_stream:=RS2_STREAM_ANY
-      
-sleep 5
-
-<<<<<<< HEAD
-=======
-docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
-    roslaunch realsense2_camera rs_camera.launch \
-    camera:=l515_1 serial_no:=f1381818 \
-    decimate_filter.enable:=true \
-    depth_width:=640 \
-    depth_height:=480 \
-    filters:=pointcloud depth_fps:=30 enable_color:=false \
-    pointcloud_texture_stream:=RS2_STREAM_ANY
-      
-sleep 5
-
->>>>>>> parent of 38af202... Try only one camera
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
     roslaunch realsense2_camera rs_camera.launch \
     camera:=l515_1 serial_no:=f1381818 \
