@@ -10,7 +10,7 @@ ros::Publisher base_pub;
 #define RAD_PER_SEC_TO_PERCENT(rps) ((rps)*0.5)
 
 // Radius of each wheel.
-#define WHEEL_RADIUS 30
+#define WHEEL_RADIUS 3.0
 
 // Width of the robot; specifically the distance from the center of
 // the left tread to the center of the right tread.
