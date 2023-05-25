@@ -52,6 +52,7 @@ ros-noetic-rqt-image-view  \
 ros-noetic-dynamic-reconfigure \
 ros-noetic-rqt-reconfigure
 
+
 RUN apt-get install -y software-properties-common
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE \
 || apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE
@@ -122,6 +123,8 @@ COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
 # Incremental-ish builds to avoid full rebuilds. Keep these in order
 # from least to most often changed.
 # Uncomment the ones to be compiled
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+
 COPY ros/catkin_ws/src/kindr /ros/catkin_ws/src/kindr
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
@@ -145,6 +148,10 @@ RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
 COPY can /can
 
+RUN apt-get install -y \
+    ros-noetic-pointcloud-to-laserscan \
+    ros-noetic-gmapping 
+
 COPY ros/catkin_ws/src/motor_bridge /ros/catkin_ws/src/motor_bridge
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
@@ -161,6 +168,7 @@ RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 #RUN rm -rf /ros/catkin_ws/src
 #COPY ros/catkin_ws/src /ros/catkin_ws/src
 #RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
+
 
 # Add /catkin_ws to the ROS environment.
 COPY ros/ros_entrypoint.sh /ros_entrypoint.sh
