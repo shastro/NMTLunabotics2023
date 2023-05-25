@@ -13,5 +13,10 @@
     </node>
 
     <!-- Occupancy grid node -->
-    <node pkg="david_navigation" type="occupancy_grid" name="occupancy_grid" />
+    <node pkg="david_navigation" type="occupancy_grid" name="occupancy_grid">
+        <rosparam>
+            rate: 0.1
+            threshold: 0.1
+        </rosparam>
+    </node>
 </launch>
