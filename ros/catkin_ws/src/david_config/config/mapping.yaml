@@ -1,23 +1,23 @@
 input_sources:
-  l515_1:
-    type: pointcloud
-    topic: /l515_1/depth/color/points
-    queue_size: 5
-    publish_on_update: true
-    sensor_processor:
-      type: structured_light
-      ignore_points_above: 1
-      ignore_points_below: -1
-
-  # l515_2:
+  # l515_1:
   #   type: pointcloud
-  #   topic: /l515_2/depth/color/points
+  #   topic: /l515_1/depth/color/points
   #   queue_size: 5
   #   publish_on_update: true
   #   sensor_processor:
   #     type: structured_light
   #     ignore_points_above: 1
   #     ignore_points_below: -1
+
+  l515_2:
+    type: pointcloud
+    topic: /l515_2/depth/color/points
+    queue_size: 5
+    publish_on_update: true
+    sensor_processor:
+      type: structured_light
+      ignore_points_above: 1
+      ignore_points_below: -1
 
   # d455_1:
   #   type: pointcloud
