@@ -4,6 +4,7 @@
 #include <grid_map_msgs/GridMap.h>
 #include <grid_map_ros/GridMapRosConverter.hpp>
 #include <nav_msgs/OccupancyGrid.h>
+#include <cmath>
 
 ros::Publisher pub;
 ros::NodeHandle nh;
