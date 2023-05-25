@@ -26,4 +26,5 @@ inflation_radius: 0.4
 # From https://answers.ros.org/question/293696/move_base-to-use-map-published-on-a-certain-topic/
 plugins:
   - {name: inflation, type:"costmap_2d::InflationLayer"}
+  - {name: static, type:"costmap_2d::StaticLayer"}
   - {name: obstacle_layer, type:"costmap_2d::ObstactleLayer"}
