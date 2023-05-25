@@ -50,8 +50,11 @@ int main(int argc, char **argv) {
 
     base_pub =
         handle.advertise<motor_bridge::LocoCtrl>("system/loco_ctrl", 1000);
-    ros::Rate loop_rate(10);
+    ros::Rate loop_rate(30);
 
     ros::Subscriber cmd_sub =
         handle.subscribe("/cmd_vel", 1000, cmd_vel_callback);
+
+    ros::spin();
 }
+
