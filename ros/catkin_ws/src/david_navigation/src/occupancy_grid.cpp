@@ -79,8 +79,8 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
             float norm_val = (filter_val - min)/range;
             // norm_val = (isnan(norm_val))? norm_median : norm_val;
             float diff = norm_val - scuf_avg;
-            // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(diff > final_threshold);
-            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(abs(diff));
+            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(diff > final_threshold);
+            // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(abs(diff));
             prev(i,j) = filter_val;
             // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = isnan(norm_val)? 53 : 100.0*abs(norm_val);
         }
