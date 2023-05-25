@@ -65,7 +65,7 @@
     </joint>
 
     <joint name="t265_pose_joint" type="fixed">
-        <origin xyz="0 0 -0.095" rpy="0 0 3.1415926535" />
+        <origin xyz="0 0 -0.095" rpy="0 0 0" />
         <parent link="t265_pose_frame" />
         <child link="base_link" />
         <axis xyz="0 0 0" />
