@@ -76,4 +76,4 @@ sleep 5
 
 sleep 5
 
-libcamera-vid -n -t 0 --inline -o 'udp://192.168.1.45:5000?overrun_nonfatal=1&fifo_size=50000000' --width 320 --height 180 --codec h264
+# libcamera-vid -n -t 0 --inline -o 'udp://192.168.1.45:5000?overrun_nonfatal=1&fifo_size=50000000' --width 320 --height 180 --codec h264
