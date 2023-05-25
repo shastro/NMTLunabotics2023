@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+
+<launch>
+    <env name="ROSCONSOLE_CONFIG_FILE"
+         value="$(find david_config)/config/rosconsole.conf"/>
+
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+        <remap from="cloud_in" to="/l515_1/depth/color/points"/>
+        <!-- <remap from="scan" to="/camera/scan"/>  -->
+        <rosparam>
+            target_frame: l515_1_depth_optical_frame
+            transform_tolerance: 0.01
+            min_height: 0.0
+            max_height: 1.0
+
+            angle_min: -1.5708
+            angle_max: 1.5708
+            angle_increment: 0.0087
+            scan_time: 0.3333
+            range_min: 0.45
+            range_max: 4.0
+            use_inf: true
+        </rosparam>
+    </node>
+
+    <!-- Pose publisher -->
+    <node pkg="david_config" name="pose_pub" type="pose_pub" />
+
+    <!-- Elevation mapping node -->
+    <!-- <node pkg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
+         <rosparam command="load" file="$(find david_config)/config/mapping.yaml" />
+         <!-- rosparam command="load" file="$(find david_config)/config/postprocessor_pipeline.yaml" -/->
+         </node> -->
+
+    <!-- Occupancy grid node -->
+    <!-- <node pkg="david_navigation" type="occupancy_grid" name="occupancy_grid" /> -->
+
+    <node name="move_base"
+          pkg="move_base" type="move_base"
+          respawn="true" output="screen">
+
+        <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+
+        <rosparam file="$(find david_navigation)/config/move_base_config.yaml" command="load"/>
+        <rosparam file="$(find david_navigation)/config/costmap_common_params.yaml"
+                  command="load" ns="global_costmap" />
+        <rosparam file="$(find david_navigation)/config/costmap_common_params.yaml"
+                  command="load" ns="local_costmap" />
+        <rosparam file="$(find david_navigation)/config/local_costmap_params.yaml"
+                  command="load" />
+        <rosparam file="$(find david_navigation)/config/global_costmap_params.yaml"
+                  command="load" />
+        <rosparam file="$(find david_navigation)/config/base_local_planner_params.yaml"
+                  command="load" />
+    </node>
+
+    <node name='base_controller' pkg='david_navigation' type='base_controller' respawn='true'/>
+    <node name='motor_bridge' pkg='motor_bridge' type='motor_bridge' respawn='true'/>
+</launch>
