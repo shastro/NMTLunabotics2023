@@ -6,15 +6,19 @@
 #include <nav_msgs/OccupancyGrid.h>
 
 ros::Publisher pub;
+ros::NodeHandle nh;
+
 std::string layer = "elevation";
 
 void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     grid_map::GridMap map;
     grid_map::GridMapRosConverter::fromMessage(*msg, map, msg->layers);
+
+    float rate;
+    nh.param<float>("/rate", rate, 0.0f);
     
     float min = 100.0;
     float max = -100.0;
-    float median = 0.0;
 
     grid_map::Matrix mx = map.get(layer);
     int nRows = mx.rows();
@@ -22,6 +26,9 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     int sz = map.getSize().prod();
     nav_msgs::OccupancyGrid grid;
     grid.data.resize(sz);
+
+    float median = mx.coeff(35,35);
+
     
     for (int j = 0; j < nCols; j++) {
         for (int i = 0; i < nRows; i++) {
@@ -33,8 +40,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
                 max = val;
             }
 
-#define sign(x) ((x > 0) - (x < 0))
-#define rate 0.01
+#define signum(x) ((x > 1)? 1 : ((x < -1)? -1 : x));
             median += rate * sign(val - median);
         }
     }
@@ -60,8 +66,6 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     //         // grid.data[i + nRows*j] = (val > threshold) 100 : 0;
     //     }
     // }
-
-    
     
     // // Centers
     // #define threshold 0.5
@@ -123,7 +127,6 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "occupancy_grid");
-    ros::NodeHandle nh;
 
     ros::Subscriber sub =
         nh.subscribe("/elevation_mapping/elevation_map", 2, callback);
