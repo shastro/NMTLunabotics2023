@@ -6,10 +6,12 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <cmath>
 
+#define topic "elevation_mapping/elevation_map_raw"
+#define layer "elevation_smooth"
+
 ros::Publisher pub;
 ros::NodeHandle* nh;
 
-std::string layer = "elevation";
 
 void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     grid_map::GridMap map;
@@ -139,7 +141,7 @@ int main(int argc, char **argv) {
     nh = &nodehandle;
 
     ros::Subscriber sub =
-        nh->subscribe("/elevation_mapping/elevation_map", 2, callback);
+        nh->subscribe(topic, 2, callback);
     pub = nh->advertise<nav_msgs::OccupancyGrid>("/map", 2);
 
     ros::spin();
