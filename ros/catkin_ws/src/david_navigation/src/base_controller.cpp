@@ -33,7 +33,7 @@ void cmd_vel_callback(const geometry_msgs::Twist &msg) {
     double omega = msg.angular.z;
 
     // Brute force w/ <1hr till comp
-    v *= 100;
+    v *= -100;
     v = std::min(std::max(v, 99.0), -99.0);
 
     // Using formulas from https://wiki.ros.org/diff_drive_controller.
