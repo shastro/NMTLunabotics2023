@@ -34,7 +34,8 @@ if ! $disable_rebuild; then
     docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
 fi
 
-it=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
+#it=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
+it=192.168.1.43
 
 LOG_FILE="/var/log/rosbags/$(date -Iseconds)"
 LOG_DIR="$(dirname "$LOG_FILE")"
