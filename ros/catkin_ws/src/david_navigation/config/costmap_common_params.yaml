@@ -20,6 +20,11 @@ footprint: [
 #robot_radius: ir_of_robot
 inflation_radius: 0.4
 
+plugins:
+  - {name: inflation, type:"costmap_2d::InflationLayer"}
+  - {name: obstacle, type:"costmap_2d::ObstacleLayer"}
+  - {name: static_layer, type:"costmap_2d::StaticLayer"}
+
 # From https://answers.ros.org/question/293696/move_base-to-use-map-published-on-a-certain-topic/
 # plugins:
 # dwa_local_planner::DWAPlannerROS
