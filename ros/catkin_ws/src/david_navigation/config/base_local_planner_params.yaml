@@ -3,7 +3,7 @@
 # plan.
 TebLocalPlannerROS:
 
- odom_topic: t265_odom
+ odom_topic: t265_odom_frame
     
  # Trajectory
   

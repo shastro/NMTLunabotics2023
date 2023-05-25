@@ -42,8 +42,6 @@ params=(
     # Allow access to devices.
     --volume=/dev:/dev
     
-    --rm
-
     # Device rules for accessing Realsense cameras.
     --device-cgroup-rule "c 81:* rmw"
     --device-cgroup-rule "c 189:* rmw"
@@ -52,6 +50,8 @@ params=(
     # Environmental variables
     -e ROS_MASTER_URI=http://jetson:11311
     -e ROS_IP=$it
+
+    --name=$CONTAINER_NAME
 
 )
 
@@ -67,7 +67,7 @@ cleanup () {
 }
 trap cleanup INT
 
-docker run "${params[@]}" $IMAGE_NAME rosrun usb_cam usb_cam_node _image_width:=320 _image_height:=240 _framerate:=30  __name:=mast_vid
+docker run "${params[@]}" $IMAGE_NAME rosrun usb_cam usb_cam_node _image_width:=320 _image_height:=240 _framerate:=30
 
 sleep 5
 
