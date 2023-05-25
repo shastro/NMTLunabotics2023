@@ -7,6 +7,7 @@
 #include <cmath>
 
 ros::Publisher pub;
+ros::NodeHandle* nh;
 
 std::string layer = "elevation";
 
@@ -14,9 +15,8 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     grid_map::GridMap map;
     grid_map::GridMapRosConverter::fromMessage(*msg, map, msg->layers);
 
-    ros::NodeHandle nh;
     float rate;
-    nh.param<float>("/rate", rate, 0.1f);
+    nh->param<float>("/rate", rate, 0.1f);
     
     float min = 100.0;
     float max = -100.0;
@@ -40,7 +40,8 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
                 max = val;
             }
 
-#define sign(x) ((x > 1)? 1 : ((x < -1)? -1 : x));
+#define signum(x) ((x > 1)? 1 : ((x < -1)? -1 : x));
+#define sign(x) ((x > 1) - (x < -1))
             median += rate * sign(val - median);
         }
     }
@@ -128,7 +129,8 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "occupancy_grid");
-    ros::NodeHandle nh;
+    ros::NodeHandle nodehandle;
+    nh = &nodehandle;
 
     ros::Subscriber sub =
         nh.subscribe("/elevation_mapping/elevation_map", 2, callback);
