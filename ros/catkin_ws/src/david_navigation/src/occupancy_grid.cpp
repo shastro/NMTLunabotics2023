@@ -41,7 +41,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
                 max = val;
             }
 
-#define signum(x) ((x > 1)? 1 : ((x < -1)? -1 : x));
+#define sign(x) ((x > 1)? 1 : ((x < -1)? -1 : x));
             median += rate * sign(val - median);
         }
     }
