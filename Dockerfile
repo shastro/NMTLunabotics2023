@@ -44,7 +44,8 @@ RUN apt-get install -y \
 
 
 RUN apt-get install -y \
-    ros-noetic-pointcloud-to-laserscan 
+    ros-noetic-pointcloud-to-laserscan \
+    ros-noetic-gmapping 
 
 # Install visual and debugging tools
 RUN apt-get install -y \

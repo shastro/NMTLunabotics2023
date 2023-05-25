@@ -147,7 +147,8 @@ RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 COPY can /can
 
 RUN apt-get install -y \
-    ros-noetic-pointcloud-to-laserscan 
+    ros-noetic-pointcloud-to-laserscan \
+    ros-noetic-gmapping 
 
 COPY ros/catkin_ws/src/motor_bridge /ros/catkin_ws/src/motor_bridge
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
