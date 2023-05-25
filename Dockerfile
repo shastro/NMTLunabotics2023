@@ -48,10 +48,10 @@ RUN apt-get install -y \
     ros-noetic-plotjuggler \
     ros-noetic-rqt-tf-tree \
     ros-noetic-rqt-plot \
-    ros-noetic-rqt-image-view 
+    ros-noetic-rqt-image-view \
+    ros-noetic-dynamic-reconfigure \
+    ros-noetic-rqt-reconfigure
 
-RUN apt-get install -y \
-    gdb
 
 COPY ros/scripts /ros/scripts
 COPY ros/catkin_ws /ros/catkin_ws

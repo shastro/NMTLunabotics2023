@@ -1,0 +1,13 @@
+<launch>
+    <node pkg="tf2_ros" type="static_transform_publisher"
+        name="static_transform_publisher"
+        args="0 0 0 0 0 0 map t265_odom_frame" respawn="true" />
+
+    <!-- Transform publisher -->
+    <param name="david_description"
+        textfile="$(find david_config)/urdf/david2.urdf" />
+    <node pkg="robot_state_publisher"  name="state_publisher"
+        type="robot_state_publisher" output="screen">
+        <remap from="robot_description" to="david_description" />
+    </node>
+</launch>
