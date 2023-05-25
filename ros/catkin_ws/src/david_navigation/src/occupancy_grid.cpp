@@ -28,9 +28,8 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     nav_msgs::OccupancyGrid grid;
     grid.data.resize(sz);
 
-    float median = mx.coeff(35,35);
+    float median = 0;
 
-    
     for (int j = 0; j < nCols; j++) {
         for (int i = 0; i < nRows; i++) {
             float val = mx.coeff(i,j);
