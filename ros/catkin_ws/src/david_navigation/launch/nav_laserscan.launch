@@ -56,4 +56,8 @@
 
     <node name='base_controller' pkg='david_navigation' type='base_controller' respawn='true'/>
     <node name='motor_bridge' pkg='motor_bridge' type='motor_bridge' respawn='true'/>
+
+    <node pkg="gmapping" type="slam_gmapping">
+        <remap from="scan" to="base_scan" />
+    </node>
 </launch>
