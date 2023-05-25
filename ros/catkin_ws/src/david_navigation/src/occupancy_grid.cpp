@@ -34,7 +34,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
             }
 
 #define sign(x) ((x > 0) - (x < 0))
-#define rate 0.01
+#define rate 0.1
             median += rate * sign(val - median);
         }
     }
@@ -46,7 +46,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
         for (int i = 0; i < nRows; i++) {
             float norm_val = mx.coeff(i,j)/range;
             float diff = norm_val - norm_median;
-            grid.data[i + j*nCols] = 100.0*diff*diff*diff; 
+            grid.data[i + j*nRows] = 100.0*diff*diff; 
         }
     }
 
