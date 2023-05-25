@@ -55,7 +55,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
 
 #define signum(x) ((x > 1)? 1 : ((x < -1)? -1 : x));
 #define sign(x) ((x > 1) - (x < -1))
-            if (!isnan(val)) {
+            if (!isnan(val) && val > min*1.25) {
                 median += rate * sign(val - median);
             }
         }
