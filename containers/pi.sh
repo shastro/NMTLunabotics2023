@@ -29,7 +29,8 @@ if ! $disable_rebuild; then
     docker build "$DIR" -f "$DIR"/Dockerfile_full_build -t $IMAGE_NAME
 fi
 
-it=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
+# it=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
+it=10.0.0.100
 
 params=(
     # Detach from the container, and create a fake virtual terminal.
