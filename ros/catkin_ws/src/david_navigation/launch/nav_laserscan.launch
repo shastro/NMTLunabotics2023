@@ -26,15 +26,6 @@
     <!-- Pose publisher -->
     <node pkg="david_config" name="pose_pub" type="pose_pub" />
 
-    <!-- Elevation mapping node -->
-    <!-- <node pkg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
-         <rosparam command="load" file="$(find david_config)/config/mapping.yaml" />
-         <!-- rosparam command="load" file="$(find david_config)/config/postprocessor_pipeline.yaml" -/->
-         </node> -->
-
-    <!-- Occupancy grid node -->
-    <!-- <node pkg="david_navigation" type="occupancy_grid" name="occupancy_grid" /> -->
-
     <node name="move_base"
           pkg="move_base" type="move_base"
           respawn="true" output="screen">
@@ -57,7 +48,7 @@
     <node name='base_controller' pkg='david_navigation' type='base_controller' respawn='true'/>
     <node name='motor_bridge' pkg='motor_bridge' type='motor_bridge' respawn='true'/>
 
-    <node pkg="gmapping" type="slam_gmapping">
+    <node name="gmapping" pkg="gmapping" type="slam_gmapping">
         <remap from="scan" to="base_scan" />
     </node>
 </launch>
