@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+rosnode kill move_base
+rostopic pub /cmd_vel geometry_msgs/Twist '[0, 0, 0]' '[0, 0, 0]'
