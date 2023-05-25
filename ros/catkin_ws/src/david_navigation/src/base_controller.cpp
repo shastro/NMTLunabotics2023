@@ -26,6 +26,7 @@ void cmd_vel_callback(const geometry_msgs::Twist &msg) {
     // > velocities and converting them into motor commands to send to
     // > a mobile base.
 
+    ROS::Info("Got milk");
     double rad_per_second = 5.43144; // rad/s at 99% power
     double rps_per_vel = rad_per_second/ 99; // rad/s per power percentage
     
@@ -37,8 +38,8 @@ void cmd_vel_callback(const geometry_msgs::Twist &msg) {
     double omega_r = (v + omega * ROBOT_WIDTH / 2) / WHEEL_RADIUS;
 
     motor_bridge::LocoCtrl loco_msg;
-    loco_msg.left_vel = omega_l / rps_per_vel;
-    loco_msg.right_vel = omega_r / rps_per_vel;
+    loco_msg.left_vel = omega_l /(double) rps_per_vel;
+    loco_msg.right_vel = omega_r /(double) rps_per_vel;
 
     base_pub.publish(loco_msg);
 }
@@ -49,7 +50,7 @@ int main(int argc, char **argv) {
     ros::NodeHandle handle;
 
     base_pub =
-        handle.advertise<motor_bridge::LocoCtrl>("system/loco_ctrl", 1000);
+        handle.advertise<motor_bridge::LocoCtrl>("/system/loco_ctrl", 1000);
     ros::Rate loop_rate(30);
 
     ros::Subscriber cmd_sub =
