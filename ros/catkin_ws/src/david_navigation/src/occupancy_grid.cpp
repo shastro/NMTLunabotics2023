@@ -20,7 +20,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     float power;
     nh->param<float>("/rate", rate, 0.1f);
     nh->param<float>("/threshold", threshold, 0.55f);
-    nh->param<float>("/power", power, 0.5f);
+    nh->param<float>("/power", power, 0.4f);
 
     float final_threshold = powf(threshold, 1.0/power);
     
