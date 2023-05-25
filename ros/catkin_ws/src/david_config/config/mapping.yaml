@@ -41,10 +41,11 @@ input_sources:
 
 map_frame_id: "map"
 robot_base_frame_id: "base_link"
+num_callback_threads: 4
 
 #postprocessor_pipeline_name: postprocessor_pipeline
 #enable_continuous_cleanup: true
-postprocessor_num_threads: 1
+#postprocessor_num_threads: 1
 
 robot_pose_with_covariance_topic: "/pose_with_covariance"
 track_point_frame_id:                       "t265_pose_frame"
