@@ -40,7 +40,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     nav_msgs::OccupancyGrid grid;
     nav_msgs::OccupancyGrid grid_no_thresh;
     grid.data.resize(sz);
-    grid.no_thresh.resize(sz);
+    grid_no_thresh.resize(sz);
     
     //
     int nRowsPrev = prev.rows();
