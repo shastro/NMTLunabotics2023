@@ -78,7 +78,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
             // float filter_val = 0.5*mx.coeff(i, j) + 0.5*prev.coeff(i,j);
             // float filter_val = (2*prev.coeff(i,j) + mx.coeff(i+1,j+1) + mx.coeff(i+1,j-1) + mx.coeff(i-1,j-1) + mx.coeff(i-1,j+1))/6.0;
             float filter_val = 0.75*prev(i,j) + 0.25*(isnan(mx(i,j))? scuf_avg : mx(i,j));
-            filter_val = isnan(mx(i,j))? scuf_avg : mx(i,j);
+            filter_val = isnan(mx(i,j))? max : mx(i,j);
             float norm_val = (filter_val - min)/range;
             // norm_val = (isnan(norm_val))? norm_median : norm_val;
             float diff = norm_val - scuf_avg;
