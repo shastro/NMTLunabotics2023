@@ -6,7 +6,6 @@
 #include <nav_msgs/OccupancyGrid.h>
 
 ros::Publisher pub;
-ros::NodeHandle nh;
 
 std::string layer = "elevation";
 
@@ -14,6 +13,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     grid_map::GridMap map;
     grid_map::GridMapRosConverter::fromMessage(*msg, map, msg->layers);
 
+    ros::NodeHandle nh;
     float rate;
     nh.param<float>("/rate", rate, 0.0f);
     
@@ -127,6 +127,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "occupancy_grid");
+    ros::NodeHandle nh;
 
     ros::Subscriber sub =
         nh.subscribe("/elevation_mapping/elevation_map", 2, callback);
