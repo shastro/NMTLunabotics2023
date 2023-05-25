@@ -29,6 +29,8 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     
     float min = 100.0;
     float max = -100.0;
+    float scuf_avg = 0;
+    int scuf_avg_n = 0;
 
     grid_map::Matrix mx = map.get(layer);
     int nRows = mx.rows();
@@ -57,9 +59,13 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
 #define sign(x) ((x > 1) - (x < -1))
             if (!isnan(val) && val > min*1.25) {
                 median += rate * sign(val - median);
+                scuf_avg += val;
+                scuf_avg_n++;
             }
         }
     }
+
+    scuf_avg /= scuf_avg_n;
 
     float range = max-min;
     float norm_median = median / range;
@@ -68,10 +74,11 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
         for (int i = 1; i < nRows-1; i++) {
             // float filter_val = 0.5*mx.coeff(i, j) + 0.5*prev.coeff(i,j);
             // float filter_val = (2*prev.coeff(i,j) + mx.coeff(i+1,j+1) + mx.coeff(i+1,j-1) + mx.coeff(i-1,j-1) + mx.coeff(i-1,j+1))/6.0;
-            float filter_val = 0.75*prev(i,j) + 0.25*(isnan(mx(i,j))? norm_median : mx(i,j));
+            float filter_val = 0.75*prev(i,j) + 0.25*(isnan(mx(i,j))? scuf_avg : mx(i,j));
+            filter_val = isnan(mx(i,j))? scuf_avg : mx(i,j);
             float norm_val = (filter_val - min)/range;
             // norm_val = (isnan(norm_val))? norm_median : norm_val;
-            float diff = norm_val - norm_median;
+            float diff = norm_val - scuf_avg;
             // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(diff > final_threshold);
             grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(abs(diff));
             prev(i,j) = filter_val;
