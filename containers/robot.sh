@@ -159,3 +159,6 @@ docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
 
 docker exec -d $CONTAINER_NAME /ros_entrypoint.sh \
        roslaunch david_config mapping.launch rate:=0.1
+
+docker exec -dt $CONTAINER_NAME /ros_entrypoint.sh roslaunch \
+    david_navigation move_base.launch

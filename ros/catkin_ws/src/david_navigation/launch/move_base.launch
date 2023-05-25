@@ -6,8 +6,6 @@
 <launch>
   <master auto="start"/>
 
-  <include file='$(find david_config)/launch/mapping.launch' />
-
   <node name="move_base"
         pkg="move_base" type="move_base"
         respawn="true" output="screen">
@@ -33,6 +31,5 @@
   </node>
 
   <node name='base_controller' pkg='david_navigation' type='base_controller' respawn='true'/>
-  <node name='motor_bridge' pkg='motor_bridge' type='motor_bridge' respawn='true'/>
 
 </launch>
