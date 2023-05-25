@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+DIR="$(realpath "$(dirname "$0")")"/..
+
+sudo docker exec lunabotics-2023-robot rosnode kill move_base
+
+# ROS might create files owned by root here; it'll cause all kinds of
+# problems with git.
+sudo chown -R "$(id -u):$(id -g)" "$DIR"
