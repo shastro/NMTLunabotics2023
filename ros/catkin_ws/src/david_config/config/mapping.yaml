@@ -2,7 +2,7 @@ input_sources:
   l515_1:
     type: pointcloud
     topic: /l515_1/depth/color/points
-    queue_size: 5
+    queue_size: 2
     publish_on_update: true
     sensor_processor:
       type: structured_light
@@ -12,7 +12,7 @@ input_sources:
   l515_2:
     type: pointcloud
     topic: /l515_2/depth/color/points
-    queue_size: 5
+    queue_size: 2
     publish_on_update: true
     sensor_processor:
       type: structured_light
@@ -22,7 +22,7 @@ input_sources:
   d455_1:
     type: pointcloud
     topic: /d455_1/depth/color/points
-    queue_size: 5
+    queue_size: 2
     publish_on_update: true
     sensor_processor:
       type: structured_light
@@ -32,7 +32,7 @@ input_sources:
   d455_2:
     type: pointcloud
     topic: /d455_2/depth/color/points
-    queue_size: 5
+    queue_size: 2
     publish_on_update: true
     sensor_processor:
       type: structured_light
@@ -42,7 +42,7 @@ input_sources:
 map_frame_id: "map"
 robot_base_frame_id: "base_link"
 
-postprocessor_pipeline_name: postprocessor_pipeline
+#postprocessor_pipeline_name: postprocessor_pipeline
 #enable_continuous_cleanup: true
 postprocessor_num_threads: 1
 
@@ -57,5 +57,5 @@ length_in_x:                                7.5
 length_in_y:                                7.5
 position_x:                                 0.0
 position_y:                                 0.0
-resolution:                                 0.1
+resolution:                                 0.05
 
