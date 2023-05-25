@@ -7,6 +7,7 @@
 #include <cmath>
 
 ros::Publisher pub;
+ros::Publisher pub_no_thresh;
 ros::NodeHandle* nh;
 
 std::string layer = "elevation";
@@ -37,8 +38,10 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     int nCols = mx.cols();
     int sz = map.getSize().prod();
     nav_msgs::OccupancyGrid grid;
+    nav_msgs::OccupancyGrid grid_no_tresh;
     grid.data.resize(sz);
-
+    grid.no_thresh.resize(sz);
+    
     //
     int nRowsPrev = prev.rows();
     if (nRowsPrev != nRows) {
@@ -80,7 +83,8 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
             // norm_val = (isnan(norm_val))? norm_median : norm_val;
             float diff = norm_val - scuf_avg;
             // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(diff > final_threshold);
-            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(abs(diff));
+            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(abs(diff) > final_threshold);
+            grid_no_thresh.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(abs(diff));
             prev(i,j) = filter_val;
             // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = isnan(norm_val)? 53 : 100.0*abs(norm_val);
         }
@@ -152,8 +156,25 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     grid.info.origin.orientation.z = 0.0;
     grid.info.origin.orientation.w = 1.0;
 
-    pub.publish(grid);
 
+    grid_no_thresh.header.frame_id = map.getFrameId();
+    grid_no_thresh.header.stamp.fromNSec(map.getTimestamp());
+    grid_no_thresh.info.map_load_time = grid_no_thresh.header.stamp;  // Same as header stamp as we do not load the map.
+    grid_no_thresh.info.resolution = map.getResolution();
+    grid_no_thresh.info.width = map.getSize()(0);
+    grid_no_thresh.info.height = map.getSize()(1);
+    grid_map::Position position = map.getPosition() - 0.5 * map.getLength().matrix();
+    grid_no_thresh.info.origin.position.x = position.x();
+    grid_no_thresh.info.origin.position.y = position.y();
+    grid_no_thresh.info.origin.position.z = 0.0;
+    grid_no_thresh.info.origin.orientation.x = 0.0;
+    grid_no_thresh.info.origin.orientation.y = 0.0;
+    grid_no_thresh.info.origin.orientation.z = 0.0;
+    grid_no_thresh.info.origin.orientation.w = 1.0;
+
+    pub.publish(grid);
+    pub_no_thresh.publish(grid_no_thresh);
+    
     prev = mx;
 }
 
@@ -164,7 +185,9 @@ int main(int argc, char **argv) {
 
     ros::Subscriber sub =
         nh->subscribe("/elevation_mapping/elevation_map", 2, callback);
+
     pub = nh->advertise<nav_msgs::OccupancyGrid>("/map", 2);
+    pub_no_thresh = nh->advertise<nav_msgs::OccupancyGrid>("/map_no_thresh", 2);
 
     ros::spin();
 
