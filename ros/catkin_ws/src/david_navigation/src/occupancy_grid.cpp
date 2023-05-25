@@ -60,7 +60,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
 
 #define signum(x) ((x > 1)? 1 : ((x < -1)? -1 : x));
 #define sign(x) ((x > 1) - (x < -1))
-            if (!isnan(val) && val <  min*1.25) {
+            if (!isnan(val) && val >  min*1.25) {
                 median += rate * sign(val - median);
                 scuf_avg += val;
                 scuf_avg_n++;
@@ -78,13 +78,19 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
             // float filter_val = 0.5*mx.coeff(i, j) + 0.5*prev.coeff(i,j);
             // float filter_val = (2*prev.coeff(i,j) + mx.coeff(i+1,j+1) + mx.coeff(i+1,j-1) + mx.coeff(i-1,j-1) + mx.coeff(i-1,j+1))/6.0;
             float filter_val = 0.75*prev(i,j) + 0.25*(isnan(mx(i,j))? scuf_avg : mx(i,j));
-            filter_val = isnan(mx(i,j))? max : mx(i,j);
+            filter_val =  mx(i,j);
+            if (isnan(filter_val)) {
+                grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 1;
+                grid_no_thresh.data[(nRows-1-i) + nRows*(nCols-1-j)] = 1;
+                continue;
+            }
+                            
             float norm_val = (filter_val - min)/range;
             // norm_val = (isnan(norm_val))? norm_median : norm_val;
             float diff = norm_val - scuf_avg;
             // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(diff > final_threshold);
-            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*((abs(diff) > final_threshold)? 1.0 : 0.0);
-            grid_no_thresh.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(abs(diff));
+            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 1+99.0*((abs(diff) > final_threshold)? 1.0 : 0.0);
+            grid_no_thresh.data[(nRows-1-i) + nRows*(nCols-1-j)] = 1+99.0*(abs(diff));
             prev(i,j) = filter_val;
             // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = isnan(norm_val)? 53 : 100.0*abs(norm_val);
         }
