@@ -2,7 +2,6 @@
 # https://wiki.ros.org/navigation/Tutorials/RobotSetup.
 
 # Include objects that are 2.5 meters away in the local cost map.
-static_map: false
 obstacle_range: 2.5
 transform_tolerance: 30
 # Raytrace free space to 3 meters. TODO: what does this mean?
@@ -12,19 +11,17 @@ raytrace_range: 3.0
 # TODO: Can we get this from the URDF?
 
 footprint: [
-  [-0.4, -0.4],
-  [0.4, -0.4],
-  [0.4, 0.4],
-  [-0.4, 0.4]
+  [-0.3, -0.25],
+  [0.3, -0.25],
+  [0.3, 0.25],
+  [-0.3, 0.25]
 ]
 
-subscribe_to_updates: true
-
-map_topic: "/map"
+#robot_radius: ir_of_robot
 inflation_radius: 0.4
 
 # From https://answers.ros.org/question/293696/move_base-to-use-map-published-on-a-certain-topic/
-plugins:
-  - {name: inflation, type:"costmap_2d::InflationLayer"}
-  - {name: static, type:"costmap_2d::StaticLayer"}
-  - {name: obstacle_layer, type:"costmap_2d::ObstactleLayer"}
+# plugins:
+# dwa_local_planner::DWAPlannerROS
+#   - {name: inflation, type:"costmap_2d::InflationLayer"}
+#   - {name: static_layer, type:"costmap_2d::StaticLayer"}
