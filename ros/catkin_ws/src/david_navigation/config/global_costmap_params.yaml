@@ -13,4 +13,5 @@ global_costmap:
   # Use `static_map` because the map here is maintained by a map
   # server node.
   # Don't want a static map for SLAM. 
+  map_topic: "/map"
   static_map: false
