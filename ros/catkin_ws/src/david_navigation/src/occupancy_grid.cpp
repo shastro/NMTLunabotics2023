@@ -67,12 +67,13 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     for (int j = 1; j < nCols-1; j++) {
         for (int i = 1; i < nRows-1; i++) {
             // float filter_val = 0.5*mx.coeff(i, j) + 0.5*prev.coeff(i,j);
-            float filter_val = (mx.coeff(i+1,j) + mx.coeff(i-1,j) + mx.coeff(i,j-1) + mx.coeff(i,j+1))/4.0;
+            // float filter_val = (mx.coeff(i+1,j) + mx.coeff(i-1,j) + mx.coeff(i,j-1) + mx.coeff(i,j+1))/4.0;
+            float filter_val = mx.coeff(i,j);
             float norm_val = (filter_val - min)/range;
             norm_val = (isnan(norm_val))? norm_median : norm_val;
             float diff = norm_val - norm_median;
             // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(diff > final_threshold);
-            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*abs(diff);
+            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*sqrt(abs(diff));
             // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = isnan(norm_val)? 53 : 100.0*abs(norm_val);
         }
     }
