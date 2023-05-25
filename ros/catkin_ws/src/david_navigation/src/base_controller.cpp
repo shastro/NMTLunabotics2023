@@ -26,7 +26,6 @@ void cmd_vel_callback(const geometry_msgs::Twist &msg) {
     // > velocities and converting them into motor commands to send to
     // > a mobile base.
 
-    ROS::Info("Got milk");
     double rad_per_second = 5.43144; // rad/s at 99% power
     double rps_per_vel = rad_per_second/ 99; // rad/s per power percentage
     
