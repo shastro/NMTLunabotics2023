@@ -42,6 +42,11 @@ RUN apt-get install -y \
     ros-noetic-xacro \
     ros-noetic-teb-local-planner
 
+
+RUN apt-get install -y \
+    ros-noetic-pointcloud-to-laserscan \
+    ros-noetic-gmapping 
+
 # Install visual and debugging tools
 RUN apt-get install -y \
     ros-noetic-rosbag \
