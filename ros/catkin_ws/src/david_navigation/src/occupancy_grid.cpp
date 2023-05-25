@@ -23,8 +23,8 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     float threshold;
     float power;
     nh->param<float>("/rate", rate, 0.1f);
-    nh->param<float>("/threshold", threshold, 0.55f);
-    nh->param<float>("/power", power, 0.4f);
+    nh->param<float>("/threshold", threshold, 0.85f);
+    nh->param<float>("/power", power, 0.5f);
 
     float final_threshold = powf(threshold, 1.0/power);
     
@@ -83,7 +83,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
             // norm_val = (isnan(norm_val))? norm_median : norm_val;
             float diff = norm_val - scuf_avg;
             // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(diff > final_threshold);
-            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(abs(diff) > final_threshold);
+            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*((abs(diff) > final_threshold)? 1.0 : 0.0);
             grid_no_thresh.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(abs(diff));
             prev(i,j) = filter_val;
             // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = isnan(norm_val)? 53 : 100.0*abs(norm_val);
