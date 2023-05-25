@@ -38,7 +38,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     int nCols = mx.cols();
     int sz = map.getSize().prod();
     nav_msgs::OccupancyGrid grid;
-    nav_msgs::OccupancyGrid grid_no_tresh;
+    nav_msgs::OccupancyGrid grid_no_thresh;
     grid.data.resize(sz);
     grid.no_thresh.resize(sz);
     
@@ -163,7 +163,6 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     grid_no_thresh.info.resolution = map.getResolution();
     grid_no_thresh.info.width = map.getSize()(0);
     grid_no_thresh.info.height = map.getSize()(1);
-    grid_map::Position position = map.getPosition() - 0.5 * map.getLength().matrix();
     grid_no_thresh.info.origin.position.x = position.x();
     grid_no_thresh.info.origin.position.y = position.y();
     grid_no_thresh.info.origin.position.z = 0.0;
