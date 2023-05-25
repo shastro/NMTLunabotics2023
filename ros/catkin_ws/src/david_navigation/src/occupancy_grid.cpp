@@ -48,20 +48,24 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
 
 #define signum(x) ((x > 1)? 1 : ((x < -1)? -1 : x));
 #define sign(x) ((x > 1) - (x < -1))
-            median += rate * sign(val - median);
+            if (val != 0) {
+                median += rate * sign(val - median);
+            }
         }
     }
 
     float range = max-min;
     float norm_median = median / range;
 
-    for (int j = 0; j < nCols; j++) {
-        for (int i = 0; i < nRows; i++) {
-            float norm_val = (mx.coeff(i,j) - min)/range;
-            // norm_val = isnan(norm_val) ? norm_median : norm_val;
-            // float diff = norm_val - norm_median;
+    for (int j = 1; j < nCols-1; j++) {
+        for (int i = 1; i < nRows-1; i++) {
+            float filter_val = (2.0*mx.coeff(i, j) + mx.coeff(i-1, j) + mx.coeff(i+1, j) + mx.coeff(i, j-1) + mx.coeff(i, j+1) )/6.0;
+            float norm_val = (filter_val - min)/range;
+            norm_val = isnan(norm_val) ? norm_median : norm_val;
+            float diff = norm_val - norm_median;
             // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(diff > final_threshold);
-            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*abs(norm_val);
+            // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*abs(diff);
+            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = isnan(norm_val)? 53 : 100.0*abs(norm_val);
         }
     }
 
