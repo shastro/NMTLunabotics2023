@@ -123,6 +123,8 @@ COPY ros/catkin_ws/.catkin_workspace /ros/catkin_ws/.catkin_workspace
 # Incremental-ish builds to avoid full rebuilds. Keep these in order
 # from least to most often changed.
 # Uncomment the ones to be compiled
+RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+
 COPY ros/catkin_ws/src/kindr /ros/catkin_ws/src/kindr
 RUN cd /ros/catkin_ws && /ros_entrypoint.sh catkin build
 
