@@ -15,44 +15,44 @@ postprocessor_pipeline: # set by postprocessor_pipeline_name
       output_layer: elevation_smooth
       radius: 0.2
 
-#   # Compute surface normals.
-#   - name: surface_normals
-#     type: gridMapFilters/NormalVectorsFilter
-#     params:
-#       input_layer: elevation_smooth
-#       output_layers_prefix: normal_vectors_
-#       radius: 0.4
-#       normal_vector_positive_axis: z
-# 
-#   # Compute slope from surface normal.
-#   - name: slope
-#     type: gridMapFilters/MathExpressionFilter
-#     params:
-#       output_layer: slope
-#       expression: acos(normal_vectors_z)
-#   
-#   - name: traversability
-#     type: gridMapFilters/MathExpressionFilter
-#     params:
-#       input_layer: elevation_inpainted
-#       output_layer: traversability
-#       expression: 1 * (1.0 - (slope / 0.6))
-# 
-#   # Set lower threshold on traversability.
-#   # - name: traversability_lower_threshold
-#   #   type: gridMapFilters/ThresholdFilter
-#   #   params:
-#   #     condition_layer: traversability
-#   #     output_layer: traversability
-#   #     lower_threshold: 0.5
-#   #     set_to: 0.0
-# 
-#   # Set upper threshold on traversability.
-#   - name: traversability_upper_threshold
-#     type: gridMapFilters/ThresholdFilter
-#     params:
-#       condition_layer: traversability
-#       output_layer: traversability
-#       upper_threshold: 0.5
-#       set_to: 1.0 # Other uses: .nan, .inf
+  # Compute surface normals.
+  - name: surface_normals
+    type: gridMapFilters/NormalVectorsFilter
+    params:
+      input_layer: elevation_smooth
+      output_layers_prefix: normal_vectors_
+      radius: 0.4
+      normal_vector_positive_axis: z
+
+  # Compute slope from surface normal.
+  - name: slope
+    type: gridMapFilters/MathExpressionFilter
+    params:
+      output_layer: slope
+      expression: acos(normal_vectors_z)
+  
+  - name: traversability
+    type: gridMapFilters/MathExpressionFilter
+    params:
+      input_layer: elevation_inpainted
+      output_layer: traversability
+      expression: 1 * (1.0 - (slope / 0.6))
+
+  # Set lower threshold on traversability.
+  # - name: traversability_lower_threshold
+  #   type: gridMapFilters/ThresholdFilter
+  #   params:
+  #     condition_layer: traversability
+  #     output_layer: traversability
+  #     lower_threshold: 0.5
+  #     set_to: 0.0
+
+  # Set upper threshold on traversability.
+  - name: traversability_upper_threshold
+    type: gridMapFilters/ThresholdFilter
+    params:
+      condition_layer: traversability
+      output_layer: traversability
+      upper_threshold: 0.5
+      set_to: 1.0 # Other uses: .nan, .inf
     

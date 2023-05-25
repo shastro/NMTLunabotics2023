@@ -6,12 +6,10 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <cmath>
 
-#define topic "elevation_mapping/elevation_map_raw"
-#define layer "elevation_smooth"
-
 ros::Publisher pub;
 ros::NodeHandle* nh;
 
+std::string layer = "elevation";
 
 void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     grid_map::GridMap map;
@@ -22,7 +20,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     float power;
     nh->param<float>("/rate", rate, 0.1f);
     nh->param<float>("/threshold", threshold, 0.55f);
-    nh->param<float>("/power", power, 0.5f);
+    nh->param<float>("/power", power, 0.4f);
 
     float final_threshold = powf(threshold, 1.0/power);
     
@@ -50,19 +48,24 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
 
 #define signum(x) ((x > 1)? 1 : ((x < -1)? -1 : x));
 #define sign(x) ((x > 1) - (x < -1))
-            median += rate * sign(val - median);
+            if (val != 0) {
+                median += rate * sign(val - median);
+            }
         }
     }
 
     float range = max-min;
     float norm_median = median / range;
 
-    for (int j = 0; j < nCols; j++) {
-        for (int i = 0; i < nRows; i++) {
+    for (int j = 1; j < nCols-1; j++) {
+        for (int i = 1; i < nRows-1; i++) {
+            // float filter_val = (2.0*mx.coeff(i, j) + mx.coeff(i-1, j) + mx.coeff(i+1, j) + mx.coeff(i, j-1) + mx.coeff(i, j+1) )/6.0;
             float norm_val = (mx.coeff(i,j) - min)/range;
-            norm_val = isnan(norm_val) ? norm_median : norm_val;
+            norm_val = (mx.coeff(i,j) == 0.0)? norm_median : norm_val;
             float diff = norm_val - norm_median;
-            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(diff > final_threshold);
+            // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(diff > final_threshold);
+            // grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*abs(diff);
+            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = isnan(norm_val)? 53 : 100.0*abs(norm_val);
         }
     }
 
@@ -141,7 +144,7 @@ int main(int argc, char **argv) {
     nh = &nodehandle;
 
     ros::Subscriber sub =
-        nh->subscribe(topic, 2, callback);
+        nh->subscribe("/elevation_mapping/elevation_map", 2, callback);
     pub = nh->advertise<nav_msgs::OccupancyGrid>("/map", 2);
 
     ros::spin();

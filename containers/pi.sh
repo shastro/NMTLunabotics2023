@@ -35,14 +35,13 @@ params=(
     # Detach from the container, and create a fake virtual terminal.
     -dt
 
-    --rm
     # Use host's network interfaces to listen to ROS, and operate the
     # CAN bus.
     --network=host
 
     # Allow access to devices.
     --volume=/dev:/dev
-
+    
     # Device rules for accessing Realsense cameras.
     --device-cgroup-rule "c 81:* rmw"
     --device-cgroup-rule "c 189:* rmw"
@@ -51,6 +50,8 @@ params=(
     # Environmental variables
     -e ROS_MASTER_URI=http://jetson:11311
     -e ROS_IP=$it
+
+    --name=$CONTAINER_NAME
 
 )
 
@@ -66,12 +67,12 @@ cleanup () {
 }
 trap cleanup INT
 
-# Set up the ROS core.
-docker run "${params[@]}" $IMAGE_NAME rosrun usb_cam_excav usb_cam_node image_width:=320 image_height:=240 framerate:=30 
+docker run "${params[@]}" $IMAGE_NAME rosrun usb_cam usb_cam_node _image_width:=320 _image_height:=240 _framerate:=30
 
 sleep 5
 
-docker run "${params[@]}" $IMAGE_NAME rosrun usb_cam_fwd usb_cam_node image_width:=320 image_height:=240 framerate:=30 
+# docker run "${params[@]}" $IMAGE_NAME rosrun usb_cam usb_cam_node _image_width:=320 _image_height:=240 _framerate:=30 __video_device:=/dev/video0 _name:=excav_vid
+
 
 sleep 5
 
