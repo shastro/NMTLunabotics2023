@@ -32,6 +32,10 @@ void cmd_vel_callback(const geometry_msgs::Twist &msg) {
     double v = msg.linear.x;
     double omega = msg.angular.z;
 
+    // Brute force w/ <1hr till comp
+    v *= 100;
+    v = std::min(std::max(v, 99.0), -99.0);
+
     // Using formulas from https://wiki.ros.org/diff_drive_controller.
     double omega_l = (v - omega * ROBOT_WIDTH / 2) / WHEEL_RADIUS;
     double omega_r = (v + omega * ROBOT_WIDTH / 2) / WHEEL_RADIUS;
