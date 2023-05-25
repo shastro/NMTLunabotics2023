@@ -11,6 +11,9 @@ ros::NodeHandle* nh;
 
 std::string layer = "elevation";
 
+grid_map::Matrix prev;
+float median = 0;
+
 void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     grid_map::GridMap map;
     grid_map::GridMapRosConverter::fromMessage(*msg, map, msg->layers);
@@ -34,7 +37,11 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     nav_msgs::OccupancyGrid grid;
     grid.data.resize(sz);
 
-    float median = 0;
+    //
+    int nRowsPrev = prev.rows();
+    if (nRowsPrev != nRows) {
+        prev = mx;
+    }
 
     for (int j = 0; j < nCols; j++) {
         for (int i = 0; i < nRows; i++) {
@@ -59,7 +66,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
 
     for (int j = 1; j < nCols-1; j++) {
         for (int i = 1; i < nRows-1; i++) {
-            float filter_val = (2.0*mx.coeff(i, j) + mx.coeff(i-1, j) + mx.coeff(i+1, j) + mx.coeff(i, j-1) + mx.coeff(i, j+1) )/6.0;
+            float filter_val = 0.5*mx.coeff(i, j) + 0.5*prev.coeff(i,j);
             float norm_val = (filter_val - min)/range;
             norm_val = (isnan(norm_val))? norm_median : norm_val;
             float diff = norm_val - norm_median;
@@ -136,6 +143,8 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     grid.info.origin.orientation.w = 1.0;
 
     pub.publish(grid);
+
+    prev = mx;
 }
 
 int main(int argc, char **argv) {
