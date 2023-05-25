@@ -16,7 +16,13 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     grid_map::GridMapRosConverter::fromMessage(*msg, map, msg->layers);
 
     float rate;
+    float threshold;
+    float power;
     nh->param<float>("/rate", rate, 0.1f);
+    nh->param<float>("/threshold", threshold, 0.4f);
+    nh->param<float>("/power", power, 0.5f);
+
+    float final_threshold = powf(threshold, 1.0/power);
     
     float min = 100.0;
     float max = -100.0;
@@ -54,7 +60,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
             float norm_val = (mx.coeff(i,j) - min)/range;
             norm_val = isnan(norm_val) ? norm_median : norm_val;
             float diff = norm_val - norm_median;
-            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*sqrt(abs(diff)); 
+            grid.data[(nRows-1-i) + nRows*(nCols-1-j)] = 100.0*(diff > final_threshold);
         }
     }
 
