@@ -67,7 +67,7 @@ void callback(const grid_map_msgs::GridMap::ConstPtr& msg) {
     for (int j = 1; j < nCols-1; j++) {
         for (int i = 1; i < nRows-1; i++) {
             // float filter_val = 0.5*mx.coeff(i, j) + 0.5*prev.coeff(i,j);
-            float filter_val = (mx.coeff(i+1,j+1) + mx.coeff(i+1,j-1) + mx.coeff(i-1,j-1) + mx.coeff(i-1,j+1))/4.0;
+            float filter_val = (2*prev.coeff(i,j) + mx.coeff(i+1,j+1) + mx.coeff(i+1,j-1) + mx.coeff(i-1,j-1) + mx.coeff(i-1,j+1))/6.0;
             // float filter_val = mx.coeff(i,j);
             float norm_val = (filter_val - min)/range;
             norm_val = (isnan(norm_val))? norm_median : norm_val;
